@@ -4,6 +4,9 @@
 
 El presente proyecto tiene como finalidad el desarrollo de una aplicación web para la **gestión de un equipo de fútbol**, abarcando todos los elementos clave de su día a día: la administración de jugadores, equipos contrarios, temporadas, resultados y estadísticas relevantes como tarjetas. El proyecto busca combinar el desarrollo técnico con una proyección práctica y económica, haciendo uso de herramientas actuales y orientadas al despliegue y la escalabilidad.
 
+## Documentos del proyecto
+- [Trabajo del proyecto](https://docs.google.com/document/d/1e52IDNOS9UoQX5oOJPwAVAHNHViP8_pzB9Sro8Vgf3s/edit?tab=t.0#heading=h.cqcld96sqn3p)
+
 ## Descripción general de la aplicación
 
 La aplicación está pensada para ser utilizada por **clubes deportivos, entrenadores o gestores de equipos**, permitiéndoles registrar y gestionar toda la información relativa a su equipo de forma centralizada y accesible desde cualquier dispositivo.

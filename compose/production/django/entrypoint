@@ -1,0 +1,71 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+
+# Check if FUTGOAL_POSTGRES_USER is set using safe expansion
+if [ -z "${FUTGOAL_POSTGRES_USER:-}" ]; then
+    # If not set, use the default
+    postgres_user_to_use='postgres'
+else
+    # If set, use its value
+    postgres_user_to_use="${FUTGOAL_POSTGRES_USER}"
+fi
+# Export the determined user as POSTGRES_USER
+export POSTGRES_USER="${postgres_user_to_use}"
+
+# Set up all postgres parameters with safe defaults
+export POSTGRES_PASSWORD="${FUTGOAL_POSTGRES_PASSWORD:-postgres}"
+export POSTGRES_HOST="${FUTGOAL_POSTGRES_HOST:-db}"
+export POSTGRES_PORT="${FUTGOAL_POSTGRES_PORT:-5432}"
+export POSTGRES_DB="${FUTGOAL_POSTGRES_DB:-postgres}"
+
+# Set up Django environment variables with safe defaults
+export FUTGOAL_DJANGO_DEV="${FUTGOAL_DJANGO_DEV:-False}"
+export FUTGOAL_DJANGO_DEVJS="${FUTGOAL_DJANGO_DEVJS:-False}"
+export FUTGOAL_DJANGO_DEBUG="${FUTGOAL_DJANGO_DEBUG:-False}"
+export FUTGOAL_DJANGO_SECRET_KEY="${FUTGOAL_DJANGO_SECRET_KEY:-PB3aGvTmCkzaLGRAxDc3aMayKTPTDd5usXXXX4pCmKOk5AlJjh12pTrnNgQyOHCH}"
+export FUTGOAL_SITE_URL="${FUTGOAL_SITE_URL:-http://localhost:8000}"
+export FUTGOAL_DJANGO_EMAIL_BACKEND="${FUTGOAL_DJANGO_EMAIL_BACKEND:-django.core.mail.backends.console.EmailBackend}"
+export FUTGOAL_EMAIL_FROM="${FUTGOAL_EMAIL_FROM:-noreply@example.com}"
+export FUTGOAL_EMAIL_HOST="${FUTGOAL_EMAIL_HOST:-localhost}"
+export FUTGOAL_EMAIL_PORT="${FUTGOAL_EMAIL_PORT:-25}"
+export FUTGOAL_EMAIL_USE_TLS="${FUTGOAL_EMAIL_USE_TLS:-False}"
+export FUTGOAL_EMAIL_HOST_USER="${FUTGOAL_EMAIL_HOST_USER:-}"
+export FUTGOAL_EMAIL_HOST_PASSWORD="${FUTGOAL_EMAIL_HOST_PASSWORD:-}"
+export FUTGOAL_EMAIL_BCC="${FUTGOAL_EMAIL_BCC:-}"
+export FUTGOAL_DEBUG_TOOLBAR="${FUTGOAL_DEBUG_TOOLBAR:-False}"
+
+# Now construct DATABASE_URL using the guaranteed-to-be-set variables
+export DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}"
+
+postgres_ready() {
+python << END
+import sys
+
+import psycopg2
+
+try:
+    psycopg2.connect(
+        dbname="${POSTGRES_DB}",
+        user="${POSTGRES_USER}",
+        password="${POSTGRES_PASSWORD}",
+        host="${POSTGRES_HOST}",
+        port="${POSTGRES_PORT}",
+    )
+except psycopg2.OperationalError:
+    sys.exit(-1)
+sys.exit(0)
+
+END
+}
+until postgres_ready; do
+  >&2 echo 'Esperando for PostgreSQL to become available...'
+  >&2 echo "POSTGRES_HOST: ${POSTGRES_HOST}"
+  sleep 1
+done
+# >&2 echo 'PostgreSQL is available'
+
+exec "$@"

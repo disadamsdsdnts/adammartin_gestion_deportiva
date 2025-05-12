@@ -1,0 +1,40 @@
+FROM python:3.12-slim
+
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+RUN apt-get update \
+  # dependencies for building Python packages
+  && apt-get install -y build-essential \
+  # psycopg2 dependencies
+  && apt-get install -y libpq-dev tree \
+  # Translations dependencies
+  && apt-get install -y gettext \
+  && apt-get install -y telnet \
+  && apt-get install -y iputils-ping \
+  && apt-get install -y locales tzdata \
+  # cleaning up unused files
+  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+  && rm -rf /var/lib/apt/lists/*
+
+# Configurar el locale para español (España)
+RUN sed -i '/es_ES.UTF-8/s/^# //g' /etc/locale.gen && \
+  locale-gen es_ES.UTF-8 && \
+  update-locale LANG=es_ES.UTF-8
+
+# Configurar la zona horaria a Europa/Madrid
+RUN ln -sf /usr/share/zoneinfo/Europe/Madrid /etc/localtime && \
+  echo "Europe/Madrid" > /etc/timezone && \
+  dpkg-reconfigure -f noninteractive tzdata
+
+# Establecer las variables de entorno para locales
+ENV LANG=es_ES.UTF-8
+ENV LANGUAGE=es_ES:es
+ENV LC_ALL=es_ES.UTF-8
+
+RUN addgroup django \
+  && useradd -g django django
+
+# Requirements are installed here to ensure they will be cached.
+COPY requirements /requirements
+RUN pip install --no-cache-dir -r /requirements/dev.txt

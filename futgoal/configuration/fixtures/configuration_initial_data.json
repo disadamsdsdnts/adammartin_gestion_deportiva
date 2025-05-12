@@ -1,0 +1,11 @@
+[
+{
+  "model": "configuration.configuration",
+  "pk": 1,
+  "fields": {
+    "app_name": "EV Review",
+    "main_email": "no-reply@evreview.app",
+    "enable_emails": true
+  }
+}
+]

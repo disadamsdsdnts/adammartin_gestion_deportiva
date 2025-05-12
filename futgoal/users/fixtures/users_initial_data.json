@@ -1,0 +1,24 @@
+[
+{
+  "model": "users.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$390000$bg8BZsZfp6ONbDJHX6b4nN$APzA0eQ5oY3SHbyEPev10jtwuWeZjpRihk75dnXludI=",
+    "last_login": "2024-07-20T07:49:17.933Z",
+    "is_superuser": true,
+    "username": "b@b.com",
+    "first_name": "Bienvenido",
+    "last_name": "Sáez Muelas",
+    "email": "b@b.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2024-07-20T07:48:45.421Z",
+    "remember_key": "529688c8ac9ad320d816b4a4850c4c1f",
+    "position": null,
+    "notification_language": "es",
+    "is_eveon_user": false,
+    "groups": [],
+    "user_permissions": []
+  }
+}
+]

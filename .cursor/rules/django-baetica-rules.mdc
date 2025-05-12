@@ -1,9 +1,14 @@
+---
+description: Django Developer Structure
+globs:
+alwaysApply: false
+---
 # Reglas y Buenas Prácticas del Proyecto
 
 Este documento describe las reglas y buenas prácticas que se siguen en este proyecto Django.
 
 ## 1. Estructura del Proyecto
-- Organización modular por aplicaciones (baedev/, users/, configuration/, etc.)
+- Organización modular por aplicaciones (futgoal/, users/, configuration/, etc.)
 - Separación clara de responsabilidades por carpetas (models/, forms/, views/)
 - Uso de archivos `__init__.py` para gestionar imports
 

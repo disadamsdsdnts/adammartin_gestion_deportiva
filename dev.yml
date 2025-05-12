@@ -1,0 +1,56 @@
+# Definición de servicios Docker
+services:
+  # Servicio principal de Django
+  django: &django  # El &django es un anchor que permite referenciar esta configuración en otros lugares
+    # Configuración de construcción de la imagen
+    build:
+      context: .  # Usa el directorio actual como contexto
+      dockerfile: ./compose/dev/django/Dockerfile  # Ubicación del Dockerfile para Django
+    image: futgoal_django  # Nombre de la imagen resultante
+
+    # Configuración de volúmenes para persistencia y desarrollo
+    volumes:
+      - .:/app  # Monta el código fuente en /app dentro del contenedor
+      - static_volume:/app/staticfiles  # Volumen para archivos estáticos
+      - media_volume:/app/media  # Volumen para archivos multimedia
+
+    # Archivos de variables de entorno
+    env_file:
+      - ./.envs/.dev/.django  # Variables específicas de Django
+      - ./.envs/.dev/.email   # Variables de configuración de email
+      - ./.envs/.dev/.ubuntu  # Variables específicas del sistema
+
+    # Variables de entorno para la base de datos
+    environment:
+      - DEBUG=True  # Modo debug activado para desarrollo
+      - DB_NAME=futgoal  # Nombre de la base de datos
+      - DB_USER=postgres  # Usuario de la base de datos
+      - DB_PASSWORD=postgres  # Contraseña de la base de datos
+      - DB_HOST=db  # Nombre del servicio de base de datos
+      - DB_PORT=5432  # Puerto de PostgreSQL
+
+    # Mapeo de puertos host:contenedor
+    ports:
+      - "8000:8000"  # Expone el puerto 8000 para acceder a Django
+
+    command: /start  # Comando para iniciar Django
+    depends_on:
+      - db  # Asegura que la base de datos esté disponible antes de iniciar Django
+
+  # Servicio de base de datos PostgreSQL con extensión PostGIS
+  db:
+    image: postgis/postgis:15-3.3  # Imagen oficial de PostgreSQL con PostGIS
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Persistencia de datos
+    environment:
+      - POSTGRES_DB=futgoal  # Nombre de la base de datos a crear
+      - POSTGRES_USER=postgres  # Usuario administrador
+      - POSTGRES_PASSWORD=postgres  # Contraseña del usuario
+    ports:
+      - "5432:5432"  # Expone el puerto de PostgreSQL
+
+# Definición de volúmenes persistentes
+volumes:
+  static_volume:  # Volumen para archivos estáticos de Django
+  media_volume:   # Volumen para archivos multimedia subidos
+  postgres_data:  # Volumen para datos de PostgreSQL
