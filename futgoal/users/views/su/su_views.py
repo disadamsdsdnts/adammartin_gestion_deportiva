@@ -47,7 +47,7 @@ class SuDashboardView(TemplateView):
         context = super().get_context_data(**kwargs)
 
         breadcrums = [
-            {'title': _('Dashboard'), 'url': reverse('users:dashboard')},
+            {'title': _('Dashboard'), 'url': reverse('dashboard')},
         ]
         context['page_title'] = f'Dashboard de Soporte'
         context['breadcrums'] = breadcrums
@@ -86,7 +86,7 @@ class SuListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrums = [
-            {'title': _('Dashboard'), 'url': reverse('users:dashboard')},
+            {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Onboarding'), 'url': reverse(
                 'support:su_list')},
         ]
@@ -150,7 +150,7 @@ class SuUpdateView(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrums = [
-            {'title': _('Dashboard'), 'url': reverse('users:dashboard')},
+            {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Editar venta'), 'url': ''}
         ]
         context['page_title'] = _('Editar venta')
@@ -178,7 +178,7 @@ class SuDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrums = [
-            {'title': _('Dashboard'), 'url': reverse('users:dashboard')},
+            {'title': _('Dashboard'), 'url': reverse('dashboard')},
         ]
         context['page_title'] = _('Venta')
         context['breadcrums'] = breadcrums

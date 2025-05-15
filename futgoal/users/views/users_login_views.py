@@ -45,7 +45,7 @@ decorators = [
 
 @method_decorator(login_required, name='dispatch')
 class DashboardView(TemplateView):
-    template_name = 'users/Dashboard.html'
+    template_name = 'users/dashboard/Dashboard.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -77,7 +77,7 @@ class LoginView(FormView):
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return HttpResponseRedirect(reverse('users:dashboard'))
+            return HttpResponseRedirect(reverse('dashboard'))
         else:
             return super().dispatch(
                 request, *args, **kwargs
@@ -114,7 +114,7 @@ class LoginWithUUID(RedirectView):
             login(request, user)
             # redirijo a la página de dashboard
             request.session['sales_boss'] = True
-            return HttpResponseRedirect(reverse('users:dashboard'))
+            return HttpResponseRedirect(reverse('dashboard'))
         else:
             return super().dispatch(
                 request, *args, **kwargs

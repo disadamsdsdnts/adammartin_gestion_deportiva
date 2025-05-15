@@ -43,7 +43,7 @@ class GaUserListView(TemplateView):
         context = super().get_context_data(**kwargs)
 
         breadcrums = [
-            {'title': _('Dashboard'), 'url': reverse('users:dashboard')},
+            {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Usuarios'), 'url': reverse(
                 'users:ga_user_list')},
         ]
@@ -94,7 +94,7 @@ class GaUserDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrums = [
-            {'title': _('Dashboard'), 'url': reverse('users:dashboard')},
+            {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Usuarios'), 'url': reverse(
                 'users:ga_user_list')},
             {'title': self.object.full_name}
@@ -123,7 +123,7 @@ class GaUserCreateView(CreateView):
         context = super().get_context_data(**kwargs)
 
         breadcrums = [
-            {'title': _('Dashboard'), 'url': reverse('users:dashboard')},
+            {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Usuarios'), 'url': reverse(
                 'users:ga_user_list')},
             {'title': _('Nuevo usuario'), 'url': reverse(
@@ -155,7 +155,7 @@ class GaUserUpdateView(UpdateView):
         context = super().get_context_data(**kwargs)
 
         breadcrums = [
-            {'title': _('Dashboard'), 'url': reverse('users:dashboard')},
+            {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Usuarios'), 'url': reverse(
                 'users:ga_user_list')},
             {'title': _('Editar usuario')},
@@ -187,7 +187,7 @@ class GaUserDeleteView(DeleteView):
         context = super().get_context_data(**kwargs)
 
         breadcrums = [
-            {'title': _('Dashboard'), 'url': reverse('users:dashboard')},
+            {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Usuarios'), 'url': reverse(
                 'users:ga_user_list')},
             {'title': _('Eliminar')},
