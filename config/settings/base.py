@@ -48,7 +48,6 @@ THIRD_PARTY_APPS = [
     "crispy_forms",
     "crispy_bootstrap4",
     'django_extensions',
-    # django-allauth
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -76,15 +75,12 @@ MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',
 ]
 
-# django-allauth
-UTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
-]
+
 
 # django-allauth settings
-SITE_ID = 1
+SITE_ID = 2
 LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = reverse_lazy('auth:login')
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USERNAME_REQUIRED = False
@@ -118,6 +114,7 @@ SOCIALACCOUNT_QUERY_EMAIL = True
 SOCIALACCOUNT_ADAPTER = 'futgoal.users.adapters.CustomSocialAccountAdapter'
 
 # Authentication settings
+# django-allauth
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
@@ -211,18 +208,11 @@ ADMINS = [
 ]
 MANAGERS = ADMINS
 
-LOGIN_REDIRECT_URL = "/"
-
-AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend",
-]
 
 # URL config
 SITE_URL = env.str("FUTGOAL_SITE_URL")
 
-FILE_UPLOAD_PERMISSIONS = 0o640  # De audax
-LOGIN_REDIRECT_URL = "/"
-LOGIN_URL = reverse_lazy('auth:login')
+
 
 
 # Email
@@ -257,8 +247,6 @@ ALLOWED_HOSTS = [
 ]
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-SITE_ID = 1
 
 
 import locale

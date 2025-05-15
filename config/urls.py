@@ -51,6 +51,6 @@ if 'debug_toolbar' in settings.INSTALLED_APPS and settings.DEBUG:
         path('__debug__/', include(debug_toolbar.urls)),
     ]
 
-admin.site.index_title = "Baedev"
-admin.site.site_header = "Baedev"
-admin.site.site_title = "Baedev"
+admin.site.index_title = "FutGOAL"
+admin.site.site_header = "FutGOAL"
+admin.site.site_title = "FutGOAL"
