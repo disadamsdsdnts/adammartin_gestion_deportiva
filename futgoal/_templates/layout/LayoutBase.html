@@ -88,24 +88,33 @@
   {% include "layout/_sidebar.html" %}
 
   <!-- Main content -->
-  <main class="p-4 {% if user.is_authenticated %}md:ml-64{% endif %} h-auto pt-20 flex-grow">
-    {% if messages %}
-    <div class="messages mb-4">
-      {% for message in messages %}
-      <div
-        class="p-4 mb-4 text-sm rounded-lg {% if message.tags == 'error' %}text-red-800 bg-red-50 dark:bg-gray-800 dark:text-red-400{% elif message.tags == 'success' %}text-green-800 bg-green-50 dark:bg-gray-800 dark:text-green-400{% else %}text-blue-800 bg-blue-50 dark:bg-gray-800 dark:text-blue-400{% endif %}"
-        role="alert">
-        {{ message }}
+  <div class="{% if user.is_authenticated %}md:ml-64{% endif %} flex-grow flex flex-col min-h-full">
+    <main class="p-4 h-auto pt-20 flex-grow">
+      {% if messages %}
+      <div class="messages mb-4">
+        {% for message in messages %}
+        <div
+          class="p-4 mb-4 text-sm rounded-lg {% if message.tags == 'error' %}text-red-800 bg-red-50 dark:bg-gray-800 dark:text-red-400{% elif message.tags == 'success' %}text-green-800 bg-green-50 dark:bg-gray-800 dark:text-green-400{% else %}text-blue-800 bg-blue-50 dark:bg-gray-800 dark:text-blue-400{% endif %}"
+          role="alert">
+          {{ message }}
+        </div>
+        {% endfor %}
       </div>
-      {% endfor %}
-    </div>
+      {% endif %}
+
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    {% if user.is_authenticated %}
+    {% include "layout/_footer.html" %}
     {% endif %}
+  </div>
 
-    {% block content %}{% endblock %}
-  </main>
-
-  <!-- Footer -->
+  <!-- Footer para usuarios no autenticados -->
+  {% if not user.is_authenticated %}
   {% include "layout/_footer.html" %}
+  {% endif %}
 
   <!-- Custom JS -->
   <!-- <script src="{% static 'js/main.js' %}"></script> -->
