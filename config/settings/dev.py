@@ -31,6 +31,10 @@ CSRF_TRUSTED_ORIGINS = [
 # Templates
 TEMPLATES[0]['OPTIONS']['debug'] = DEBUG  # NOQA
 
+# Django Browser Reload
+INSTALLED_APPS += ['django_browser_reload']
+MIDDLEWARE.insert(0, "django_browser_reload.middleware.BrowserReloadMiddleware")
+
 # AUTHENTICATION_BACKENDS = [
 #     "django.contrib.auth.backends.ModelBackend",
 # ]

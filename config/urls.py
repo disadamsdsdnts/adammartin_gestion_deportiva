@@ -45,6 +45,12 @@ urlpatterns = [
  ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
+# Django Browser Reload
+if "django_browser_reload" in settings.INSTALLED_APPS:
+    urlpatterns += [
+        path("__reload__/", include("django_browser_reload.urls")),
+    ]
+
 if 'debug_toolbar' in settings.INSTALLED_APPS and settings.DEBUG:
     import debug_toolbar
     urlpatterns += [
