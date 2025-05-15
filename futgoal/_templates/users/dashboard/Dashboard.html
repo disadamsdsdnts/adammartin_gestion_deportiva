@@ -2,12 +2,12 @@
 {% load i18n %}
 
 {% block content %}
-  {% include 'layout/_page_header.html' with page_title='Panel de Control' breadcrumbs=breadcrumbs show_actions=False %}
+{% include 'layout/PageHeader.html' with title='Panel de Control' breadcrumb_items=breadcrumb_items show_actions=False %}
 
-  <div class="mb-8">
-    <p class="mb-6 text-lg font-normal text-gray-500 lg:text-xl">
-      {% trans 'Bienvenido al panel de administración. Aquí podrás gestionar todos los aspectos de tu sistema deportivo.' %}
-    </p>
-    <hr class="h-px my-8 bg-gray-200 border-0" />
-  </div>
+<div class="mb-8">
+  <p class="mb-6 text-lg font-normal text-gray-500 lg:text-xl">
+    {% trans 'Bienvenido al panel de administración. Aquí podrás gestionar todos los aspectos de tu sistema deportivo.' %}
+  </p>
+  <hr class="h-px my-8 bg-gray-200 border-0" />
+</div>
 {% endblock %}
