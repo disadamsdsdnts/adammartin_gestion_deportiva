@@ -8,3 +8,4 @@ crispy-bootstrap4
 requests
 
 django-allauth==0.61.1
+django-compressor

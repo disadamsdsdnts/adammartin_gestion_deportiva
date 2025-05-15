@@ -52,6 +52,7 @@ THIRD_PARTY_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'compressor',
 ]
 
 LOCAL_APPS = [
@@ -159,6 +160,7 @@ AUTH_PASSWORD_VALIDATORS = [
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    'compressor.finders.CompressorFinder',
 ]
 
 STATIC_ROOT = str(ROOT_DIR("staticfiles"))
@@ -255,3 +257,6 @@ try:
     locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')  # En Linux o macOS
 except locale.Error:
     locale.setlocale(locale.LC_TIME, 'es_ES')  # Fallback en caso de error
+
+COMPRESS_ROOT = STATIC_ROOT
+COMPRESS_ENABLED = True
