@@ -1,0 +1,16 @@
+{% if form_tag %}<form {% if form_action %}action="{{ form_action }}" {% endif %}class="space-y-4 {% if form_class %}{{ form_class }}{% endif %}" method="{{ form_method }}" {% if form_id %}id="{{ form_id }}" {% endif %}{% if form_attrs %}{{ form_attrs|safe }} {% endif %}>{% endif %}
+    {% if form_method|lower == 'post' and not disable_csrf %}
+        {% csrf_token %}
+    {% endif %}
+
+    {% include "tailwind/display_form.html" %}
+
+    {% if inputs %}
+        <div class="flex justify-end space-x-2">
+            {% for input in inputs %}
+                {% include "tailwind/layout/button.html" with field=input %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+{% if form_tag %}</form>{% endif %}

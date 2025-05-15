@@ -36,6 +36,7 @@ from futgoal.users.decorators import (
 
 from futgoal.users.forms import LoginForm, RememberForm, PasswordForm, LoginCodeForm
 from futgoal.users.models import User
+from futgoal.users.forms.auth_forms import CustomAuthenticationForm
 
 decorators = [
     csrf_protect,
@@ -69,7 +70,7 @@ class Error404View(TemplateView):
 
 class LoginView(FormView):
     template_name = 'users/login/UserLogin.html'
-    form_class = LoginForm
+    form_class = CustomAuthenticationForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -84,23 +85,11 @@ class LoginView(FormView):
             )
 
     def form_valid(self, form):
-        usuario = form.cleaned_data.get('username')
-        password = form.cleaned_data.get('password')
-        user = authenticate(username=usuario, password=password)
-
-        if user is not None:
-            from django.utils import translation
-            translation.activate('es')
-            login(self.request, user)
-            user.add_action(_("User logged in"))
-            return HttpResponseRedirect(
-                reverse('dashboard')
-            )
-
-        else:
-            messages.add_message(
-                self.request, messages.ERROR, _('Usuario no válido o contraseña no válida'))
-            return super(LoginView, self).form_invalid(form)
+        login(self.request, form.get_user())
+        form.get_user().add_action(_("User logged in"))
+        return HttpResponseRedirect(
+            self.request.GET.get('next', reverse('dashboard'))
+        )
 
 
 class LoginWithUUID(RedirectView):
