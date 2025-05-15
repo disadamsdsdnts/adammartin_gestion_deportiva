@@ -38,6 +38,11 @@ urlpatterns = [
                  namespace='users')
          ),
 
+    path('players/',
+         include(('futgoal.players.urls', 'players'),
+                 namespace='players')
+         ),
+
     path('config/',
          include(('futgoal.configuration.urls', 'configuration'),
                  namespace='configuration')

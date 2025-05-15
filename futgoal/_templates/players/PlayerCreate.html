@@ -1,0 +1,118 @@
+{% extends 'layout/LayoutBase.html' %}
+{% load i18n %}
+
+{% block content %}
+  <main>
+    <div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
+      <div class="w-full mb-1">
+        <div class="mb-4">
+          <nav class="flex mb-5" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2">
+              <li class="inline-flex items-center">
+                <a href="{% url 'dashboard' %}" class="inline-flex items-center text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-white">
+                  <svg class="w-5 h-5 mr-2.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+                  </svg>
+                  {% trans 'Dashboard' %}
+                </a>
+              </li>
+              <li>
+                <div class="flex items-center">
+                  <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                  <a href="{% url 'players:player_list' %}" class="ml-1 text-gray-400 hover:text-primary-600 md:ml-2 dark:text-gray-500 dark:hover:text-white">{% trans 'Jugadores' %}</a>
+                </div>
+              </li>
+              <li>
+                <div class="flex items-center">
+                  <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                  <span class="ml-1 text-gray-400 md:ml-2 dark:text-gray-500" aria-current="page">{% trans 'Nuevo jugador' %}</span>
+                </div>
+              </li>
+            </ol>
+          </nav>
+          <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">{% trans 'Crear nuevo jugador' %}</h1>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col">
+      <div class="overflow-x-auto">
+        <div class="inline-block min-w-full align-middle">
+          <div class="overflow-hidden shadow">
+            <div class="p-6 bg-white dark:bg-gray-800">
+              <form method="post" action="{% url 'players:player_create' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="grid grid-cols-6 gap-6">
+                  <div class="col-span-6 sm:col-span-3">
+                    <label for="first_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Nombre' %}</label>
+                    <input type="text" name="first_name" id="first_name" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required />
+                  </div>
+                  <div class="col-span-6 sm:col-span-3">
+                    <label for="last_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Apellidos' %}</label>
+                    <input type="text" name="last_name" id="last_name" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required />
+                  </div>
+                  <div class="col-span-6 sm:col-span-3">
+                    <label for="identity_document" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Documento de identidad' %}</label>
+                    <input type="text" name="identity_document" id="identity_document" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required />
+                  </div>
+                  <div class="col-span-6 sm:col-span-3">
+                    <label for="sport_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Nombre deportivo' %}</label>
+                    <input type="text" name="sport_name" id="sport_name" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" />
+                  </div>
+                  <div class="col-span-6 sm:col-span-3">
+                    <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Email' %}</label>
+                    <input type="email" name="email" id="email" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required />
+                  </div>
+                  <div class="col-span-6 sm:col-span-3">
+                    <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Teléfono' %}</label>
+                    <input type="tel" name="phone" id="phone" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required />
+                  </div>
+                  <div class="col-span-6 sm:col-span-3">
+                    <label for="position" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Posición' %}</label>
+                    <input type="text" name="position" id="position" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required />
+                  </div>
+                  <div class="col-span-6 sm:col-span-3">
+                    <label for="country" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'País' %}</label>
+                    <input type="text" name="country" id="country" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required />
+                  </div>
+                  <div class="col-span-6">
+                    <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Dirección' %}</label>
+                    <input type="text" name="address" id="address" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required />
+                  </div>
+                  <div class="col-span-6 sm:col-span-2">
+                    <label for="city" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Ciudad' %}</label>
+                    <input type="text" name="city" id="city" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required />
+                  </div>
+                  <div class="col-span-6 sm:col-span-2">
+                    <label for="municipality" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Municipio' %}</label>
+                    <input type="text" name="municipality" id="municipality" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required />
+                  </div>
+                  <div class="col-span-6 sm:col-span-2">
+                    <label for="postal_code" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Código postal' %}</label>
+                    <input type="text" name="postal_code" id="postal_code" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required />
+                  </div>
+                  <div class="col-span-6">
+                    <label for="biography" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Biografía' %}</label>
+                    <textarea id="biography" name="biography" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"></textarea>
+                  </div>
+                  <div class="col-span-6">
+                    <label for="photo" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Foto' %}</label>
+                    <input type="file" name="photo" id="photo" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" />
+                  </div>
+                </div>
+                <div class="flex items-center space-x-4 mt-6">
+                  <button type="submit" class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">{% trans 'Crear jugador' %}</button>
+                  <a href="{% url 'players:player_list' %}" class="text-gray-900 bg-white hover:bg-gray-100 focus:ring-4 focus:ring-primary-300 border border-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700">{% trans 'Cancelar' %}</a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+{% endblock %}
