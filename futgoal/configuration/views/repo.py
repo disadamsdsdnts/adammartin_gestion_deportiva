@@ -28,13 +28,13 @@ class ConfigurationDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        breadcrums = [
+        breadcrumbs = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Configuración'), 'url': reverse(
                 'configuration:configuration_detail')},
         ]
         context['page_title'] = _('Configuración Global')
-        context['breadcrums'] = breadcrums
+        context['breadcrumbs'] = breadcrumbs
         return context
 
     def get_object(self):
@@ -49,7 +49,7 @@ class ConfigurationUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        breadcrums = [
+        breadcrumbs = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Configuración'), 'url': reverse(
                 'configuration:configuration_detail')},
@@ -57,7 +57,7 @@ class ConfigurationUpdateView(UpdateView):
                 'configuration:configuration_update')},
         ]
         context['page_title'] = _('Editar Configuración Global')
-        context['breadcrums'] = breadcrums
+        context['breadcrumbs'] = breadcrumbs
         return context
 
     def get_object(self):

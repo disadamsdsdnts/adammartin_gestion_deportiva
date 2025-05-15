@@ -46,11 +46,11 @@ class SuDashboardView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        breadcrums = [
+        breadcrumbs = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
         ]
-        context['page_title'] = f'Dashboard de Soporte'
-        context['breadcrums'] = breadcrums
+        context['page_title'] = 'Dashboard de Soporte'
+        context['breadcrumbs'] = breadcrumbs
         context['js_template'] = ['js/custom/datatables.js']
 
         return context
@@ -85,14 +85,14 @@ class SuListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        breadcrums = [
+        breadcrumbs = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Onboarding'), 'url': reverse(
                 'support:su_list')},
         ]
         context['page_title'] = _('Onboarding')
 
-        context['breadcrums'] = breadcrums
+        context['breadcrumbs'] = breadcrumbs
         context['js_template'] = ['js/custom/datatables.js']
 
         months_original = [
@@ -149,12 +149,12 @@ class SuUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        breadcrums = [
+        breadcrumbs = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Editar venta'), 'url': ''}
         ]
         context['page_title'] = _('Editar venta')
-        context['breadcrums'] = breadcrums
+        context['breadcrumbs'] = breadcrumbs
         return context
 
 
@@ -177,9 +177,9 @@ class SuDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        breadcrums = [
+        breadcrumbs = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
         ]
         context['page_title'] = _('Venta')
-        context['breadcrums'] = breadcrums
+        context['breadcrumbs'] = breadcrumbs
         return context

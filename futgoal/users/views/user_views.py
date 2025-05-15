@@ -42,44 +42,13 @@ class GaUserListView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        breadcrums = [
+        breadcrumbs = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Usuarios'), 'url': reverse(
                 'users:ga_user_list')},
         ]
         context['page_title'] = _('Usuarios')
-        context['breadcrums'] = breadcrums
-        context['actions'] = [
-            {
-                'title': _('Nuevo'),
-                'url': reverse('users:ga_user_create'),
-                'primary': True,
-                'icon': '<i class="bi bi-plus-lg"></i>'
-            },
-        ]
-        context['js_template'] = ['js/custom/datatables.js']
-
-        sales_teams = []
-        sale_teams =  Group.objects.exclude(name__startswith='Closers').exclude(name__startswith='Lí').exclude(name__startswith='So').exclude(name__startswith='Ch').exclude(name__startswith='Se').exclude(name__startswith='Fa').order_by('name')
-        for st in sale_teams:
-            sales_teams.append(
-                {
-                    'id': st.id,
-                    'name': st.name,
-                    'users': User.objects.filter(sale_team=st, is_active=True).order_by('first_name')
-                })
-        context['sales_teams'] = sales_teams
-
-        other_teams = []
-        support_teams =  Group.objects.filter(name__startswith='So').order_by('name')
-        for st in support_teams:
-            other_teams.append(
-                {
-                    'id': st.id,
-                    'name': st.name,
-                    'users': User.objects.filter(groups__in=support_teams, is_active=True).order_by('first_name')
-                })
-        context['other_teams'] = other_teams
+        context['breadcrumbs'] = breadcrumbs
 
         return context
 
@@ -93,14 +62,14 @@ class GaUserDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        breadcrums = [
+        breadcrumbs = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Usuarios'), 'url': reverse(
                 'users:ga_user_list')},
             {'title': self.object.full_name}
         ]
         context['page_title'] = f"{_('Usuario')} : {self.object.full_name}"
-        context['breadcrums'] = breadcrums
+        context['breadcrumbs'] = breadcrumbs
         context['actions'] = [
             {
                 'title': _('Editar'),
@@ -122,7 +91,7 @@ class GaUserCreateView(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        breadcrums = [
+        breadcrumbs = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Usuarios'), 'url': reverse(
                 'users:ga_user_list')},
@@ -130,7 +99,7 @@ class GaUserCreateView(CreateView):
                 'users:ga_user_create')},
         ]
         context['page_title'] = _('Nuevo Usuario')
-        context['breadcrums'] = breadcrums
+        context['breadcrumbs'] = breadcrumbs
 
         return context
 
@@ -154,14 +123,14 @@ class GaUserUpdateView(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        breadcrums = [
+        breadcrumbs = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Usuarios'), 'url': reverse(
                 'users:ga_user_list')},
             {'title': _('Editar usuario')},
         ]
         context['page_title'] = _('Editar Usuario')
-        context['breadcrums'] = breadcrums
+        context['breadcrumbs'] = breadcrumbs
 
         return context
 
@@ -186,14 +155,14 @@ class GaUserDeleteView(DeleteView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        breadcrums = [
+        breadcrumbs = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Usuarios'), 'url': reverse(
                 'users:ga_user_list')},
             {'title': _('Eliminar')},
         ]
         context['page_title'] = _("Eliminar Usuario")
-        context['breadcrums'] = breadcrums
+        context['breadcrumbs'] = breadcrumbs
 
         return context
 

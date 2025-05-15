@@ -50,11 +50,11 @@ class DashboardView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        breadcrums = [
+        breadcrumbs = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
         ]
-        context['page_title'] = f"{_('Dashboard')}"
-        context['breadcrums'] = breadcrums
+        context['page_title'] = _('Dashboard')
+        context['breadcrumbs'] = breadcrumbs
         context['actions'] = []
 
         return context
