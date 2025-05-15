@@ -27,7 +27,7 @@
   <header class="bg-primary text-white">
     <nav class="navbar navbar-expand-lg navbar-dark">
       <div class="container">
-        <a class="navbar-brand" href="{% url 'users:dashboard' %}">
+        <a class="navbar-brand" href="{% url 'dashboard' %}">
           <img src="{% static 'img/logo.png' %}" alt="FutGoal" height="40">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
@@ -37,17 +37,10 @@
           {% if user.is_authenticated %}
           <ul class="navbar-nav me-auto">
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'users:dashboard' %}">
+              <a class="nav-link" href="{% url 'dashboard' %}">
                 <i class="bi bi-speedometer2"></i> {% trans "Dashboard" %}
               </a>
             </li>
-            {% if user.is_staff %}
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'users:ga_user_list' %}">
-                <i class="bi bi-people"></i> {% trans "Usuarios" %}
-              </a>
-            </li>
-            {% endif %}
             <li class="nav-item">
               <a class="nav-link" href="{% url 'configuration:configuration_detail' %}">
                 <i class="bi bi-gear"></i> {% trans "Configuración" %}
