@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from ..models import Player
+from ..models.player import Player
 
 
 class PlayerForm(forms.ModelForm):
@@ -10,11 +10,18 @@ class PlayerForm(forms.ModelForm):
         fields = [
             'first_name',
             'last_name',
+            'birth_date',
             'identity_document',
             'sport_name',
             'email',
+            'phone',
             'position',
             'country',
+            'address',
+            'city',
+            'municipality',
+            'postal_code',
+            'region',
             'photo',
             'is_active'
         ]
@@ -29,6 +36,12 @@ class PlayerForm(forms.ModelForm):
                 attrs={
                     'class': 'shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500',
                     'placeholder': _('Apellido del jugador')
+                }
+            ),
+            'birth_date': forms.DateInput(
+                attrs={
+                    'class': 'shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500',
+                    'type': 'date'
                 }
             ),
             'identity_document': forms.TextInput(
@@ -49,6 +62,12 @@ class PlayerForm(forms.ModelForm):
                     'placeholder': _('Email del jugador')
                 }
             ),
+            'phone': forms.TextInput(
+                attrs={
+                    'class': 'shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500',
+                    'placeholder': _('Teléfono del jugador')
+                }
+            ),
             'position': forms.TextInput(
                 attrs={
                     'class': 'shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500',
@@ -59,6 +78,36 @@ class PlayerForm(forms.ModelForm):
                 attrs={
                     'class': 'shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500',
                     'placeholder': _('País del jugador')
+                }
+            ),
+            'address': forms.TextInput(
+                attrs={
+                    'class': 'shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500',
+                    'placeholder': _('Dirección del jugador')
+                }
+            ),
+            'city': forms.TextInput(
+                attrs={
+                    'class': 'shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500',
+                    'placeholder': _('Ciudad del jugador')
+                }
+            ),
+            'municipality': forms.TextInput(
+                attrs={
+                    'class': 'shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500',
+                    'placeholder': _('Municipio del jugador')
+                }
+            ),
+            'postal_code': forms.TextInput(
+                attrs={
+                    'class': 'shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500',
+                    'placeholder': _('Código postal del jugador')
+                }
+            ),
+            'region': forms.TextInput(
+                attrs={
+                    'class': 'shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500',
+                    'placeholder': _('Comunidad Autónoma del jugador')
                 }
             ),
             'photo': forms.FileInput(

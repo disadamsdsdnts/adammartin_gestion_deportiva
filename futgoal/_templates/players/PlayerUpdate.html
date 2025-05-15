@@ -1,6 +1,5 @@
 {% extends 'layout/LayoutBase.html' %}
 {% load i18n %}
-
 {% block content %}
 <main>
   <div
@@ -9,250 +8,160 @@
       <div class="mb-4">
         <nav class="flex mb-5" aria-label="Breadcrumb">
           <ol class="inline-flex items-center space-x-1 text-sm font-medium md:space-x-2">
-            <li class="inline-flex items-center">
-              <a href="{% url 'dashboard' %}"
+            <li class="inline-flex items-center"> <a href="{% url 'dashboard' %}"
                 class="inline-flex items-center text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-white">
                 <svg class="w-5 h-5 mr-2.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                   <path
                     d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z">
                   </path>
-                </svg>
-                {% trans 'Dashboard' %}
-              </a>
-            </li>
+                </svg> {% trans 'Dashboard' %} </a> </li>
             <li>
-              <div class="flex items-center">
-                <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"
+              <div class="flex items-center"> <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"
                   xmlns="http://www.w3.org/2000/svg">
                   <path fill-rule="evenodd"
                     d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
                     clip-rule="evenodd"></path>
-                </svg>
-                <a href="{% url 'players:player_list' %}"
+                </svg> <a href="{% url 'players:player_list' %}"
                   class="ml-1 text-gray-400 hover:text-primary-600 md:ml-2 dark:text-gray-500 dark:hover:text-white">{% trans 'Jugadores' %}</a>
               </div>
             </li>
             <li>
-              <div class="flex items-center">
-                <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"
+              <div class="flex items-center"> <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"
                   xmlns="http://www.w3.org/2000/svg">
                   <path fill-rule="evenodd"
                     d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
                     clip-rule="evenodd"></path>
-                </svg>
-                <span class="ml-1 text-gray-400 md:ml-2 dark:text-gray-500" aria-current="page">
-                  {% trans 'Nuevo jugador' %}
-                </span>
-              </div>
+                </svg> <span class="ml-1 text-gray-400 md:ml-2 dark:text-gray-500" aria-current="page">
+                  {% trans 'Actualizar jugador' %} </span> </div>
             </li>
           </ol>
         </nav>
-        <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">{% trans 'Crear nuevo jugador' %}
+        <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">{% trans 'Actualizar jugador' %}
         </h1>
       </div>
     </div>
-  </div>
-
-  {% if messages %}
-  <div class="p-4">
-    {% for message in messages %}
-    <div class="p-4 mb-4 {% if message.tags == 'success' %}
-               bg-green-100 text-green-700
-            {% elif message.tags == 'error' %}
-               bg-red-100 text-red-700
-            {% else %}
-               bg-blue-100 text-blue-700
-            {% endif %} rounded-lg" role="alert">{{ message }}</div>
-    {% endfor %}
-  </div>
-  {% endif %}
-
-  <div class="flex flex-col">
+  </div> {% if messages %} <div class="p-4"> {% for message in messages %} <div
+      class="p-4 mb-4 {% if message.tags == 'success' %} bg-green-100 text-green-700 {% elif message.tags == 'error' %} bg-red-100 text-red-700 {% else %} bg-blue-100 text-blue-700 {% endif %} rounded-lg"
+      role="alert">{{ message }}</div> {% endfor %} </div> {% endif %} <div class="flex flex-col">
     <div class="overflow-x-auto">
       <div class="inline-block min-w-full align-middle">
         <div class="overflow-hidden shadow">
           <div class="p-6 bg-white dark:bg-gray-800">
-            <form method="post" action="{% url 'players:player_create' %}" enctype="multipart/form-data">
+            <form method="post" action="{% url 'players:player_update' object.pk %}" enctype="multipart/form-data">
               {% csrf_token %}
-
-              {% if form.errors %}
-              <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
-                <ul class="list-disc pl-5">
-                  {% for field, errors in form.errors.items %}
-                  {% for error in errors %}
-                  <li>{{ field|title }}: {{ error }}</li>
-                  {% endfor %}
-                  {% endfor %}
-                </ul>
-              </div>
-              {% endif %}
-
-              <div class="grid grid-cols-6 gap-6">
-                <div class="col-span-6 sm:col-span-3">
-                  <label for="{{ form.first_name.id_for_label }}"
+              {% if form.errors %} <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
+                <ul class="list-disc pl-5"> {% for field, errors in form.errors.items %}
+                  {% for error in errors %} <li>
+                    {{ field|title }}: {{ error }}</li> {% endfor %}
+                  {% endfor %} </ul>
+              </div> {% endif %} <div class="grid grid-cols-6 gap-6">
+                <div class="col-span-6 sm:col-span-3"> <label for="{{ form.first_name.id_for_label }}"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Nombre' %}</label>
                   <input type="text" name="{{ form.first_name.name }}" id="{{ form.first_name.id_for_label }}"
                     value="{{ form.first_name.value|default:'' }}"
                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    required />
-                  {% if form.first_name.errors %}
-                  <p class="mt-2 text-sm text-red-600">{{ form.first_name.errors.0 }}</p>
-                  {% endif %}
-                </div>
-                <div class="col-span-6 sm:col-span-3">
-                  <label for="{{ form.last_name.id_for_label }}"
+                    required /> {% if form.first_name.errors %} <p class="mt-2 text-sm text-red-600">
+                    {{ form.first_name.errors.0 }}</p> {% endif %} </div>
+                <div class="col-span-6 sm:col-span-3"> <label for="{{ form.last_name.id_for_label }}"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Apellidos' %}</label>
                   <input type="text" name="{{ form.last_name.name }}" id="{{ form.last_name.id_for_label }}"
                     value="{{ form.last_name.value|default:'' }}"
                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    required />
-                  {% if form.last_name.errors %}
-                  <p class="mt-2 text-sm text-red-600">{{ form.last_name.errors.0 }}</p>
-                  {% endif %}
-                </div>
-                <div class="col-span-6 sm:col-span-3">
-                  <label for="{{ form.birth_date.id_for_label }}"
+                    required /> {% if form.last_name.errors %} <p class="mt-2 text-sm text-red-600">
+                    {{ form.last_name.errors.0 }}</p> {% endif %} </div>
+                <div class="col-span-6 sm:col-span-3"> <label for="{{ form.birth_date.id_for_label }}"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Fecha de nacimiento' %}</label>
                   <input type="date" name="{{ form.birth_date.name }}" id="{{ form.birth_date.id_for_label }}"
                     value="{{ form.birth_date.value|date:'Y-m-d'|default:'' }}"
                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" />
-                  {% if form.birth_date.errors %}
-                  <p class="mt-2 text-sm text-red-600">{{ form.birth_date.errors.0 }}</p>
-                  {% endif %}
-                </div>
-                <div class="col-span-6 sm:col-span-3">
-                  <label for="{{ form.identity_document.id_for_label }}"
+                  {% if form.birth_date.errors %} <p class="mt-2 text-sm text-red-600">
+                    {{ form.birth_date.errors.0 }}</p> {% endif %} </div>
+                <div class="col-span-6 sm:col-span-3"> <label for="{{ form.identity_document.id_for_label }}"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Documento de identidad' %}</label>
                   <input type="text" name="{{ form.identity_document.name }}"
                     id="{{ form.identity_document.id_for_label }}" value="{{ form.identity_document.value|default:'' }}"
                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    required />
-                  {% if form.identity_document.errors %}
-                  <p class="mt-2 text-sm text-red-600">{{ form.identity_document.errors.0 }}</p>
-                  {% endif %}
-                </div>
-                <div class="col-span-6 sm:col-span-3">
-                  <label for="{{ form.sport_name.id_for_label }}"
+                    required /> {% if form.identity_document.errors %} <p class="mt-2 text-sm text-red-600">
+                    {{ form.identity_document.errors.0 }}</p> {% endif %} </div>
+                <div class="col-span-6 sm:col-span-3"> <label for="{{ form.sport_name.id_for_label }}"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Nombre deportivo' %}</label>
                   <input type="text" name="{{ form.sport_name.name }}" id="{{ form.sport_name.id_for_label }}"
                     value="{{ form.sport_name.value|default:'' }}"
                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" />
-                  {% if form.sport_name.errors %}
-                  <p class="mt-2 text-sm text-red-600">{{ form.sport_name.errors.0 }}</p>
-                  {% endif %}
-                </div>
-                <div class="col-span-6 sm:col-span-3">
-                  <label for="{{ form.email.id_for_label }}"
+                  {% if form.sport_name.errors %} <p class="mt-2 text-sm text-red-600">{{ form.sport_name.errors.0 }}
+                  </p> {% endif %} </div>
+                <div class="col-span-6 sm:col-span-3"> <label for="{{ form.email.id_for_label }}"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Email' %}</label>
                   <input type="email" name="{{ form.email.name }}" id="{{ form.email.id_for_label }}"
                     value="{{ form.email.value|default:'' }}"
                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    required />
-                  {% if form.email.errors %}
-                  <p class="mt-2 text-sm text-red-600">{{ form.email.errors.0 }}</p>
-                  {% endif %}
-                </div>
-                <div class="col-span-6 sm:col-span-3">
-                  <label for="{{ form.phone.id_for_label }}"
+                    required /> {% if form.email.errors %} <p class="mt-2 text-sm text-red-600">
+                    {{ form.email.errors.0 }}</p> {% endif %} </div>
+                <div class="col-span-6 sm:col-span-3"> <label for="{{ form.phone.id_for_label }}"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Teléfono' %}</label>
                   <input type="tel" name="{{ form.phone.name }}" id="{{ form.phone.id_for_label }}"
                     value="{{ form.phone.value|default:'' }}"
                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    required />
-                  {% if form.phone.errors %}
-                  <p class="mt-2 text-sm text-red-600">{{ form.phone.errors.0 }}</p>
-                  {% endif %}
-                </div>
-                <div class="col-span-6 sm:col-span-3">
-                  <label for="{{ form.position.id_for_label }}"
+                    required /> {% if form.phone.errors %} <p class="mt-2 text-sm text-red-600">
+                    {{ form.phone.errors.0 }}</p> {% endif %} </div>
+                <div class="col-span-6 sm:col-span-3"> <label for="{{ form.position.id_for_label }}"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Posición' %}</label>
                   <input type="text" name="{{ form.position.name }}" id="{{ form.position.id_for_label }}"
                     value="{{ form.position.value|default:'' }}"
                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    required />
-                  {% if form.position.errors %}
-                  <p class="mt-2 text-sm text-red-600">{{ form.position.errors.0 }}</p>
-                  {% endif %}
-                </div>
-                <div class="col-span-6 sm:col-span-3">
-                  <label for="{{ form.country.id_for_label }}"
+                    required /> {% if form.position.errors %} <p class="mt-2 text-sm text-red-600">
+                    {{ form.position.errors.0 }}</p> {% endif %} </div>
+                <div class="col-span-6 sm:col-span-3"> <label for="{{ form.country.id_for_label }}"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'País' %}</label>
                   <input type="text" name="{{ form.country.name }}" id="{{ form.country.id_for_label }}"
                     value="{{ form.country.value|default:'' }}"
                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    required />
-                  {% if form.country.errors %}
-                  <p class="mt-2 text-sm text-red-600">{{ form.country.errors.0 }}</p>
-                  {% endif %}
-                </div>
-                <div class="col-span-6">
-                  <label for="{{ form.address.id_for_label }}"
+                    required /> {% if form.country.errors %} <p class="mt-2 text-sm text-red-600">
+                    {{ form.country.errors.0 }}</p> {% endif %} </div>
+                <div class="col-span-6"> <label for="{{ form.address.id_for_label }}"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Dirección' %}</label>
                   <input type="text" name="{{ form.address.name }}" id="{{ form.address.id_for_label }}"
                     value="{{ form.address.value|default:'' }}"
                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    required />
-                  {% if form.address.errors %}
-                  <p class="mt-2 text-sm text-red-600">{{ form.address.errors.0 }}</p>
-                  {% endif %}
-                </div>
-                <div class="col-span-6 sm:col-span-2">
-                  <label for="{{ form.city.id_for_label }}"
+                    required /> {% if form.address.errors %} <p class="mt-2 text-sm text-red-600">
+                    {{ form.address.errors.0 }}</p> {% endif %} </div>
+                <div class="col-span-6 sm:col-span-2"> <label for="{{ form.city.id_for_label }}"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Ciudad' %}</label>
                   <input type="text" name="{{ form.city.name }}" id="{{ form.city.id_for_label }}"
                     value="{{ form.city.value|default:'' }}"
                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    required />
-                  {% if form.city.errors %}
-                  <p class="mt-2 text-sm text-red-600">{{ form.city.errors.0 }}</p>
-                  {% endif %}
-                </div>
-                <div class="col-span-6 sm:col-span-2">
-                  <label for="{{ form.municipality.id_for_label }}"
+                    required /> {% if form.city.errors %} <p class="mt-2 text-sm text-red-600">{{ form.city.errors.0 }}
+                  </p> {% endif %} </div>
+                <div class="col-span-6 sm:col-span-2"> <label for="{{ form.municipality.id_for_label }}"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Municipio' %}</label>
                   <input type="text" name="{{ form.municipality.name }}" id="{{ form.municipality.id_for_label }}"
                     value="{{ form.municipality.value|default:'' }}"
                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    required />
-                  {% if form.municipality.errors %}
-                  <p class="mt-2 text-sm text-red-600">{{ form.municipality.errors.0 }}</p>
-                  {% endif %}
-                </div>
-                <div class="col-span-6 sm:col-span-2">
-                  <label for="{{ form.postal_code.id_for_label }}"
-                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Código postal' %}</label>
-                  <input type="text" name="{{ form.postal_code.name }}" id="{{ form.postal_code.id_for_label }}"
-                    value="{{ form.postal_code.value|default:'' }}"
-                    class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    required />
-                  {% if form.postal_code.errors %}
-                  <p class="mt-2 text-sm text-red-600">{{ form.postal_code.errors.0 }}</p>
-                  {% endif %}
-                </div>
-                <div class="col-span-6 sm:col-span-2">
-                  <label for="{{ form.region.id_for_label }}"
+                    required /> {% if form.municipality.errors %} <p class="mt-2 text-sm text-red-600">
+                    {{ form.municipality.errors.0 }}</p> {% endif %} </div>
+                <div class="col-span-6 sm:col-span-2"> <label for="{{ form.region.id_for_label }}"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Comunidad Autónoma' %}</label>
                   <input type="text" name="{{ form.region.name }}" id="{{ form.region.id_for_label }}"
                     value="{{ form.region.value|default:'' }}"
                     class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    required />
-                  {% if form.region.errors %}
-                  <p class="mt-2 text-sm text-red-600">{{ form.region.errors.0 }}</p>
-                  {% endif %}
-                </div>
-                <div class="col-span-6">
-                  <label for="{{ form.photo.id_for_label }}"
+                    required /> {% if form.region.errors %} <p class="mt-2 text-sm text-red-600">
+                    {{ form.region.errors.0 }}</p> {% endif %} </div>
+                <div class="col-span-6 sm:col-span-2"> <label for="{{ form.postal_code.id_for_label }}"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Código postal' %}</label>
+                  <input type="text" name="{{ form.postal_code.name }}" id="{{ form.postal_code.id_for_label }}"
+                    value="{{ form.postal_code.value|default:'' }}"
+                    class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    required /> {% if form.postal_code.errors %} <p class="mt-2 text-sm text-red-600">
+                    {{ form.postal_code.errors.0 }}</p> {% endif %} </div>
+                <div class="col-span-6"> <label for="{{ form.photo.id_for_label }}"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Foto' %}</label>
                   <input type="file" name="{{ form.photo.name }}" id="{{ form.photo.id_for_label }}"
                     class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" />
-                  {% if form.photo.errors %}
-                  <p class="mt-2 text-sm text-red-600">{{ form.photo.errors.0 }}</p>
-                  {% endif %}
-                </div>
+                  {% if form.photo.errors %} <p class="mt-2 text-sm text-red-600">{{ form.photo.errors.0 }}</p>
+                  {% endif %} </div>
               </div>
-              <div class="flex items-center space-x-4 mt-6">
-                <button type="submit"
-                  class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">{% trans 'Crear jugador' %}</button>
+              <div class="flex items-center space-x-4 mt-6"> <button type="submit"
+                  class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">{% trans 'Actualizar jugador' %}</button>
                 <a href="{% url 'players:player_list' %}"
                   class="text-gray-900 bg-white hover:bg-gray-100 focus:ring-4 focus:ring-primary-300 border border-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700">{% trans 'Cancelar' %}</a>
               </div>

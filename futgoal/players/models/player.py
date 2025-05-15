@@ -18,6 +18,11 @@ class Player(AuditModel):
         blank=True,
         null=True
     )
+    birth_date = models.DateField(
+        _('Fecha de nacimiento'),
+        blank=True,
+        null=True
+    )
     identity_document = models.CharField(
         _('Documento de identidad'),
         max_length=100,
@@ -79,28 +84,18 @@ class Player(AuditModel):
         blank=True,
         null=True
     )
-
     region = models.CharField(
         _('Comunidad Autónoma'),
         max_length=100,
         blank=True,
         null=True
     )
-
-    country = models.CharField(
-        _('País'),
-        max_length=100,
-        blank=True,
-        null=True
-    )
-
     photo = models.ImageField(
         _('Foto'),
         upload_to='players/photos/',
         blank=True,
         null=True
     )
-
     is_active = models.BooleanField(
         _('Activo'),
         default=True

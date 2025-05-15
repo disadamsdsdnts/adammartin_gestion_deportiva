@@ -63,11 +63,11 @@ class PlayerDetail(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['page_title'] = self.object.name
+        context['page_title'] = f"{self.object.first_name} {self.object.last_name}"
         context['breadcrums'] = [
             {'title': _('Dashboard'), 'url': reverse_lazy('dashboard')},
             {'title': _('Jugadores'), 'url': reverse_lazy('players:player_list')},
-            {'title': self.object.name}
+            {'title': f"{self.object.first_name} {self.object.last_name}"}
         ]
         return context
 
@@ -87,7 +87,7 @@ class PlayerUpdate(LoginRequiredMixin, UpdateView):
             {'title': _('Dashboard'), 'url': reverse_lazy('dashboard')},
             {'title': _('Jugadores'), 'url': reverse_lazy('players:player_list')},
             {'title': _('Editar'), 'url': reverse_lazy('players:player_detail', kwargs={'pk': self.object.pk})},
-            {'title': self.object.name}
+            {'title': f"{self.object.first_name} {self.object.last_name}"}
         ]
         return context
 
@@ -108,7 +108,7 @@ class PlayerDelete(LoginRequiredMixin, DeleteView):
             {'title': _('Dashboard'), 'url': reverse_lazy('dashboard')},
             {'title': _('Jugadores'), 'url': reverse_lazy('players:player_list')},
             {'title': _('Eliminar')},
-            {'title': self.object.name}
+            {'title': f"{self.object.first_name} {self.object.last_name}"}
         ]
         return context
 
