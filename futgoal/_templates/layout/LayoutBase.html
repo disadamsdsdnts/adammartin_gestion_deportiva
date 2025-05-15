@@ -1,6 +1,6 @@
 {% load static i18n compress %}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="h-full">
 
 <head>
   <meta charset="UTF-8">
@@ -18,7 +18,7 @@
 
 </head>
 
-<body class="antialiased bg-gray-50 dark:bg-gray-900">
+<body class="antialiased bg-gray-50 dark:bg-gray-900 min-h-full flex flex-col">
   <nav
     class="bg-white border-b border-gray-200 px-4 py-2.5 dark:bg-gray-800 dark:border-gray-700 fixed left-0 right-0 top-0 z-50">
     <div class="flex flex-wrap justify-between items-center">
@@ -88,7 +88,7 @@
   {% include "layout/_sidebar.html" %}
 
   <!-- Main content -->
-  <main class="p-4 {% if user.is_authenticated %}md:ml-64{% endif %} h-auto pt-20">
+  <main class="p-4 {% if user.is_authenticated %}md:ml-64{% endif %} h-auto pt-20 flex-grow">
     {% if messages %}
     <div class="messages mb-4">
       {% for message in messages %}
@@ -105,19 +105,7 @@
   </main>
 
   <!-- Footer -->
-  <footer class="bg-dark text-white py-4 mt-auto">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-6">
-          <h5>FutGoal</h5>
-          <p>Sistema de gestión deportiva</p>
-        </div>
-        <div class="col-lg-6 text-lg-end">
-          <p>&copy; {% now "Y" %} FutGoal. {% trans "Todos los derechos reservados" %}.</p>
-        </div>
-      </div>
-    </div>
-  </footer>
+  {% include "layout/_footer.html" %}
 
   <!-- Custom JS -->
   <!-- <script src="{% static 'js/main.js' %}"></script> -->
