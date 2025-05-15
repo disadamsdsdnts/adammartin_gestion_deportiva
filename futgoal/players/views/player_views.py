@@ -3,6 +3,7 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import models
 
 from ..models.player import Player
 from ..forms.player_forms import PlayerForm
@@ -17,8 +18,13 @@ class PlayerList(LoginRequiredMixin, ListView):
         queryset = super().get_queryset()
         search = self.request.GET.get('search', '')
         if search:
-            queryset = queryset.filter(name__icontains=search)
-        return queryset.order_by('-created')
+            queryset = queryset.filter(
+                models.Q(first_name__icontains=search) |
+                models.Q(last_name__icontains=search) |
+                models.Q(sport_name__icontains=search)
+            )
+
+        return queryset.order_by('first_name')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

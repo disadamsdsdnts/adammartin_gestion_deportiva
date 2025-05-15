@@ -1,5 +1,14 @@
 {
   "files.associations": {
     "*.html": "django-html"
+  },
+  "[django-html]": {
+    "editor.defaultFormatter": "HookyQR.beautify",
+    "editor.formatOnSave": true
+  },
+  "beautify.language": {
+    "html": [
+      "django-html"
+    ]
   }
 }

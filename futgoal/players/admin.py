@@ -28,7 +28,7 @@ class PlayerAdmin(admin.ModelAdmin):
 
     list_display = ('get_full_name', 'get_sport_name', 'get_identity_document', 'email', 'get_phone', 'position', 'country', 'is_active')
     list_filter = ('is_active', 'position', 'country')
-    search_fields = ('first_name', 'last_name', 'sport_name', 'identity_document', 'email', 'phone', 'biography')
+    search_fields = ('first_name', 'last_name', 'sport_name', 'identity_document', 'email', 'phone')
     fieldsets = (
         (_('Información personal'), {
             'fields': (
@@ -43,7 +43,7 @@ class PlayerAdmin(admin.ModelAdmin):
         }),
         (_('Información deportiva'), {
             'fields': (
-                'position', 'country', 'biography'
+                'position', 'country'
             )
         }),
         (_('Estado'), {

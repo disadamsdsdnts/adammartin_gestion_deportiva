@@ -16,22 +16,22 @@ urlpatterns = [
         name='player_list'
     ),
     path(
-        'players/new-player/',
+        'new-player/',
         PlayerCreate.as_view(),
         name='player_create'
     ),
     path(
-        'players/<pk>/',
+        '<pk>/',
         PlayerDetail.as_view(),
         name='player_detail'
     ),
     path(
-        'players/<pk>/update/',
+        '<pk>/update/',
         PlayerUpdate.as_view(),
         name='player_update'
     ),
     path(
-        'players/<pk>/delete/',
+        '<pk>/delete/',
         PlayerDelete.as_view(),
         name='player_delete'
     ),

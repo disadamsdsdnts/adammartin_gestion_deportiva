@@ -6,10 +6,29 @@ from futgoal.utils.models import AuditModel
 
 
 class Player(AuditModel):
-    name = models.CharField(
+    first_name = models.CharField(
         _('Nombre'),
-        max_length=255,
-        default=''
+        max_length=100,
+        blank=True,
+        null=True
+    )
+    last_name = models.CharField(
+        _('Apellido'),
+        max_length=100,
+        blank=True,
+        null=True
+    )
+    identity_document = models.CharField(
+        _('Documento de identidad'),
+        max_length=100,
+        blank=True,
+        null=True
+    )
+    sport_name = models.CharField(
+        _('Nombre deportivo'),
+        max_length=100,
+        blank=True,
+        null=True
     )
     email = models.EmailField(
         _('Email'),
@@ -18,8 +37,9 @@ class Player(AuditModel):
         null=True,
         blank=True
     )
-    biography = models.TextField(
-        _('Biografía'),
+    phone = models.CharField(
+        _('Teléfono'),
+        max_length=100,
         blank=True,
         null=True
     )
@@ -35,12 +55,52 @@ class Player(AuditModel):
         blank=True,
         null=True
     )
+    address = models.CharField(
+        _('Dirección'),
+        max_length=100,
+        blank=True,
+        null=True
+    )
+    city = models.CharField(
+        _('Ciudad'),
+        max_length=100,
+        blank=True,
+        null=True
+    )
+    municipality = models.CharField(
+        _('Municipio'),
+        max_length=100,
+        blank=True,
+        null=True
+    )
+    postal_code = models.CharField(
+        _('Código postal'),
+        max_length=100,
+        blank=True,
+        null=True
+    )
+
+    region = models.CharField(
+        _('Comunidad Autónoma'),
+        max_length=100,
+        blank=True,
+        null=True
+    )
+
+    country = models.CharField(
+        _('País'),
+        max_length=100,
+        blank=True,
+        null=True
+    )
+
     photo = models.ImageField(
         _('Foto'),
         upload_to='players/photos/',
         blank=True,
         null=True
     )
+
     is_active = models.BooleanField(
         _('Activo'),
         default=True
@@ -52,4 +112,4 @@ class Player(AuditModel):
         ordering = ['-created']
 
     def __str__(self) -> str:
-        return str(self.name)
+        return str(self.first_name + ' ' + self.last_name)
