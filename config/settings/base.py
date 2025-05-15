@@ -46,7 +46,6 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     "crispy_forms",
-    "crispy_bootstrap4",
     'django_extensions',
     'allauth',
     'allauth.account',
@@ -57,7 +56,8 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     'configuration',
-    'users'
+    'users',
+    'futgoal.crispy_forms_tailwind',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -173,7 +173,8 @@ STATICFILES_DIRS = [
 MEDIA_ROOT = "/futgoal-media"
 MEDIA_URL = "/media/"
 
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_ALLOWED_TEMPLATE_PACKS = ('tailwind',)
+CRISPY_TEMPLATE_PACK = 'tailwind'
 
 TEMPLATES_DIR = str(APPS_DIR.path("_templates"))
 TEMPLATES = [
