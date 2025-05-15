@@ -64,7 +64,7 @@ Ahí nos pedirá usuario, email contraseña etc...
 
 `docker-compose -f dev.yml run --rm django python manage.py shell_plus`
 
-Configuration.objects.create(app_name="Baedev")
+Configuration.objects.create(app_name="FutGOAL")
 
 exit()
 
