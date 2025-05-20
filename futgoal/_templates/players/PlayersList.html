@@ -59,6 +59,16 @@
       <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
         {{ player.last_name }}</td>
       <td class="p-4 space-x-2 whitespace-nowrap">
+        <a href="{% url 'players:player_detail' player.id %}"
+          class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+          <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+            <path fill-rule="evenodd"
+              d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+              clip-rule="evenodd"></path>
+          </svg>
+          {% trans 'Información' %}
+        </a>
         <a href="{% url 'players:player_update' player.id %}"
           class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
           <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
