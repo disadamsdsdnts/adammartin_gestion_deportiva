@@ -32,7 +32,7 @@ class ConfigurationDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         breadcrumbs = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
-            {'title': _('Configuración'), 'url': reverse('configuration:configuration_list')},
+            {'title': _('Configuración'), 'url': reverse('configuration:configuration_update_list')},
         ]
         context['page_title'] = _('Configuración')
         context['breadcrumbs'] = breadcrumbs
@@ -50,25 +50,17 @@ class ConfigurationUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        breadcrumbs = [
-            {'title': _('Dashboard'), 'url': reverse('dashboard')},
-            {'title': _('Configuración'), 'url': reverse('configuration:configuration_list')},
-            {'title': _('Editar configuración')},
-        ]
-        context['page_title'] = _('Editar configuración')
-        context['breadcrumbs'] = breadcrumbs
+        context['page_title'] = _('Configuración')
+        context['breadcrumb_items'] = [_('Configuración')]
         return context
 
     def get_object(self):
         return Configuration.objects.first()
 
     def get_success_url(self):
-
         messages.add_message(
             self.request,
             messages.SUCCESS,
             _('Configuración actualizada correctamente')
         )
-        return reverse_lazy(
-            'configuration:configuration_detail'
-        )
+        return reverse_lazy('configuration:configuration_update')

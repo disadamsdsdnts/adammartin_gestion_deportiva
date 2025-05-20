@@ -31,7 +31,7 @@ class ConfigurationDetailView(DetailView):
         breadcrumbs = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Configuración'), 'url': reverse(
-                'configuration:configuration_detail')},
+                'configuration:configuration_update')},
         ]
         context['page_title'] = _('Configuración Global')
         context['breadcrumbs'] = breadcrumbs
@@ -52,9 +52,9 @@ class ConfigurationUpdateView(UpdateView):
         breadcrumbs = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Configuración'), 'url': reverse(
-                'configuration:configuration_detail')},
-            {'title': _('Editar'), 'url': reverse(
                 'configuration:configuration_update')},
+            {'title': _('Editar'), 'url': reverse(
+                'configuration:configuration_update_update')},
         ]
         context['page_title'] = _('Editar Configuración Global')
         context['breadcrumbs'] = breadcrumbs
@@ -71,5 +71,5 @@ class ConfigurationUpdateView(UpdateView):
             _('Configuración actualizada correctamente')
         )
         return reverse_lazy(
-            'configuration:configuration_detail'
+            'configuration:configuration_update'
         )
