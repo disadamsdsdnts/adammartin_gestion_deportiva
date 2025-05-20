@@ -59,6 +59,7 @@ LOCAL_APPS = [
     'users',
     'futgoal.crispy_forms_tailwind',
     'futgoal.players',
+    'futgoal.team',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

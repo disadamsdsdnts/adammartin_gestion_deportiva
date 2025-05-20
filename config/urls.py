@@ -47,7 +47,12 @@ urlpatterns = [
          include(('futgoal.configuration.urls', 'configuration'),
                  namespace='configuration')
          ),
- ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+    path('team/',
+         include(('futgoal.team.urls', 'team'),
+                 namespace='team')
+         ),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
 # Django Browser Reload
