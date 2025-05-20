@@ -54,12 +54,10 @@
       <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
         {% if season.is_active %}
         <span
-          class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">{%
-					trans 'Activa' %}</span>
+          class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">{% trans 'Activa' %}</span>
         {% else %}
         <span
-          class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">{%
-					trans 'Inactiva' %}</span>
+          class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">{% trans 'Inactiva' %}</span>
         {% endif %}
       </td>
       <td class="p-4 space-x-2 whitespace-nowrap">
@@ -132,8 +130,7 @@
         <form method="post" action="{% url 'season:season_delete' season.id %}">
           {% csrf_token %}
           <button type="submit"
-            class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-base inline-flex items-center px-3 py-2.5 text-center mr-2 dark:focus:ring-red-800">{%
-						trans 'Sí, estoy seguro' %}</button>
+            class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-base inline-flex items-center px-3 py-2.5 text-center mr-2 dark:focus:ring-red-800">{% trans 'Sí, estoy seguro' %}</button>
           <button type="button"
             class="text-gray-900 bg-white hover:bg-gray-100 focus:ring-4 focus:ring-primary-300 border border-gray-200 font-medium inline-flex items-center rounded-lg text-base px-3 py-2.5 text-center dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700"
             data-modal-toggle="delete-season-modal-{{ season.id }}">{% trans 'No, cancelar' %}</button>
