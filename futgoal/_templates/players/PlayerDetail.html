@@ -1,6 +1,8 @@
-{% extends 'layout/LayoutBase.html' %} {% load i18n %} {% block content %}
-{% include 'layout/_page-header.html' with title=player.first_name|add:' '|add:player.last_name breadcrumb_items='Jugadores,'|add:player.first_name|add:' '|add:player.last_name %}
+{% extends 'layout/LayoutBase.html' %}
+{% load i18n %}
 
+{% block content %}
+{% include 'layout/_page-header.html' with title=page_title breadcrumb_items=breadcrums %}
 
 <div class="flex flex-col">
   <div class="overflow-x-auto">
