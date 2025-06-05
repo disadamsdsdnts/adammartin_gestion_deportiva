@@ -1,7 +1,9 @@
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from .models import Team
 
 class TeamListView(ListView):
@@ -19,7 +21,7 @@ class TeamListView(ListView):
         ]
         return context
 
-class TeamDetailView(DetailView):
+class TeamDetailView(LoginRequiredMixin, DetailView):
     model = Team
     template_name = 'team/TeamDetail.html'
     context_object_name = 'team'
@@ -30,13 +32,12 @@ class TeamDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['page_title'] = _('Detalles del Equipo')
-        context['action_button'] = render_to_string('team/partials/team_edit_button.html', {'team': self.object})
-        context['breadcrumb_items'] = [
-            {'name': _('Equipo'), 'url': reverse('team:detail')}
+        context['breadcrums'] = [
+            {'title': _('Equipo')}
         ]
         return context
 
-class TeamUpdateView(UpdateView):
+class TeamUpdateView(LoginRequiredMixin, UpdateView):
     model = Team
     template_name = 'team/TeamForm.html'
     context_object_name = 'team'
@@ -51,8 +52,13 @@ class TeamUpdateView(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['page_title'] = _('Editar Equipo')
-        context['breadcrumb_items'] = [
-            {'name': _('Equipo'), 'url': reverse('team:detail')},
-            {'name': _('Editar'), 'url': reverse('team:update')}
+        context['breadcrums'] = [
+            {'title': _('Equipo'), 'url': reverse_lazy('team:detail')},
+            {'title': _('Editar')}
         ]
         return context
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, _('Equipo actualizado correctamente'))
+        return response
