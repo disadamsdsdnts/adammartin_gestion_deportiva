@@ -101,10 +101,17 @@ class Player(AuditModel):
         default=True
     )
 
+    def __str__(self) -> str:
+        return str(self.first_name + ' ' + self.last_name)
+
+    @property
+    def full_name(self):
+        """
+        Retorna el nombre completo del jugador
+        """
+        return f"{self.first_name or ''} {self.last_name or ''}".strip()
+
     class Meta:
         verbose_name = _('Jugador')
         verbose_name_plural = _('Jugadores')
         ordering = ['-created']
-
-    def __str__(self) -> str:
-        return str(self.first_name + ' ' + self.last_name)
