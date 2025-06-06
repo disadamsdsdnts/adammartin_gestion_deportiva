@@ -12,6 +12,12 @@ class Rival(AuditModel):
         max_length=140,
         help_text=_('Nombre del equipo rival')
     )
+    seasons = models.ManyToManyField(
+        'season.Season',
+        verbose_name=_('Temporadas'),
+        help_text=_('Temporadas en las que participa este equipo rival'),
+        blank=True
+    )
     coach_name = models.CharField(
         _('Nombre del entrenador'),
         max_length=140,
@@ -60,3 +66,31 @@ class Rival(AuditModel):
 
     def __str__(self):
         return str(self.name)
+
+    @classmethod
+    def get_by_active_season(cls):
+        """
+        Obtiene todos los rivales de la temporada activa.
+        """
+        from futgoal.season.models import Season
+        active_season = Season.get_active()
+        if active_season:
+            return cls.objects.filter(seasons=active_season)
+        return cls.objects.none()
+
+    @classmethod
+    def get_by_season(cls, season):
+        """
+        Obtiene todos los rivales de una temporada específica.
+        """
+        return cls.objects.filter(seasons=season)
+
+    def is_in_active_season(self):
+        """
+        Verifica si este rival está en la temporada activa.
+        """
+        from futgoal.season.models import Season
+        active_season = Season.get_active()
+        if active_season:
+            return self.seasons.filter(id=active_season.id).exists()
+        return False

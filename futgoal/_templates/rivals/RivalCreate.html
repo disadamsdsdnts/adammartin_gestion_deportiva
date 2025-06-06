@@ -55,6 +55,27 @@
                 {% endif %}
               </div>
 
+              <div class="col-span-6">
+                <label
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Temporadas' %}</label>
+                <div class="space-y-2">
+                  {% for choice in form.seasons %}
+                  <div class="flex items-center">
+                    {{ choice.tag }}
+                    <label for="{{ choice.id_for_label }}"
+                      class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                      {{ choice.choice_label }}
+                    </label>
+                  </div>
+                  {% endfor %}
+                </div>
+                {% if form.seasons.errors %}
+                <p class="mt-2 text-sm text-red-600">{{ form.seasons.errors.0 }}</p>
+                {% endif %}
+                <p class="mt-1 text-sm text-gray-500">
+                  {% trans 'Selecciona las temporadas en las que participará este equipo rival' %}</p>
+              </div>
+
               <div class="col-span-6 sm:col-span-3">
                 <label for="{{ form.field_name.id_for_label }}"
                   class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Nombre del Campo' %}</label>

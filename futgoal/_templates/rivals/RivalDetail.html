@@ -29,6 +29,24 @@
                       class="block text-sm font-medium text-gray-700 dark:text-gray-300">{% trans 'Nombre del Campo' %}</label>
                     <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ rival.field_name|default:"-" }}</p>
                   </div>
+                  <div>
+                    <label
+                      class="block text-sm font-medium text-gray-700 dark:text-gray-300">{% trans 'Temporadas' %}</label>
+                    <div class="mt-1">
+                      {% for season in rival.seasons.all %}
+                      <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 mr-2 mb-2">
+                        {{ season.name }}
+                        {% if season.is_active %}
+                        <span class="ml-1 w-2 h-2 bg-green-400 rounded-full"></span>
+                        {% endif %}
+                      </span>
+                      {% empty %}
+                      <p class="text-sm text-gray-500 dark:text-gray-400">{% trans 'No asignado a ninguna temporada' %}
+                      </p>
+                      {% endfor %}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

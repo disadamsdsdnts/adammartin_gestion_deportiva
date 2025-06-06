@@ -13,8 +13,9 @@ from django.views.generic import (
 from django.db.models import Q
 
 from futgoal.users.decorators import is_global_admin
+from futgoal.season.models import Season
 from .models import Rival
-from .forms import RivalForm
+from .forms import RivalForm, ImportRivalsForm
 
 
 @method_decorator([login_required, is_global_admin], name='dispatch')
@@ -26,7 +27,18 @@ class RivalListView(ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        queryset = Rival.objects.all()
+        # Mostrar todos los equipos por defecto, filtrar por temporada solo si se solicita
+        show_all = self.request.GET.get('show_all', '')
+        filter_by_season = self.request.GET.get('filter_season', '')
+
+        if filter_by_season and not show_all:
+            active_season = Season.get_active()
+            if active_season:
+                queryset = Rival.objects.filter(seasons=active_season)
+            else:
+                queryset = Rival.objects.all()
+        else:
+            queryset = Rival.objects.all()
 
         # Filtro de búsqueda
         search = self.request.GET.get('search', '')
@@ -43,11 +55,19 @@ class RivalListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        active_season = Season.get_active()
+        filter_by_season = self.request.GET.get('filter_season', '')
+
         context['page_title'] = _('Equipos Rivales')
         context['breadcrumbs'] = [
             {'title': _('Equipos Rivales'), 'url': reverse('rivals:rival_list')},
         ]
         context['action_button'] = f'<a href="{reverse_lazy("rivals:rival_create")}" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"><svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>{_("Nuevo Rival")}</a>'
+
+        # Información adicional de contexto
+        context['active_season'] = active_season
+        context['filter_by_season'] = filter_by_season
+
         return context
 
 
