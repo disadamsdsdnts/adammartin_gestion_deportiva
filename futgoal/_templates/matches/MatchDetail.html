@@ -24,9 +24,11 @@
                       class="block text-sm font-medium text-gray-700 dark:text-gray-300">{% trans 'Equipos' %}</label>
                     <p class="mt-1 text-sm text-gray-900 dark:text-white">
                       {% if match.is_home %}
-                      <span class="text-green-600 font-bold">{{ match.home_team.name }}</span> vs {{ match.away_team }}
+                      <span class="text-green-600 font-bold">{{ match.home_team.name }}</span> vs
+                      {{ match.away_team.name }}
                       {% else %}
-                      {{ match.away_team }} vs <span class="text-green-600 font-bold">{{ match.home_team.name }}</span>
+                      {{ match.away_team.name }} vs <span
+                        class="text-green-600 font-bold">{{ match.home_team.name }}</span>
                       {% endif %}
                     </p>
                   </div>
@@ -138,18 +140,89 @@
                 </div>
               </div>
             </div>
-            {% if match.notes %}
-            <div class="col-span-6">
+            <!-- Notas del partido -->
+            <div class="col-span-6" id="notas">
               <div class="mb-4">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans 'Notas y Observaciones' %}</h3>
-                <div class="mt-4">
-                  <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <p class="text-sm text-gray-900 dark:text-white">{{ match.notes }}</p>
-                  </div>
+                <div class="flex justify-between items-center mb-4">
+                  <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans 'Notas del Partido' %}</h3>
+                  <a href="{% url 'matches:match_note_create' match.id %}"
+                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd"
+                        d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                        clip-rule="evenodd"></path>
+                    </svg>
+                    {% trans 'Agregar Nota' %}
+                  </a>
                 </div>
+
+                {% if match.match_notes.all %}
+                <div class="space-y-4">
+                  {% for note in match.match_notes.all %}
+                  <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                    <div class="flex justify-between items-start mb-2">
+                      <h4 class="text-md font-semibold text-gray-900 dark:text-white">{{ note.title }}</h4>
+                      <div class="flex items-center space-x-2">
+                        <span
+                          class="text-xs text-gray-500 dark:text-gray-400">{{ note.created|date:'d/m/Y H:i' }}</span>
+                        <div class="flex space-x-1">
+                          <a href="{% url 'matches:match_note_update' note.pk %}"
+                            class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z">
+                              </path>
+                              <path fill-rule="evenodd"
+                                d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+                                clip-rule="evenodd"></path>
+                            </svg>
+                          </a>
+                          <button onclick="deleteNote({{ note.pk }})"
+                            class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                              <path fill-rule="evenodd"
+                                d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9zM4 5a2 2 0 012-2h6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 112 0v4a1 1 0 11-2 0V9zm4 0a1 1 0 112 0v4a1 1 0 11-2 0V9z"
+                                clip-rule="evenodd"></path>
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <p class="text-sm text-gray-700 dark:text-gray-300">{{ note.content }}</p>
+                    <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                      {% trans 'Equipo rival' %}: {{ note.rival_team }}
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+
+                <div class="mt-4 text-center">
+                  <a href="{% url 'matches:match_note_list' %}"
+                    class="text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300 text-sm font-medium">
+                    {% trans 'Ver todas las notas' %} →
+                  </a>
+                </div>
+                {% else %}
+                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg text-center">
+                  <p class="text-sm text-gray-500 dark:text-gray-400">{% trans 'No hay notas para este partido' %}</p>
+                  <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                    {% trans 'Haz clic en "Agregar Nota" para crear la primera nota' %}</p>
+                </div>
+                {% endif %}
+
+                {% if match.notes %}
+                <div
+                  class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+                  <h4 class="text-sm font-medium text-blue-900 dark:text-blue-300 mb-2">
+                    {% trans 'Nota antigua del sistema' %}</h4>
+                  <p class="text-sm text-blue-800 dark:text-blue-200">{{ match.notes }}</p>
+                  <p class="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                    {% trans 'Esta es una nota del sistema anterior. Considera migrarla a las nuevas notas individuales.' %}
+                  </p>
+                </div>
+                {% endif %}
               </div>
             </div>
-            {% endif %}
             <div class="col-span-6">
               <div class="mb-4">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans 'Información Adicional' %}</h3>
@@ -233,4 +306,32 @@
     </div>
   </div>
 </div>
+
+<script>
+  function deleteNote(noteId) {
+    if (confirm('{% trans "¿Estás seguro de que quieres eliminar esta nota?" %}')) {
+      fetch(`{% url 'matches:match_note_delete_ajax' 0 %}`.replace('0', noteId), {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json',
+          },
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            // Recargar la página para mostrar los cambios
+            window.location.reload();
+          } else {
+            alert(data.message || '{% trans "Error al eliminar la nota" %}');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('{% trans "Error al eliminar la nota" %}');
+        });
+    }
+  }
+
+</script>
 {% endblock %}

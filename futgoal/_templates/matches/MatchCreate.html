@@ -25,81 +25,11 @@
             {% endif %}
 
             <div class="grid grid-cols-6 gap-6">
-              <div class="col-span-6 sm:col-span-3">
-                <label for="{{ form.home_team.id_for_label }}"
-                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Equipo local' %}</label>
-                <select name="{{ form.home_team.name }}" id="{{ form.home_team.id_for_label }}"
-                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  required>
-                  <option value="">{% trans 'Selecciona un equipo' %}</option>
-                  {% for choice in form.home_team %}
-                  {{ choice.tag }}
-                  {% endfor %}
-                </select>
-                {% if form.home_team.errors %}
-                <p class="mt-2 text-sm text-red-600">{{ form.home_team.errors.0 }}</p>
-                {% endif %}
-              </div>
-              <div class="col-span-6 sm:col-span-3">
-                <label for="{{ form.away_team.id_for_label }}"
-                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Equipo visitante' %}</label>
-                <input type="text" name="{{ form.away_team.name }}" id="{{ form.away_team.id_for_label }}"
-                  value="{{ form.away_team.value|default:'' }}"
-                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="{% trans 'Nombre del equipo rival' %}" required />
-                {% if form.away_team.errors %}
-                <p class="mt-2 text-sm text-red-600">{{ form.away_team.errors.0 }}</p>
-                {% endif %}
-              </div>
-              <div class="col-span-6 sm:col-span-3">
-                <label for="{{ form.match_date.id_for_label }}"
-                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Fecha y hora del partido' %}</label>
-                <input type="datetime-local" name="{{ form.match_date.name }}" id="{{ form.match_date.id_for_label }}"
-                  value="{{ form.match_date.value|date:'Y-m-d\TH:i'|default:'' }}"
-                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  required />
-                {% if form.match_date.errors %}
-                <p class="mt-2 text-sm text-red-600">{{ form.match_date.errors.0 }}</p>
-                {% endif %}
-              </div>
-              <div class="col-span-6 sm:col-span-3">
-                <label for="{{ form.venue.id_for_label }}"
-                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Estadio/Campo' %}</label>
-                <input type="text" name="{{ form.venue.name }}" id="{{ form.venue.id_for_label }}"
-                  value="{{ form.venue.value|default:'' }}"
-                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="{% trans 'Nombre del estadio o campo' %}" />
-                {% if form.venue.errors %}
-                <p class="mt-2 text-sm text-red-600">{{ form.venue.errors.0 }}</p>
-                {% endif %}
-              </div>
-              <div class="col-span-6 sm:col-span-3">
-                <label for="{{ form.match_type.id_for_label }}"
-                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Tipo de partido' %}</label>
-                <select name="{{ form.match_type.name }}" id="{{ form.match_type.id_for_label }}"
-                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                  {% for choice in form.match_type %}
-                  {{ choice.tag }}
-                  {% endfor %}
-                </select>
-                {% if form.match_type.errors %}
-                <p class="mt-2 text-sm text-red-600">{{ form.match_type.errors.0 }}</p>
-                {% endif %}
-              </div>
-              <div class="col-span-6 sm:col-span-3">
-                <label for="{{ form.status.id_for_label }}"
-                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Estado' %}</label>
-                <select name="{{ form.status.name }}" id="{{ form.status.id_for_label }}"
-                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                  {% for choice in form.status %}
-                  {{ choice.tag }}
-                  {% endfor %}
-                </select>
-                {% if form.status.errors %}
-                <p class="mt-2 text-sm text-red-600">{{ form.status.errors.0 }}</p>
-                {% endif %}
-              </div>
-              <div class="col-span-6 sm:col-span-3">
+              <!-- Campo home_team oculto (gestionado por el formulario) -->
+              {{ form.home_team }}
+
+              <!-- Partido en casa - Fila completa -->
+              <div class="col-span-6">
                 <label for="{{ form.is_home.id_for_label }}"
                   class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Partido en casa' %}</label>
                 <div class="flex items-center">
@@ -115,9 +45,84 @@
                 <p class="mt-2 text-sm text-red-600">{{ form.is_home.errors.0 }}</p>
                 {% endif %}
               </div>
+
+              <!-- Equipo rival -->
+              <div class="col-span-6 sm:col-span-3">
+                <label for="{{ form.away_team.id_for_label }}"
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Equipo rival' %}</label>
+                <select name="{{ form.away_team.name }}" id="{{ form.away_team.id_for_label }}"
+                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  required>
+                  <option value="">{% trans 'Selecciona un equipo rival' %}</option>
+                  {% for choice in form.away_team %}
+                  {{ choice.tag }}
+                  {% endfor %}
+                </select>
+                {% if form.away_team.errors %}
+                <p class="mt-2 text-sm text-red-600">{{ form.away_team.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <!-- Fecha y hora del partido -->
+              <div class="col-span-6 sm:col-span-3">
+                <label for="{{ form.match_date.id_for_label }}"
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Fecha y hora del partido' %}</label>
+                <input type="datetime-local" name="{{ form.match_date.name }}" id="{{ form.match_date.id_for_label }}"
+                  value="{{ form.match_date.value|date:'Y-m-d\TH:i'|default:'' }}"
+                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  required />
+                {% if form.match_date.errors %}
+                <p class="mt-2 text-sm text-red-600">{{ form.match_date.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <!-- Estadio/Campo -->
+              <div class="col-span-6 sm:col-span-3">
+                <label for="{{ form.venue.id_for_label }}"
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Estadio/Campo' %}</label>
+                <input type="text" name="{{ form.venue.name }}" id="{{ form.venue.id_for_label }}"
+                  value="{{ form.venue.value|default:'' }}"
+                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  placeholder="{% trans 'Nombre del estadio o campo' %}" />
+                {% if form.venue.errors %}
+                <p class="mt-2 text-sm text-red-600">{{ form.venue.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <!-- Tipo de partido -->
+              <div class="col-span-6 sm:col-span-3">
+                <label for="{{ form.match_type.id_for_label }}"
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Tipo de partido' %}</label>
+                <select name="{{ form.match_type.name }}" id="{{ form.match_type.id_for_label }}"
+                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                  {% for choice in form.match_type %}
+                  {{ choice.tag }}
+                  {% endfor %}
+                </select>
+                {% if form.match_type.errors %}
+                <p class="mt-2 text-sm text-red-600">{{ form.match_type.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <!-- Estado -->
+              <div class="col-span-6 sm:col-span-3">
+                <label for="{{ form.status.id_for_label }}"
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Estado' %}</label>
+                <select name="{{ form.status.name }}" id="{{ form.status.id_for_label }}"
+                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                  {% for choice in form.status %}
+                  {{ choice.tag }}
+                  {% endfor %}
+                </select>
+                {% if form.status.errors %}
+                <p class="mt-2 text-sm text-red-600">{{ form.status.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <!-- Goles - ambos en la misma fila -->
               <div class="col-span-6 sm:col-span-3">
                 <label for="{{ form.home_score.id_for_label }}"
-                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Goles equipo local' %}</label>
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Goles nuestro equipo' %}</label>
                 <input type="number" name="{{ form.home_score.name }}" id="{{ form.home_score.id_for_label }}"
                   value="{{ form.home_score.value|default:'' }}"
                   class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -128,7 +133,7 @@
               </div>
               <div class="col-span-6 sm:col-span-3">
                 <label for="{{ form.away_score.id_for_label }}"
-                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Goles equipo visitante' %}</label>
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Goles equipo rival' %}</label>
                 <input type="number" name="{{ form.away_score.name }}" id="{{ form.away_score.id_for_label }}"
                   value="{{ form.away_score.value|default:'' }}"
                   class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -137,6 +142,8 @@
                 <p class="mt-2 text-sm text-red-600">{{ form.away_score.errors.0 }}</p>
                 {% endif %}
               </div>
+
+              <!-- Notas -->
               <div class="col-span-6">
                 <label for="{{ form.notes.id_for_label }}"
                   class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Notas' %}</label>

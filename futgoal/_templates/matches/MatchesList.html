@@ -67,6 +67,9 @@
         {% trans 'Tipo' %}
       </th>
       <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
+        {% trans 'Notas' %}
+      </th>
+      <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
         {% trans 'Acciones' %}
       </th>
     </tr>
@@ -87,9 +90,9 @@
       <td class="p-4">
         <div class="text-base font-medium text-gray-900 dark:text-white">
           {% if match.is_home %}
-          <span class="text-green-600 font-bold">{{ match.home_team.name }}</span> vs {{ match.away_team }}
+          <span class="text-green-600 font-bold">{{ match.home_team.name }}</span> vs {{ match.away_team.name }}
           {% else %}
-          {{ match.away_team }} vs <span class="text-green-600 font-bold">{{ match.home_team.name }}</span>
+          {{ match.away_team.name }} vs <span class="text-green-600 font-bold">{{ match.home_team.name }}</span>
           {% endif %}
         </div>
         {% if match.venue %}
@@ -136,6 +139,29 @@
       </td>
       <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
         {{ match.get_match_type_display }}
+      </td>
+      <td class="p-4 text-center">
+        {% if match.match_notes.count > 0 %}
+        <a href="{% url 'matches:match_detail' match.id %}#notas"
+          class="inline-flex items-center px-2 py-1 text-xs font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+          <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd"
+              d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
+              clip-rule="evenodd"></path>
+          </svg>
+          {{ match.match_notes.count }}
+        </a>
+        {% else %}
+        <a href="{% url 'matches:match_note_create' match.id %}"
+          class="inline-flex items-center px-2 py-1 text-xs font-medium text-center text-gray-600 rounded-lg border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-300 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+          <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd"
+              d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+              clip-rule="evenodd"></path>
+          </svg>
+          {% trans 'Agregar' %}
+        </a>
+        {% endif %}
       </td>
       <td class="p-4 space-x-2 whitespace-nowrap">
         <a href="{% url 'matches:match_detail' match.id %}"

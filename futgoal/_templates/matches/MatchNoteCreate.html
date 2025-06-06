@@ -1,0 +1,99 @@
+{% extends 'layout/LayoutBase.html' %}
+{% load i18n %}
+
+{% block content %}
+{% include 'layout/_page-header.html' with title=page_title breadcrumb_items=breadcrumbs %}
+
+<div class="flex flex-col">
+  <div class="overflow-x-auto">
+    <div class="inline-block min-w-full align-middle">
+      <div class="overflow-hidden shadow">
+        <div class="p-6 bg-white dark:bg-gray-800">
+
+          <!-- Información del partido -->
+          <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <h3 class="text-md font-medium text-gray-900 dark:text-white mb-2">{% trans 'Información del Partido' %}
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div>
+                <span class="text-gray-500 dark:text-gray-400">{% trans 'Equipos' %}:</span>
+                <span class="text-gray-900 dark:text-white ml-1">
+                  {% if match.is_home %}
+                  <strong>{{ match.home_team.name }}</strong> vs {{ match.away_team.name }}
+                  {% else %}
+                  {{ match.away_team.name }} vs <strong>{{ match.home_team.name }}</strong>
+                  {% endif %}
+                </span>
+              </div>
+              <div>
+                <span class="text-gray-500 dark:text-gray-400">{% trans 'Fecha' %}:</span>
+                <span class="text-gray-900 dark:text-white ml-1">{{ match.match_date|date:'d/m/Y H:i' }}</span>
+              </div>
+              <div>
+                <span class="text-gray-500 dark:text-gray-400">{% trans 'Estado' %}:</span>
+                <span class="text-gray-900 dark:text-white ml-1">{{ match.get_status_display }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Formulario -->
+          <form method="post">
+            {% csrf_token %}
+            <div class="grid grid-cols-6 gap-6">
+              <div class="col-span-6">
+                <label for="{{ form.title.id_for_label }}"
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  {{ form.title.label }}
+                  {% if form.title.field.required %}<span class="text-red-500">*</span>{% endif %}
+                </label>
+                {{ form.title }}
+                {% if form.title.help_text %}
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ form.title.help_text }}</p>
+                {% endif %}
+                {% if form.title.errors %}
+                <div class="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {% for error in form.title.errors %}
+                  <p>{{ error }}</p>
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+
+              <div class="col-span-6">
+                <label for="{{ form.content.id_for_label }}"
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  {{ form.content.label }}
+                  {% if form.content.field.required %}<span class="text-red-500">*</span>{% endif %}
+                </label>
+                {{ form.content }}
+                {% if form.content.help_text %}
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ form.content.help_text }}</p>
+                {% endif %}
+                {% if form.content.errors %}
+                <div class="mt-1 text-sm text-red-600 dark:text-red-400">
+                  {% for error in form.content.errors %}
+                  <p>{{ error }}</p>
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="flex items-center space-x-4 mt-6">
+              <button type="submit"
+                class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+                {% trans 'Crear Nota' %}
+              </button>
+              <a href="{% url 'matches:match_detail' match.id %}"
+                class="text-gray-900 bg-white hover:bg-gray-100 focus:ring-4 focus:ring-primary-300 border border-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+                {% trans 'Cancelar' %}
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
