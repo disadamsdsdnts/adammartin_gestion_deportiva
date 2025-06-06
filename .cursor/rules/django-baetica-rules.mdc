@@ -50,7 +50,7 @@ class ModelListView(ListView):
         context = super().get_context_data(**kwargs)
 
         context['page_title'] = _('Título')
-        context['breadcrums'] = [
+        context['breadcrumbs'] = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Sección'), 'url': reverse('app:model_list')},
         ]
@@ -77,7 +77,7 @@ class ModelDetailView(DetailView):
         context = super().get_context_data(**kwargs)
 
         context['page_title'] = f"{_('Objeto')} : {self.object.name}"
-        context['breadcrums'] = [
+        context['breadcrumbs'] = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Sección'), 'url': reverse('app:model_list')},
             {'title': self.object.name}
@@ -97,7 +97,7 @@ class ModelCreateView(CreateView):
         context = super().get_context_data(**kwargs)
 
         context['page_title'] = _('Nuevo Objeto')
-        context['breadcrums'] = [
+        context['breadcrumbs'] = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Sección'), 'url': reverse('app:model_list')},
             {'title': _('Nuevo'), 'url': reverse('app:model_create')},
@@ -125,7 +125,7 @@ class ModelUpdateView(UpdateView):
         context = super().get_context_data(**kwargs)
 
         context['page_title'] = _('Editar Objeto')
-        context['breadcrums'] = [
+        context['breadcrumbs'] = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Sección'), 'url': reverse('app:model_list')},
             {'title': _('Editar')},
@@ -152,7 +152,7 @@ class ModelDeleteView(DeleteView):
         context = super().get_context_data(**kwargs)
 
         context['page_title'] = _("Eliminar Objeto")
-        context['breadcrums'] = [
+        context['breadcrumbs'] = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Sección'), 'url': reverse('app:model_list')},
             {'title': _('Eliminar')},

@@ -57,7 +57,7 @@ class MatchListView(ListView):
         context = super().get_context_data(**kwargs)
 
         context['page_title'] = _('Partidos')
-        context['breadcrums'] = [
+        context['breadcrumbs'] = [
             {'title': _('Partidos'), 'url': reverse('matches:match_list')},
         ]
         context['actions'] = [
@@ -86,7 +86,7 @@ class MatchDetailView(DetailView):
         context = super().get_context_data(**kwargs)
 
         context['page_title'] = f"{_('Partido')}: {self.object}"
-        context['breadcrums'] = [
+        context['breadcrumbs'] = [
             {'title': _('Partidos'), 'url': reverse('matches:match_list')},
             {'title': str(self.object)}
         ]
@@ -118,7 +118,7 @@ class MatchCreateView(CreateView):
         context = super().get_context_data(**kwargs)
 
         context['page_title'] = _('Nuevo Partido')
-        context['breadcrums'] = [
+        context['breadcrumbs'] = [
             {'title': _('Partidos'), 'url': reverse('matches:match_list')},
             {'title': _('Nuevo'), 'url': reverse('matches:match_create')},
         ]
@@ -144,7 +144,7 @@ class MatchUpdateView(UpdateView):
         context = super().get_context_data(**kwargs)
 
         context['page_title'] = _('Editar Partido')
-        context['breadcrums'] = [
+        context['breadcrumbs'] = [
             {'title': _('Partidos'), 'url': reverse('matches:match_list')},
             {'title': _('Editar')},
         ]
@@ -169,7 +169,7 @@ class MatchDeleteView(DeleteView):
         context = super().get_context_data(**kwargs)
 
         context['page_title'] = _("Eliminar Partido")
-        context['breadcrums'] = [
+        context['breadcrumbs'] = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Partidos'), 'url': reverse('matches:match_list')},
             {'title': _('Eliminar')},

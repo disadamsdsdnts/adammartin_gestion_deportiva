@@ -32,7 +32,7 @@ class TeamDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['page_title'] = _('Detalles del Equipo')
-        context['breadcrums'] = [
+        context['breadcrumbs'] = [
             {'title': _('Equipo')}
         ]
         return context
@@ -52,7 +52,7 @@ class TeamUpdateView(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['page_title'] = _('Editar Equipo')
-        context['breadcrums'] = [
+        context['breadcrumbs'] = [
             {'title': _('Equipo'), 'url': reverse_lazy('team:detail')},
             {'title': _('Editar')}
         ]
