@@ -1,7 +1,7 @@
 from django.urls import include, path, re_path
 from django.views.decorators.csrf import csrf_exempt
 
-from .views import PlayerList, PlayerCreate, PlayerDetail, PlayerUpdate, PlayerDelete
+from .views import PlayerList, PlayerCreate, PlayerDetail, PlayerUpdate, PlayerDelete, PlayerImportView, PlayerImportCSVTemplateView, PlayerProcessCSVView
 
 
 urlpatterns = [
@@ -19,6 +19,21 @@ urlpatterns = [
         'new-player/',
         PlayerCreate.as_view(),
         name='player_create'
+    ),
+    path(
+        'import/',
+        PlayerImportView.as_view(),
+        name='player_import'
+    ),
+    path(
+        'import/csv-template/',
+        PlayerImportCSVTemplateView.as_view(),
+        name='player_import_csv_template'
+    ),
+    path(
+        'import/process-csv/',
+        PlayerProcessCSVView.as_view(),
+        name='player_process_csv'
     ),
     path(
         '<pk>/',

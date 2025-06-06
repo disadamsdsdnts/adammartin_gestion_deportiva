@@ -1,1 +1,1 @@
-from .player_forms import PlayerForm
+from .player_forms import PlayerForm, PlayerImportForm

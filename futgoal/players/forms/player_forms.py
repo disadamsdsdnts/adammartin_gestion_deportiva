@@ -121,3 +121,63 @@ class PlayerForm(forms.ModelForm):
                 }
             )
         }
+
+
+class PlayerImportForm(forms.ModelForm):
+    """Formulario simplificado para importación masiva de jugadores"""
+
+    class Meta:
+        model = Player
+        fields = [
+            'first_name',
+            'last_name',
+            'birth_date',
+            'identity_document'
+        ]
+        widgets = {
+            'first_name': forms.TextInput(
+                attrs={
+                    'class': 'shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500',
+                    'placeholder': _('Nombre'),
+                    'required': True
+                }
+            ),
+            'last_name': forms.TextInput(
+                attrs={
+                    'class': 'shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500',
+                    'placeholder': _('Apellidos'),
+                    'required': True
+                }
+            ),
+            'birth_date': forms.DateInput(
+                attrs={
+                    'class': 'shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500',
+                    'type': 'date',
+                    'required': True
+                }
+            ),
+            'identity_document': forms.TextInput(
+                attrs={
+                    'class': 'shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500',
+                    'placeholder': _('Documento de identidad'),
+                    'required': True
+                }
+            )
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Hacer todos los campos obligatorios para importación
+        for field_name in self.fields:
+            self.fields[field_name].required = True
+
+    def clean_identity_document(self):
+        """Validar que el documento de identidad no esté duplicado"""
+        identity_document = self.cleaned_data.get('identity_document')
+        if identity_document:
+            # Verificar si ya existe un jugador con este documento
+            if Player.objects.filter(identity_document=identity_document).exists():
+                raise forms.ValidationError(
+                    _('Ya existe un jugador con este documento de identidad.')
+                )
+        return identity_document

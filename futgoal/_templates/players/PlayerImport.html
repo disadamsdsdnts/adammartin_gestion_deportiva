@@ -1,0 +1,580 @@
+{% extends 'layout/LayoutBase.html' %}
+{% load i18n %}
+
+{% block content %}
+{% include 'layout/_page-header.html' with title=page_title breadcrumb_items=breadcrumbs %}
+
+<div class="flex flex-col">
+  <div class="overflow-x-auto">
+    <div class="inline-block min-w-full align-middle">
+      <div class="overflow-hidden shadow">
+        <div class="p-6 bg-white dark:bg-gray-800">
+
+          <!-- Información y instrucciones -->
+          <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg dark:bg-blue-900 dark:border-blue-700">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                    clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-blue-800 dark:text-blue-300">
+                  {% trans 'Instrucciones de importación' %}
+                </h3>
+                <div class="mt-2 text-sm text-blue-700 dark:text-blue-400">
+                  <ul class="list-disc list-inside space-y-1">
+                    <li>{% trans 'Complete todos los campos obligatorios para cada jugador' %}</li>
+                    <li>{% trans 'Puede añadir o eliminar filas según necesite' %}</li>
+                    <li>{% trans 'Los documentos de identidad deben ser únicos' %}</li>
+                    <li>{% trans 'La fecha debe tener el formato correcto' %}</li>
+                    <li>{% trans 'También puede importar desde un archivo CSV' %}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sección de importación CSV -->
+          <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg dark:bg-green-900 dark:border-green-700">
+            <div class="flex items-start">
+              <div class="flex-shrink-0">
+                <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                  </path>
+                </svg>
+              </div>
+              <div class="ml-3 flex-1">
+                <h3 class="text-sm font-medium text-green-800 dark:text-green-300">
+                  {% trans 'Importación desde CSV' %}
+                </h3>
+                <div class="mt-2 text-sm text-green-700 dark:text-green-400">
+                  <p class="mb-3">
+                    {% trans 'Importe múltiples jugadores desde un archivo CSV. Descargue la plantilla, complete los datos y súbala aquí.' %}
+                  </p>
+
+                  <div class="flex flex-wrap gap-3 items-center">
+                    <a href="{% url 'players:player_import_csv_template' %}"
+                      class="inline-flex items-center px-3 py-2 text-xs font-medium text-green-800 bg-green-100 rounded-lg hover:bg-green-200 dark:bg-green-800 dark:text-green-200 dark:hover:bg-green-700">
+                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
+                      </svg>
+                      {% trans 'Descargar plantilla CSV' %}
+                    </a>
+
+                    <div class="flex items-center gap-2">
+                      <input type="file" id="csv-file-input" accept=".csv" class="hidden">
+                      <label for="csv-file-input"
+                        class="inline-flex items-center px-3 py-2 text-xs font-medium text-green-800 bg-green-100 rounded-lg hover:bg-green-200 cursor-pointer dark:bg-green-800 dark:text-green-200 dark:hover:bg-green-700">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                          </path>
+                        </svg>
+                        {% trans 'Seleccionar archivo CSV' %}
+                      </label>
+                      <span id="csv-file-name" class="text-xs text-green-600 dark:text-green-400"></span>
+                    </div>
+
+                    <button id="load-csv-btn" type="button" disabled
+                      class="inline-flex items-center px-3 py-2 text-xs font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed dark:disabled:bg-gray-600">
+                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                      </svg>
+                      {% trans 'Cargar CSV' %}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabla de importación -->
+          <div id="import-form">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+                <thead class="bg-gray-50 dark:bg-gray-700">
+                  <tr>
+                    <th scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                      {% trans 'Nombre' %} *
+                    </th>
+                    <th scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                      {% trans 'Apellidos' %} *
+                    </th>
+                    <th scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                      {% trans 'Fecha de nacimiento' %} *
+                    </th>
+                    <th scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                      {% trans 'Documento de identidad' %} *
+                    </th>
+                    <th scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                      {% trans 'Acciones' %}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="players-table-body"
+                  class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                  <!-- Las filas se añadirán dinámicamente -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="mt-6 flex flex-wrap gap-4">
+              <button id="add-row-btn" type="button"
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
+                  </path>
+                </svg>
+                {% trans 'Añadir jugador' %}
+              </button>
+
+              <button id="import-btn" type="button"
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                {% trans 'Importar jugadores' %}
+              </button>
+
+              <a href="{% url 'players:player_list' %}"
+                class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
+                {% trans 'Cancelar' %}
+              </a>
+            </div>
+          </div>
+
+          <!-- Área de resultados -->
+          <div id="import-results" class="mt-6 hidden">
+            <!-- Los resultados se mostrarán aquí -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    let rowCounter = 0;
+    const tableBody = document.getElementById('players-table-body');
+    const addRowBtn = document.getElementById('add-row-btn');
+    const importBtn = document.getElementById('import-btn');
+    const resultsDiv = document.getElementById('import-results');
+
+    // Función para crear una nueva fila
+    function createPlayerRow() {
+      rowCounter++;
+      const row = document.createElement('tr');
+      row.className = 'player-row hover:bg-gray-50 dark:hover:bg-gray-700';
+      row.innerHTML = `
+            <td class="px-6 py-4 whitespace-nowrap">
+                <input type="text" name="first_name_${rowCounter}"
+                    class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    placeholder="{% trans 'Nombre' %}" required>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <input type="text" name="last_name_${rowCounter}"
+                    class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    placeholder="{% trans 'Apellidos' %}" required>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <input type="date" name="birth_date_${rowCounter}"
+                    class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    required>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <input type="text" name="identity_document_${rowCounter}"
+                    class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    placeholder="{% trans 'Documento de identidad' %}" required>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <button type="button" class="remove-row-btn text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                    title="{% trans 'Eliminar fila' %}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                </button>
+            </td>
+        `;
+      return row;
+    }
+
+    // Función para eliminar una fila
+    function removeRow(button) {
+      const row = button.closest('.player-row');
+      if (tableBody.children.length > 1) {
+        row.remove();
+      } else {
+        alert('{% trans "Debe mantener al menos una fila" %}');
+      }
+    }
+
+    // Función para recopilar datos de los jugadores
+    function collectPlayersData() {
+      const rows = document.querySelectorAll('.player-row');
+      const playersData = [];
+
+      rows.forEach(row => {
+        const inputs = row.querySelectorAll('input');
+        const playerData = {
+          first_name: inputs[0].value.trim(),
+          last_name: inputs[1].value.trim(),
+          birth_date: inputs[2].value.trim(),
+          identity_document: inputs[3].value.trim()
+        };
+
+        // Solo añadir si al menos un campo tiene contenido
+        if (playerData.first_name || playerData.last_name || playerData.birth_date || playerData
+          .identity_document) {
+          playersData.push(playerData);
+        }
+      });
+
+      return playersData;
+    }
+
+    // Función para mostrar resultados
+    function showResults(data) {
+      resultsDiv.innerHTML = '';
+      resultsDiv.classList.remove('hidden');
+
+      if (data.success) {
+        const successDiv = document.createElement('div');
+        successDiv.className =
+          'p-4 bg-green-50 border border-green-200 rounded-lg dark:bg-green-900 dark:border-green-700';
+        successDiv.innerHTML = `
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-green-800 dark:text-green-300">
+                            {% trans 'Importación exitosa' %}
+                        </h3>
+                        <div class="mt-2 text-sm text-green-700 dark:text-green-400">
+                            <p>${data.created_count} {% trans 'jugadores importados correctamente' %}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        resultsDiv.appendChild(successDiv);
+
+        // Limpiar el formulario después del éxito
+        setTimeout(() => {
+          window.location.href = "{% url 'players:player_list' %}";
+        }, 2000);
+
+      } else {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'p-4 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900 dark:border-red-700';
+
+        let errorsHtml = '';
+        data.errors.forEach(error => {
+          const rowText = error.row ? `{% trans 'Fila' %} ${error.row}: ` : '';
+          const fieldText = error.field ? `${error.field} - ` : '';
+          errorsHtml += `<li>${rowText}${fieldText}${error.message}</li>`;
+        });
+
+        errorDiv.innerHTML = `
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800 dark:text-red-300">
+                            {% trans 'Errores de importación' %}
+                        </h3>
+                        <div class="mt-2 text-sm text-red-700 dark:text-red-400">
+                            <ul class="list-disc list-inside space-y-1">
+                                ${errorsHtml}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+        resultsDiv.appendChild(errorDiv);
+      }
+    }
+
+    // Event listeners
+    addRowBtn.addEventListener('click', function () {
+      const newRow = createPlayerRow();
+      tableBody.appendChild(newRow);
+    });
+
+    // Delegación de eventos para botones de eliminar
+    tableBody.addEventListener('click', function (e) {
+      if (e.target.closest('.remove-row-btn')) {
+        removeRow(e.target.closest('.remove-row-btn'));
+      }
+    });
+
+    // Importar jugadores
+    importBtn.addEventListener('click', function () {
+      const playersData = collectPlayersData();
+
+      if (playersData.length === 0) {
+        alert('{% trans "Por favor, complete al menos un jugador" %}');
+        return;
+      }
+
+      // Validar que todos los jugadores tengan todos los campos
+      let hasErrors = false;
+      playersData.forEach((player, index) => {
+        if (!player.first_name || !player.last_name || !player.birth_date || !player.identity_document) {
+          hasErrors = true;
+        }
+      });
+
+      if (hasErrors) {
+        alert('{% trans "Por favor, complete todos los campos obligatorios" %}');
+        return;
+      }
+
+      // Deshabilitar el botón durante la importación
+      importBtn.disabled = true;
+      importBtn.innerHTML =
+        '<svg class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>{% trans "Importando..." %}';
+
+      // Enviar datos al servidor
+      fetch('{% url "players:player_import" %}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+          },
+          body: JSON.stringify(playersData)
+        })
+        .then(response => response.json())
+        .then(data => {
+          showResults(data);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showResults({
+            success: false,
+            errors: [{
+              message: '{% trans "Error de conexión" %}'
+            }]
+          });
+        })
+        .finally(() => {
+          // Rehabilitar el botón
+          importBtn.disabled = false;
+          importBtn.innerHTML =
+            '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>{% trans "Importar jugadores" %}';
+        });
+    });
+
+    // === Funcionalidad CSV ===
+    const csvFileInput = document.getElementById('csv-file-input');
+    const csvFileName = document.getElementById('csv-file-name');
+    const loadCsvBtn = document.getElementById('load-csv-btn');
+
+    // Manejar selección de archivo CSV
+    csvFileInput.addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        csvFileName.textContent = file.name;
+        loadCsvBtn.disabled = false;
+      } else {
+        csvFileName.textContent = '';
+        loadCsvBtn.disabled = true;
+      }
+    });
+
+    // Función para limpiar tabla
+    function clearTable() {
+      tableBody.innerHTML = '';
+      rowCounter = 0;
+    }
+
+    // Función para añadir múltiples filas desde CSV
+    function addRowsFromCSV(playersData) {
+      clearTable();
+
+      playersData.forEach(playerData => {
+        const row = createPlayerRow();
+        const inputs = row.querySelectorAll('input');
+
+        inputs[0].value = playerData.first_name || '';
+        inputs[1].value = playerData.last_name || '';
+        inputs[2].value = playerData.birth_date || '';
+        inputs[3].value = playerData.identity_document || '';
+
+        tableBody.appendChild(row);
+      });
+
+      // Si no hay datos, añadir al menos una fila vacía
+      if (playersData.length === 0) {
+        const initialRow = createPlayerRow();
+        tableBody.appendChild(initialRow);
+      }
+    }
+
+    // Cargar archivo CSV
+    loadCsvBtn.addEventListener('click', function () {
+      const file = csvFileInput.files[0];
+      if (!file) {
+        alert('{% trans "Por favor, seleccione un archivo CSV" %}');
+        return;
+      }
+
+      // Crear FormData para enviar el archivo
+      const formData = new FormData();
+      formData.append('csv_file', file);
+
+      // Deshabilitar botón durante la carga
+      loadCsvBtn.disabled = true;
+      loadCsvBtn.innerHTML =
+        '<svg class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>{% trans "Cargando..." %}';
+
+      // Enviar archivo al servidor
+      fetch('{% url "players:player_process_csv" %}', {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+          },
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Limpiar selección de archivo
+            csvFileInput.value = '';
+            csvFileName.textContent = '';
+
+            // Añadir filas a la tabla
+            addRowsFromCSV(data.players_data);
+
+            // Mostrar mensaje de éxito
+            let message = `${data.total_rows} {% trans 'jugadores cargados desde CSV' %}`;
+            if (data.errors && data.errors.length > 0) {
+              message += `. ${data.errors.length} {% trans 'filas con errores fueron omitidas' %}`;
+            }
+
+            // Mostrar resultados
+            showCSVResults({
+              success: true,
+              message: message,
+              errors: data.errors || []
+            });
+
+          } else {
+            showCSVResults({
+              success: false,
+              message: data.error || '{% trans "Error al procesar el archivo CSV" %}',
+              errors: []
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showCSVResults({
+            success: false,
+            message: '{% trans "Error de conexión al procesar el archivo" %}',
+            errors: []
+          });
+        })
+        .finally(() => {
+          // Rehabilitar botón
+          loadCsvBtn.disabled = false;
+          loadCsvBtn.innerHTML =
+            '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>{% trans "Cargar CSV" %}';
+        });
+    });
+
+    // Función para mostrar resultados del CSV
+    function showCSVResults(data) {
+      resultsDiv.innerHTML = '';
+      resultsDiv.classList.remove('hidden');
+
+      const resultDiv = document.createElement('div');
+
+      if (data.success) {
+        resultDiv.className =
+          'p-4 bg-green-50 border border-green-200 rounded-lg dark:bg-green-900 dark:border-green-700';
+
+        let errorsHtml = '';
+        if (data.errors && data.errors.length > 0) {
+          errorsHtml =
+            '<div class="mt-3"><h4 class="text-sm font-medium text-green-800 dark:text-green-300">{% trans "Filas omitidas:" %}</h4><ul class="mt-1 text-xs text-green-700 dark:text-green-400 list-disc list-inside">';
+          data.errors.forEach(error => {
+            errorsHtml += `<li>{% trans 'Fila' %} ${error.row}: ${error.message}</li>`;
+          });
+          errorsHtml += '</ul></div>';
+        }
+
+        resultDiv.innerHTML = `
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-green-800 dark:text-green-300">
+                            {% trans 'CSV cargado correctamente' %}
+                        </h3>
+                        <div class="mt-2 text-sm text-green-700 dark:text-green-400">
+                            <p>${data.message}</p>
+                            ${errorsHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+      } else {
+        resultDiv.className = 'p-4 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900 dark:border-red-700';
+        resultDiv.innerHTML = `
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800 dark:text-red-300">
+                            {% trans 'Error al cargar CSV' %}
+                        </h3>
+                        <div class="mt-2 text-sm text-red-700 dark:text-red-400">
+                            <p>${data.message}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+      }
+
+      resultsDiv.appendChild(resultDiv);
+    }
+
+    // Añadir una fila inicial
+    const initialRow = createPlayerRow();
+    tableBody.appendChild(initialRow);
+  });
+
+</script>
+
+<!-- CSRF Token -->
+{% csrf_token %}
+{% endblock %}
