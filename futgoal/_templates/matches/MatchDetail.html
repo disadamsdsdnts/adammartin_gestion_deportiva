@@ -1,0 +1,236 @@
+{% extends 'layout/LayoutBase.html' %}
+{% load i18n %}
+
+{% block content %}
+{% include 'layout/_page-header.html' with title=page_title breadcrumb_items=breadcrums %}
+
+<div class="flex flex-col">
+  <div class="overflow-x-auto">
+    <div class="inline-block min-w-full align-middle">
+      <div class="overflow-hidden shadow">
+        <div class="p-6 bg-white dark:bg-gray-800">
+          <div class="grid grid-cols-6 gap-6">
+            <div class="col-span-6 sm:col-span-3">
+              <div class="mb-4">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans 'Información del Partido' %}</h3>
+                <div class="mt-4 space-y-4">
+                  <div>
+                    <label
+                      class="block text-sm font-medium text-gray-700 dark:text-gray-300">{% trans 'Fecha y hora' %}</label>
+                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ match.match_date|date:'d/m/Y H:i' }}</p>
+                  </div>
+                  <div>
+                    <label
+                      class="block text-sm font-medium text-gray-700 dark:text-gray-300">{% trans 'Equipos' %}</label>
+                    <p class="mt-1 text-sm text-gray-900 dark:text-white">
+                      {% if match.is_home %}
+                      <span class="text-green-600 font-bold">{{ match.home_team.name }}</span> vs {{ match.away_team }}
+                      {% else %}
+                      {{ match.away_team }} vs <span class="text-green-600 font-bold">{{ match.home_team.name }}</span>
+                      {% endif %}
+                    </p>
+                  </div>
+                  <div>
+                    <label
+                      class="block text-sm font-medium text-gray-700 dark:text-gray-300">{% trans 'Temporada' %}</label>
+                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ match.season.name }}</p>
+                  </div>
+                  <div>
+                    <label
+                      class="block text-sm font-medium text-gray-700 dark:text-gray-300">{% trans 'Tipo de partido' %}</label>
+                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ match.get_match_type_display }}</p>
+                  </div>
+                  <div>
+                    <label
+                      class="block text-sm font-medium text-gray-700 dark:text-gray-300">{% trans 'Estado' %}</label>
+                    <p class="mt-1">
+                      {% if match.status == 'scheduled' %}
+                      <span
+                        class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
+                        {% trans 'Programado' %}
+                      </span>
+                      {% elif match.status == 'in_progress' %}
+                      <span
+                        class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300">
+                        {% trans 'En curso' %}
+                      </span>
+                      {% elif match.status == 'finished' %}
+                      <span
+                        class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">
+                        {% trans 'Finalizado' %}
+                      </span>
+                      {% elif match.status == 'cancelled' %}
+                      <span
+                        class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">
+                        {% trans 'Cancelado' %}
+                      </span>
+                      {% elif match.status == 'postponed' %}
+                      <span
+                        class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-gray-900 dark:text-gray-300">
+                        {% trans 'Aplazado' %}
+                      </span>
+                      {% endif %}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-span-6 sm:col-span-3">
+              <div class="mb-4">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans 'Resultado y Lugar' %}</h3>
+                <div class="mt-4 space-y-4">
+                  {% if match.status == 'finished' %}
+                  <div>
+                    <label
+                      class="block text-sm font-medium text-gray-700 dark:text-gray-300">{% trans 'Resultado' %}</label>
+                    <p class="mt-1 text-lg font-bold text-gray-900 dark:text-white">
+                      <span
+                        class="{% if match.match_result_status == 'victory' %}text-green-600{% elif match.match_result_status == 'defeat' %}text-red-600{% else %}text-yellow-600{% endif %}">
+                        {{ match.result }}
+                      </span>
+                    </p>
+                  </div>
+                  <div>
+                    <label
+                      class="block text-sm font-medium text-gray-700 dark:text-gray-300">{% trans 'Resultado del partido' %}</label>
+                    <p class="mt-1">
+                      {% if match.match_result_status == 'victory' %}
+                      <span
+                        class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">
+                        {% trans 'Victoria' %}
+                      </span>
+                      {% elif match.match_result_status == 'defeat' %}
+                      <span
+                        class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">
+                        {% trans 'Derrota' %}
+                      </span>
+                      {% elif match.match_result_status == 'draw' %}
+                      <span
+                        class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300">
+                        {% trans 'Empate' %}
+                      </span>
+                      {% endif %}
+                    </p>
+                  </div>
+                  {% else %}
+                  <div>
+                    <label
+                      class="block text-sm font-medium text-gray-700 dark:text-gray-300">{% trans 'Resultado' %}</label>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% trans 'Partido no finalizado' %}</p>
+                  </div>
+                  {% endif %}
+                  <div>
+                    <label
+                      class="block text-sm font-medium text-gray-700 dark:text-gray-300">{% trans 'Estadio/Campo' %}</label>
+                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ match.venue|default:'-' }}</p>
+                  </div>
+                  <div>
+                    <label
+                      class="block text-sm font-medium text-gray-700 dark:text-gray-300">{% trans 'Ubicación' %}</label>
+                    <p class="mt-1 text-sm text-gray-900 dark:text-white">
+                      {% if match.is_home %}
+                      <span class="text-green-600 font-medium">{% trans 'En casa' %}</span>
+                      {% else %}
+                      <span class="text-blue-600 font-medium">{% trans 'Fuera de casa' %}</span>
+                      {% endif %}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% if match.notes %}
+            <div class="col-span-6">
+              <div class="mb-4">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans 'Notas y Observaciones' %}</h3>
+                <div class="mt-4">
+                  <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <p class="text-sm text-gray-900 dark:text-white">{{ match.notes }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+            <div class="col-span-6">
+              <div class="mb-4">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans 'Información Adicional' %}</h3>
+                <div class="mt-4 space-y-4">
+                  <div class="grid grid-cols-3 gap-4">
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{% trans 'Creado' %}</label>
+                      <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ match.created|date:'d/m/Y H:i' }}</p>
+                    </div>
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{% trans 'Modificado' %}</label>
+                      <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ match.modified|date:'d/m/Y H:i' }}</p>
+                    </div>
+                    {% if match.is_upcoming %}
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{% trans 'Días restantes' %}</label>
+                      <p class="mt-1 text-sm font-bold text-blue-600 dark:text-blue-400">{{ match.days_until_match }}
+                        {% trans 'días' %}</p>
+                    </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center space-x-4 mt-6">
+            <a href="{% url 'matches:match_update' match.id %}"
+              class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">{% trans 'Editar partido' %}</a>
+            <button type="button" data-modal-target="delete-match-modal-{{ match.id }}"
+              data-modal-toggle="delete-match-modal-{{ match.id }}"
+              class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">{% trans 'Eliminar partido' %}</button>
+            <a href="{% url 'matches:match_list' %}"
+              class="text-gray-900 bg-white hover:bg-gray-100 focus:ring-4 focus:ring-primary-300 border border-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700">{% trans 'Volver' %}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Match Modal -->
+<div
+  class="fixed left-0 right-0 z-50 items-center justify-center hidden overflow-x-hidden overflow-y-auto top-4 md:inset-0 h-modal sm:h-full"
+  id="delete-match-modal-{{ match.id }}">
+  <div class="relative w-full h-full max-w-md px-4 md:h-auto">
+    <!-- Modal content -->
+    <div class="relative bg-white rounded-lg shadow dark:bg-gray-800">
+      <!-- Modal header -->
+      <div class="flex justify-end p-2">
+        <button type="button"
+          class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-700 dark:hover:text-white"
+          data-modal-toggle="delete-match-modal-{{ match.id }}">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd"
+              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+              clip-rule="evenodd"></path>
+          </svg>
+        </button>
+      </div>
+      <!-- Modal body -->
+      <div class="p-6 pt-0 text-center">
+        <svg class="w-16 h-16 mx-auto text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <h3 class="mt-5 mb-6 text-lg text-gray-500 dark:text-gray-400">
+          {% trans '¿Estás seguro de que quieres eliminar este partido?' %}</h3>
+        <form method="post" action="{% url 'matches:match_delete' match.id %}">
+          {% csrf_token %}
+          <button type="submit"
+            class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-base inline-flex items-center px-3 py-2.5 text-center mr-2 dark:focus:ring-red-800">{% trans 'Sí, estoy seguro' %}</button>
+          <button type="button"
+            class="text-gray-900 bg-white hover:bg-gray-100 focus:ring-4 focus:ring-primary-300 border border-gray-200 font-medium inline-flex items-center rounded-lg text-base px-3 py-2.5 text-center dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700"
+            data-modal-toggle="delete-match-modal-{{ match.id }}">{% trans 'No, cancelar' %}</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -21,7 +21,7 @@ from futgoal.matches.forms import MatchForm, MatchFilterForm
 @method_decorator([login_required, is_global_admin], name='dispatch')
 class MatchListView(ListView):
     """Vista para listar partidos"""
-    template_name = 'matches/MatchList.html'
+    template_name = 'matches/MatchesList.html'
     model = Match
     context_object_name = 'matches'
     paginate_by = 20
@@ -57,8 +57,7 @@ class MatchListView(ListView):
         context = super().get_context_data(**kwargs)
 
         context['page_title'] = _('Partidos')
-        context['breadcrumbs'] = [
-            {'title': _('Dashboard'), 'url': reverse('dashboard')},
+        context['breadcrums'] = [
             {'title': _('Partidos'), 'url': reverse('matches:match_list')},
         ]
         context['actions'] = [
@@ -87,8 +86,7 @@ class MatchDetailView(DetailView):
         context = super().get_context_data(**kwargs)
 
         context['page_title'] = f"{_('Partido')}: {self.object}"
-        context['breadcrumbs'] = [
-            {'title': _('Dashboard'), 'url': reverse('dashboard')},
+        context['breadcrums'] = [
             {'title': _('Partidos'), 'url': reverse('matches:match_list')},
             {'title': str(self.object)}
         ]
@@ -120,8 +118,7 @@ class MatchCreateView(CreateView):
         context = super().get_context_data(**kwargs)
 
         context['page_title'] = _('Nuevo Partido')
-        context['breadcrumbs'] = [
-            {'title': _('Dashboard'), 'url': reverse('dashboard')},
+        context['breadcrums'] = [
             {'title': _('Partidos'), 'url': reverse('matches:match_list')},
             {'title': _('Nuevo'), 'url': reverse('matches:match_create')},
         ]
@@ -147,8 +144,7 @@ class MatchUpdateView(UpdateView):
         context = super().get_context_data(**kwargs)
 
         context['page_title'] = _('Editar Partido')
-        context['breadcrumbs'] = [
-            {'title': _('Dashboard'), 'url': reverse('dashboard')},
+        context['breadcrums'] = [
             {'title': _('Partidos'), 'url': reverse('matches:match_list')},
             {'title': _('Editar')},
         ]
@@ -173,7 +169,7 @@ class MatchDeleteView(DeleteView):
         context = super().get_context_data(**kwargs)
 
         context['page_title'] = _("Eliminar Partido")
-        context['breadcrumbs'] = [
+        context['breadcrums'] = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Partidos'), 'url': reverse('matches:match_list')},
             {'title': _('Eliminar')},
