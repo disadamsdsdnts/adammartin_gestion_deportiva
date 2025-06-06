@@ -61,6 +61,7 @@ LOCAL_APPS = [
     'futgoal.players',
     'futgoal.team',
     'futgoal.season',
+    'futgoal.matches',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

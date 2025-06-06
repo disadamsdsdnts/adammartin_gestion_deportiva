@@ -57,6 +57,11 @@ urlpatterns = [
          include(('futgoal.season.urls', 'season'),
                  namespace='season')
          ),
+
+    path('matches/',
+         include(('futgoal.matches.urls', 'matches'),
+                 namespace='matches')
+         ),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
