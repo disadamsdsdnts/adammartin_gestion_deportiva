@@ -3,44 +3,490 @@
 {% load static %}
 
 {% block form_content %}
-<form method="post" class="w-full">
-  {% csrf_token %}
-  <div class="grid gap-4 mb-4 sm:grid-cols-2 sm:gap-6 sm:mb-5">
-    {% for field in form %}
-    <div class="w-full">
-      <label for="{{ field.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-        {{ field.label }}
-      </label>
-      {% if field.name == 'enable_emails' %}
-      <div class="mt-2">
-        {{ field }}
+<div class="flex flex-col space-y-8">
+  <form method="post" class="w-full">
+    {% csrf_token %}
+    <div class="grid gap-4 mb-4 sm:grid-cols-2 sm:gap-6 sm:mb-5">
+      {% for field in form %}
+      <div class="w-full">
+        <label for="{{ field.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          {{ field.label }}
+        </label>
+        {% if field.name == 'enable_emails' %}
+        <div class="mt-2">
+          {{ field }}
+        </div>
+        {% else %}
+        <input type="{% if field.name == 'main_email' %}email{% else %}text{% endif %}" name="{{ field.name }}"
+          id="{{ field.id_for_label }}" value="{{ field.value|default:'' }}"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+          placeholder="{{ field.help_text|default:'' }}">
+        {% endif %}
+        {% if field.errors %}
+        <p class="mt-1 text-sm text-red-600">{{ field.errors }}</p>
+        {% endif %}
       </div>
-      {% else %}
-      <input type="{% if field.name == 'main_email' %}email{% else %}text{% endif %}" name="{{ field.name }}"
-        id="{{ field.id_for_label }}" value="{{ field.value|default:'' }}"
-        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-        placeholder="{{ field.help_text|default:'' }}">
-      {% endif %}
-      {% if field.errors %}
-      <p class="mt-1 text-sm text-red-600">{{ field.errors }}</p>
-      {% endif %}
+      {% endfor %}
     </div>
-    {% endfor %}
-  </div>
-  <div class="flex items-center space-x-4">
-    <button type="submit"
-      class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-      {% trans 'Guardar cambios' %}
-    </button>
-    <a href="{% url 'dashboard' %}"
-      class="text-red-600 inline-flex items-center hover:text-white border border-red-600 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900">
-      <svg class="w-5 h-5 mr-1 -ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+    <div class="flex items-center space-x-4">
+      <button type="submit"
+        class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+        {% trans 'Guardar cambios' %}
+      </button>
+      <a href="{% url 'dashboard' %}"
+        class="text-red-600 inline-flex items-center hover:text-white border border-red-600 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900">
+        <svg class="w-5 h-5 mr-1 -ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd"
+            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+            clip-rule="evenodd"></path>
+        </svg>
+        {% trans 'Cancelar' %}
+      </a>
+    </div>
+  </form>
+
+  <!-- Parrilla de Utilidades -->
+  <div class="mt-8 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4 flex items-center">
+      <svg class="w-5 h-5 mr-2 text-red-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
         <path fill-rule="evenodd"
-          d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+          d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
           clip-rule="evenodd"></path>
       </svg>
-      {% trans 'Cancelar' %}
-    </a>
+      {% trans 'Utilidades de Sistema' %}
+    </h3>
+    <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
+      {% trans 'Estas operaciones eliminarán permanentemente los datos seleccionados. Úsalas con precaución.' %}
+    </p>
+
+    <div class="flex flex-col gap-4 items-start">
+      <!-- Borrar todas las notas -->
+      <button type="button" data-modal-target="delete-notes-modal" data-modal-toggle="delete-notes-modal"
+        class="text-red-600 inline-flex items-center hover:text-white border border-red-600 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-3 dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900 cursor-pointer transition-colors duration-200">
+        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
+          <path fill-rule="evenodd"
+            d="M4 5a2 2 0 012-2h8a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 2a1 1 0 000 2h6a1 1 0 100-2H7zm0 4a1 1 0 100 2h6a1 1 0 100-2H7z"
+            clip-rule="evenodd"></path>
+        </svg>
+        {% trans 'Borrar todas las notas' %}
+      </button>
+
+      <!-- Borrar todos los rivales -->
+      <button type="button" data-modal-target="delete-rivals-modal" data-modal-toggle="delete-rivals-modal"
+        class="text-red-600 inline-flex items-center hover:text-white border border-red-600 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-3 dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900 cursor-pointer transition-colors duration-200">
+        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+        </svg>
+        {% trans 'Borrar todos los rivales' %}
+      </button>
+
+      <!-- Borrar todos los partidos -->
+      <button type="button" data-modal-target="delete-matches-modal" data-modal-toggle="delete-matches-modal"
+        class="text-red-600 inline-flex items-center hover:text-white border border-red-600 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-3 dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900 cursor-pointer transition-colors duration-200">
+        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z">
+          </path>
+        </svg>
+        {% trans 'Borrar todos los partidos' %}
+      </button>
+
+      <!-- Borrar todos los jugadores -->
+      <button type="button" data-modal-target="delete-players-modal" data-modal-toggle="delete-players-modal"
+        class="text-red-600 inline-flex items-center hover:text-white border border-red-600 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-3 dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900 cursor-pointer transition-colors duration-200">
+        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z">
+          </path>
+        </svg>
+        {% trans 'Borrar todos los jugadores' %}
+      </button>
+
+      <!-- Borrar todas las temporadas -->
+      <button type="button" data-modal-target="delete-seasons-modal" data-modal-toggle="delete-seasons-modal"
+        class="text-red-600 inline-flex items-center hover:text-white border border-red-600 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-3 dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900 cursor-pointer transition-colors duration-200">
+        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd"
+            d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+            clip-rule="evenodd"></path>
+        </svg>
+        {% trans 'Borrar todas las temporadas' %}
+      </button>
+
+      <!-- Borrar TODOS los datos -->
+      <button type="button" data-modal-target="delete-all-data-modal" data-modal-toggle="delete-all-data-modal"
+        class="text-white bg-red-700 hover:bg-red-800 border border-red-700 hover:border-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-3 dark:bg-red-600 dark:hover:bg-red-700 dark:border-red-600 dark:hover:border-red-700 dark:focus:ring-red-900 cursor-pointer transition-colors duration-200 inline-flex items-center">
+        <svg class="w-4 h-4 mr-2 flex-shrink-0" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M9.375 10a0.625 0.625 0 1 1 1.25 0 0.625 0.625 0 0 1-1.25 0" clip-rule="evenodd" />
+          <path fill="currentColor" fill-rule="evenodd"
+            d="M3.75 10h3.75c0 0.925 0.503 1.733 1.25 2.166l-1.875 3.248A6.25 6.25 0 0 1 3.75 10m7.5 2.166 1.875 3.248c1.869-1.081 3.125-3.1 3.125-5.414h-3.75c0 0.925-0.503 1.733-1.25 2.166m-2.5-4.331A2.5 2.5 0 0 1 10 7.5c0.456 0 0.882 0.122 1.25 0.334l1.875-3.248A6.219 6.219 0 0 0 10 3.75c-1.139 0-2.206 0.305-3.125 0.836z"
+            clip-rule="evenodd" />
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M18.125 10a8.125 8.125 0 1 1-16.25 0 8.125 8.125 0 0 1 16.25 0" />
+        </svg>
+        {% trans 'BORRAR TODOS LOS DATOS' %}
+      </button>
+    </div>
+
+    <div class="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+      <div class="flex items-center">
+        <svg class="w-4 h-4 mr-2 text-yellow-600 dark:text-yellow-400" fill="currentColor" viewBox="0 0 20 20"
+          xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd"
+            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+            clip-rule="evenodd"></path>
+        </svg>
+        <p class="text-sm text-yellow-700 dark:text-yellow-300">
+          {% trans 'Estas operaciones no se pueden deshacer. Tu suscripción no incluyen copias de seguridad recuperables por eliminaciones accidentales del usuario.' %}
+        </p>
+      </div>
+    </div>
   </div>
-</form>
+</div>
+
+<!-- Modal de confirmación para borrar todas las notas -->
+<div id="delete-notes-modal" tabindex="-1" aria-hidden="true"
+  class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+  <div class="relative w-full max-w-md max-h-full">
+    <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
+      <!-- Modal header -->
+      <button type="button"
+        class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+        data-modal-hide="delete-notes-modal">
+        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+        </svg>
+        <span class="sr-only">{% trans 'Cerrar modal' %}</span>
+      </button>
+
+      <!-- Modal body -->
+      <div class="p-6 text-center">
+        <svg class="mx-auto mb-4 text-red-600 w-12 h-12 dark:text-red-400" aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
+        <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+          {% trans '¿Estás seguro de que quieres borrar todas las notas?' %}
+        </h3>
+        <p class="mb-5 text-sm text-gray-400 dark:text-gray-500">
+          {% trans 'Esta acción eliminará permanentemente todas las notas del sistema y no se puede deshacer.' %}
+        </p>
+
+        <form method="post" action="#" class="inline">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="delete_all_notes">
+          <button data-modal-hide="delete-notes-modal" type="submit"
+            class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd"
+                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                clip-rule="evenodd"></path>
+            </svg>
+            {% trans 'Sí, borrar todas' %}
+          </button>
+        </form>
+
+        <button data-modal-hide="delete-notes-modal" type="button"
+          class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+          {% trans 'Cancelar' %}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación para borrar todos los rivales -->
+<div id="delete-rivals-modal" tabindex="-1" aria-hidden="true"
+  class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+  <div class="relative w-full max-w-md max-h-full">
+    <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
+      <!-- Modal header -->
+      <button type="button"
+        class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+        data-modal-hide="delete-rivals-modal">
+        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+        </svg>
+        <span class="sr-only">{% trans 'Cerrar modal' %}</span>
+      </button>
+
+      <!-- Modal body -->
+      <div class="p-6 text-center">
+        <svg class="mx-auto mb-4 text-red-600 w-12 h-12 dark:text-red-400" aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
+        <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+          {% trans '¿Estás seguro de que quieres borrar todos los equipos rivales?' %}
+        </h3>
+        <p class="mb-5 text-sm text-gray-400 dark:text-gray-500">
+          {% trans 'Esta acción eliminará permanentemente todos los equipos rivales del sistema y no se puede deshacer.' %}
+        </p>
+
+        <form method="post" action="#" class="inline">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="delete_all_rivals">
+          <button data-modal-hide="delete-rivals-modal" type="submit"
+            class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd"
+                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                clip-rule="evenodd"></path>
+            </svg>
+            {% trans 'Sí, borrar todos' %}
+          </button>
+        </form>
+
+        <button data-modal-hide="delete-rivals-modal" type="button"
+          class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+          {% trans 'Cancelar' %}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación para borrar todos los partidos -->
+<div id="delete-matches-modal" tabindex="-1" aria-hidden="true"
+  class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+  <div class="relative w-full max-w-md max-h-full">
+    <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
+      <!-- Modal header -->
+      <button type="button"
+        class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+        data-modal-hide="delete-matches-modal">
+        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+        </svg>
+        <span class="sr-only">{% trans 'Cerrar modal' %}</span>
+      </button>
+
+      <!-- Modal body -->
+      <div class="p-6 text-center">
+        <svg class="mx-auto mb-4 text-red-600 w-12 h-12 dark:text-red-400" aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
+        <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+          {% trans '¿Estás seguro de que quieres borrar todos los partidos?' %}
+        </h3>
+        <p class="mb-5 text-sm text-gray-400 dark:text-gray-500">
+          {% trans 'Esta acción eliminará permanentemente todos los partidos del sistema y no se puede deshacer.' %}
+        </p>
+
+        <form method="post" action="#" class="inline">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="delete_all_matches">
+          <button data-modal-hide="delete-matches-modal" type="submit"
+            class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd"
+                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                clip-rule="evenodd"></path>
+            </svg>
+            {% trans 'Sí, borrar todos' %}
+          </button>
+        </form>
+
+        <button data-modal-hide="delete-matches-modal" type="button"
+          class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+          {% trans 'Cancelar' %}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación para borrar todos los jugadores -->
+<div id="delete-players-modal" tabindex="-1" aria-hidden="true"
+  class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+  <div class="relative w-full max-w-md max-h-full">
+    <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
+      <!-- Modal header -->
+      <button type="button"
+        class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+        data-modal-hide="delete-players-modal">
+        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+        </svg>
+        <span class="sr-only">{% trans 'Cerrar modal' %}</span>
+      </button>
+
+      <!-- Modal body -->
+      <div class="p-6 text-center">
+        <svg class="mx-auto mb-4 text-red-600 w-12 h-12 dark:text-red-400" aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
+        <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+          {% trans '¿Estás seguro de que quieres borrar todos los jugadores?' %}
+        </h3>
+        <p class="mb-5 text-sm text-gray-400 dark:text-gray-500">
+          {% trans 'Esta acción eliminará permanentemente todos los jugadores del sistema y no se puede deshacer.' %}
+        </p>
+
+        <form method="post" action="#" class="inline">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="delete_all_players">
+          <button data-modal-hide="delete-players-modal" type="submit"
+            class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd"
+                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                clip-rule="evenodd"></path>
+            </svg>
+            {% trans 'Sí, borrar todos' %}
+          </button>
+        </form>
+
+        <button data-modal-hide="delete-players-modal" type="button"
+          class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+          {% trans 'Cancelar' %}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación para borrar todas las temporadas -->
+<div id="delete-seasons-modal" tabindex="-1" aria-hidden="true"
+  class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+  <div class="relative w-full max-w-md max-h-full">
+    <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
+      <!-- Modal header -->
+      <button type="button"
+        class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+        data-modal-hide="delete-seasons-modal">
+        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+        </svg>
+        <span class="sr-only">{% trans 'Cerrar modal' %}</span>
+      </button>
+
+      <!-- Modal body -->
+      <div class="p-6 text-center">
+        <svg class="mx-auto mb-4 text-red-600 w-12 h-12 dark:text-red-400" aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
+        <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+          {% trans '¿Estás seguro de que quieres borrar todas las temporadas?' %}
+        </h3>
+        <p class="mb-5 text-sm text-gray-400 dark:text-gray-500">
+          {% trans 'Esta acción eliminará permanentemente todas las temporadas del sistema y no se puede deshacer.' %}
+        </p>
+
+        <form method="post" action="#" class="inline">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="delete_all_seasons">
+          <button data-modal-hide="delete-seasons-modal" type="submit"
+            class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd"
+                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                clip-rule="evenodd"></path>
+            </svg>
+            {% trans 'Sí, borrar todas' %}
+          </button>
+        </form>
+
+        <button data-modal-hide="delete-seasons-modal" type="button"
+          class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+          {% trans 'Cancelar' %}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación para borrar TODOS los datos -->
+<div id="delete-all-data-modal" tabindex="-1" aria-hidden="true"
+  class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+  <div class="relative w-full max-w-lg max-h-full">
+    <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
+      <!-- Modal header -->
+      <button type="button"
+        class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+        data-modal-hide="delete-all-data-modal">
+        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+        </svg>
+        <span class="sr-only">{% trans 'Cerrar modal' %}</span>
+      </button>
+
+      <!-- Modal body -->
+      <div class="p-6 text-center">
+        <svg class="mx-auto mb-4 text-red-600 w-16 h-16 dark:text-red-400" viewBox="0 0 20 20"
+          xmlns="http://www.w3.org/2000/svg" fill="none">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M9.375 10a0.625 0.625 0 1 1 1.25 0 0.625 0.625 0 0 1-1.25 0" clip-rule="evenodd" />
+          <path fill="currentColor" fill-rule="evenodd"
+            d="M3.75 10h3.75c0 0.925 0.503 1.733 1.25 2.166l-1.875 3.248A6.25 6.25 0 0 1 3.75 10m7.5 2.166 1.875 3.248c1.869-1.081 3.125-3.1 3.125-5.414h-3.75c0 0.925-0.503 1.733-1.25 2.166m-2.5-4.331A2.5 2.5 0 0 1 10 7.5c0.456 0 0.882 0.122 1.25 0.334l1.875-3.248A6.219 6.219 0 0 0 10 3.75c-1.139 0-2.206 0.305-3.125 0.836z"
+            clip-rule="evenodd" />
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M18.125 10a8.125 8.125 0 1 1-16.25 0 8.125 8.125 0 0 1 16.25 0" />
+        </svg>
+        <h3 class="mb-5 text-xl font-bold text-red-600 dark:text-red-400">
+          {% trans '⚠️ OPERACIÓN DESTRUCTIVA ⚠️' %}
+        </h3>
+        <h4 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+          {% trans '¿Estás completamente seguro de que quieres borrar TODOS los datos?' %}
+        </h4>
+        <div
+          class="mb-6 text-left bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+          <p class="mb-3 text-sm font-medium text-red-800 dark:text-red-200">
+            {% trans 'Esta acción eliminará PERMANENTEMENTE:' %}
+          </p>
+          <ul class="text-sm text-red-700 dark:text-red-300 space-y-1">
+            <li>• {% trans 'Todas las notas de partidos' %}</li>
+            <li>• {% trans 'Todos los equipos rivales' %}</li>
+            <li>• {% trans 'Todos los partidos' %}</li>
+            <li>• {% trans 'Todos los jugadores' %}</li>
+            <li>• {% trans 'Todas las temporadas' %}</li>
+          </ul>
+          <p class="mt-3 text-sm font-bold text-red-800 dark:text-red-200">
+            {% trans '⚠️ Esta operación NO SE PUEDE DESHACER ⚠️' %}
+          </p>
+        </div>
+
+        <form method="post" action="#" class="inline">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="delete_all_data">
+          <button data-modal-hide="delete-all-data-modal" type="submit"
+            class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-bold rounded-lg text-sm inline-flex items-center px-6 py-3 text-center mr-3">
+            <svg class="w-5 h-5 mr-2" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M9.375 10a0.625 0.625 0 1 1 1.25 0 0.625 0.625 0 0 1-1.25 0" clip-rule="evenodd" />
+              <path fill="currentColor" fill-rule="evenodd"
+                d="M3.75 10h3.75c0 0.925 0.503 1.733 1.25 2.166l-1.875 3.248A6.25 6.25 0 0 1 3.75 10m7.5 2.166 1.875 3.248c1.869-1.081 3.125-3.1 3.125-5.414h-3.75c0 0.925-0.503 1.733-1.25 2.166m-2.5-4.331A2.5 2.5 0 0 1 10 7.5c0.456 0 0.882 0.122 1.25 0.334l1.875-3.248A6.219 6.219 0 0 0 10 3.75c-1.139 0-2.206 0.305-3.125 0.836z"
+                clip-rule="evenodd" />
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M18.125 10a8.125 8.125 0 1 1-16.25 0 8.125 8.125 0 0 1 16.25 0" />
+            </svg>
+            {% trans 'SÍ, BORRAR TODO' %}
+          </button>
+        </form>
+
+        <button data-modal-hide="delete-all-data-modal" type="button"
+          class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+          {% trans 'Cancelar' %}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
