@@ -48,7 +48,7 @@ class ModelListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context = KTLayout.init(context)
+
         context['page_title'] = _('Título')
         context['breadcrums'] = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
@@ -75,7 +75,7 @@ class ModelDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context = KTLayout.init(context)
+
         context['page_title'] = f"{_('Objeto')} : {self.object.name}"
         context['breadcrums'] = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
@@ -95,7 +95,7 @@ class ModelCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context = KTLayout.init(context)
+
         context['page_title'] = _('Nuevo Objeto')
         context['breadcrums'] = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
@@ -123,7 +123,7 @@ class ModelUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context = KTLayout.init(context)
+
         context['page_title'] = _('Editar Objeto')
         context['breadcrums'] = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
@@ -150,7 +150,7 @@ class ModelDeleteView(DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context = KTLayout.init(context)
+
         context['page_title'] = _("Eliminar Objeto")
         context['breadcrums'] = [
             {'title': _('Dashboard'), 'url': reverse('dashboard')},
@@ -173,7 +173,6 @@ class ModelDeleteView(DeleteView):
 - Implementación consistente de `get_context_data`
 - Sistema de mensajes flash para feedback al usuario
 - Breadcrumbs para navegación
-- Integración con el tema Metronic (KTLayout)
 - Traducciones con gettext
 - URLs reversibles usando `reverse` y `reverse_lazy`
 - Nombres de plantillas consistentes siguiendo el patrón `app/ModelAction.html`
