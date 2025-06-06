@@ -16,6 +16,7 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.shortcuts import get_object_or_404
 from django.db.models import Count
+from django.utils import timezone
 
 from django.contrib import messages
 
@@ -56,6 +57,64 @@ class DashboardView(TemplateView):
         context['page_title'] = _('Dashboard')
         context['breadcrumbs'] = breadcrumbs
         context['actions'] = []
+
+                # Obtener próximos partidos (máximo 5)
+        from futgoal.matches.models import Match
+        upcoming_matches = Match.objects.filter(
+            status='scheduled',
+            match_date__gt=timezone.now()
+        ).select_related('away_team', 'season').order_by('match_date')[:5]
+
+        context['upcoming_matches'] = upcoming_matches
+
+                # Obtener próximos cumpleaños (máximo 5)
+        from futgoal.players.models import Player
+        from datetime import datetime, timedelta
+
+        today = timezone.now().date()
+        current_year = today.year
+
+        # Obtener jugadores activos con fecha de nacimiento
+        players = Player.objects.filter(
+            is_active=True,
+            birth_date__isnull=False
+        ).values('id', 'first_name', 'last_name', 'sport_name', 'birth_date', 'photo')
+
+                # Calcular próximos cumpleaños
+        upcoming_birthdays = []
+        for player in players:
+            birth_date = player['birth_date']
+
+            # Crear fecha de cumpleaños para este año
+            try:
+                birthday_this_year = birth_date.replace(year=current_year)
+            except ValueError:
+                # Manejar 29 de febrero en años no bisiestos
+                birthday_this_year = birth_date.replace(year=current_year, day=28)
+
+            # Si ya pasó este año, usar el próximo año
+            if birthday_this_year < today:
+                try:
+                    birthday_this_year = birth_date.replace(year=current_year + 1)
+                except ValueError:
+                    birthday_this_year = birth_date.replace(year=current_year + 1, day=28)
+
+            # Calcular días hasta el cumpleaños
+            days_until = (birthday_this_year - today).days
+
+            # Calcular edad que cumplirá
+            age = birthday_this_year.year - birth_date.year
+
+            upcoming_birthdays.append({
+                'player': player,
+                'birthday_date': birthday_this_year,
+                'days_until': days_until,
+                'age': age
+            })
+
+        # Ordenar por días hasta cumpleaños y tomar los primeros 5
+        upcoming_birthdays.sort(key=lambda x: x['days_until'])
+        context['upcoming_birthdays'] = upcoming_birthdays[:5]
 
         return context
 

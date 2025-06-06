@@ -10,4 +10,193 @@
   </p>
   <hr class="h-px my-8 bg-gray-200 border-0" />
 </div>
+
+<!-- Dashboard Cards Grid -->
+<div class="">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+
+    <!-- Próximos Partidos Card -->
+    <div class="w-full p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+      <div class="flex items-center justify-between mb-4">
+        <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white">{% trans 'Próximos Partidos' %}</h5>
+        <a href="{% url 'matches:match_list' %}"
+          class="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">
+          {% trans 'Ver todos' %}
+        </a>
+      </div>
+
+      <div class="flow-root">
+        {% if upcoming_matches %}
+        <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+          {% for match in upcoming_matches %}
+          <li class="py-3 sm:py-4">
+            <div class="flex items-center">
+              <!-- Indicador de partido en casa/fuera -->
+              <div class="shrink-0">
+                <div
+                  class="w-8 h-8 rounded-full flex items-center justify-center {% if match.is_home %}bg-green-100 text-green-600{% else %}bg-blue-100 text-blue-600{% endif %}">
+                  {% if match.is_home %}
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z">
+                    </path>
+                  </svg>
+                  {% else %}
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                      d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                      clip-rule="evenodd"></path>
+                  </svg>
+                  {% endif %}
+                </div>
+              </div>
+
+              <!-- Información del partido -->
+              <div class="flex-1 min-w-0 ms-4">
+                <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                  {% if match.is_home %}
+                  vs {{ match.away_team.name }}
+                  {% else %}
+                  @ {{ match.away_team.name }}
+                  {% endif %}
+                </p>
+                <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                  {{ match.match_date|date:"d/m/Y H:i" }}
+                  {% if match.venue %}
+                  - {{ match.venue }}
+                  {% endif %}
+                </p>
+              </div>
+
+              <!-- Días restantes -->
+              <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                {% if match.days_until_match == 0 %}
+                <span class="text-sm text-red-600 dark:text-red-400 font-bold">{% trans 'Hoy' %}</span>
+                {% elif match.days_until_match == 1 %}
+                <span class="text-sm text-orange-600 dark:text-orange-400 font-bold">{% trans 'Mañana' %}</span>
+                {% else %}
+                <span class="text-sm text-gray-600 dark:text-gray-400">{{ match.days_until_match }}d</span>
+                {% endif %}
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <div class="text-center py-8">
+          <svg class="w-12 h-12 mx-auto text-gray-400 dark:text-gray-500 mb-4" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+          <p class="text-sm text-gray-500 dark:text-gray-400">{% trans 'No hay partidos programados' %}</p>
+          <a href="{% url 'matches:match_create' %}"
+            class="inline-flex items-center mt-2 text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">
+            {% trans 'Programar nuevo partido' %}
+            <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                clip-rule="evenodd"></path>
+            </svg>
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Próximos Cumpleaños Card -->
+    <div class="w-full p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+      <div class="flex items-center justify-between mb-4">
+        <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white">{% trans 'Próximos Cumpleaños' %}</h5>
+        <a href="{% url 'players:player_list' %}"
+          class="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">
+          {% trans 'Ver todos' %}
+        </a>
+      </div>
+
+      <div class="flow-root">
+        {% if upcoming_birthdays %}
+        <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+          {% for birthday in upcoming_birthdays %}
+          <li class="py-3 sm:py-4">
+            <div class="flex items-center">
+              <!-- Foto del jugador -->
+              <div class="shrink-0">
+                {% if birthday.player.photo %}
+                <img class="w-8 h-8 rounded-full" src="{{ birthday.player.photo.url }}"
+                  alt="{{ birthday.player.first_name }}">
+                {% else %}
+                <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                      clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                {% endif %}
+              </div>
+
+              <!-- Información del jugador -->
+              <div class="flex-1 min-w-0 ms-4">
+                <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                  {% if birthday.player.sport_name %}
+                  {{ birthday.player.sport_name }}
+                  {% else %}
+                  {{ birthday.player.first_name }} {{ birthday.player.last_name }}
+                  {% endif %}
+                </p>
+                <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                  {{ birthday.birthday_date|date:"d/m" }}
+                  - Cumple {{ birthday.age }} año{% if birthday.age != 1 %}s{% endif %}
+                </p>
+              </div>
+
+              <!-- Días restantes -->
+              <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                {% if birthday.days_until == 0 %}
+                <span class="text-sm text-red-600 dark:text-red-400 font-bold">🎉 {% trans 'Hoy' %}</span>
+                {% elif birthday.days_until == 1 %}
+                <span class="text-sm text-orange-600 dark:text-orange-400 font-bold">🎂 {% trans 'Mañana' %}</span>
+                {% else %}
+                <span class="text-sm text-purple-600 dark:text-purple-400">{{ birthday.days_until }}d</span>
+                {% endif %}
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <div class="text-center py-8">
+          <svg class="w-12 h-12 mx-auto text-gray-400 dark:text-gray-500 mb-4" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 8v4.5m0 0l3-3m-3 3l-3-3M8 2v3m8-3v3m-7 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+            </path>
+          </svg>
+          <p class="text-sm text-gray-500 dark:text-gray-400">{% trans 'No hay cumpleaños próximos' %}</p>
+          <a href="{% url 'players:player_create' %}"
+            class="inline-flex items-center mt-2 text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">
+            {% trans 'Añadir jugador' %}
+            <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                clip-rule="evenodd"></path>
+            </svg>
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="w-full p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+      <div class="flex items-center justify-between mb-4">
+        <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white">{% trans 'Próxima función' %}</h5>
+      </div>
+      <div class="text-center py-8">
+        <p class="text-sm text-gray-500 dark:text-gray-400">{% trans 'Próximamente...' %}</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 {% endblock %}
