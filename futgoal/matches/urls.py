@@ -9,4 +9,10 @@ urlpatterns = [
     path('<int:pk>/', views.MatchDetailView.as_view(), name='match_detail'),
     path('<int:pk>/edit/', views.MatchUpdateView.as_view(), name='match_update'),
     path('<int:pk>/delete/', views.MatchDeleteView.as_view(), name='match_delete'),
+    path('notes/', views.MatchNoteListView.as_view(), name='match_note_list'),
+    path('<int:match_id>/notes/create/', views.MatchNoteCreateView.as_view(), name='match_note_create'),
+    path('notes/<int:pk>/', views.MatchNoteDetailView.as_view(), name='match_note_detail'),
+    path('notes/<int:pk>/edit/', views.MatchNoteUpdateView.as_view(), name='match_note_update'),
+    path('notes/<int:pk>/delete/', views.MatchNoteDeleteView.as_view(), name='match_note_delete'),
+    path('notes/<int:pk>/delete-ajax/', views.delete_match_note_ajax, name='match_note_delete_ajax'),
 ]

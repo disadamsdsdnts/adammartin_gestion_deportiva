@@ -5,6 +5,7 @@ from django.utils import timezone
 from futgoal.matches.models import Match
 from futgoal.season.models import Season
 from futgoal.team.models import Team
+from futgoal.rivals.models import Rival
 
 
 class MatchForm(forms.ModelForm):
@@ -15,6 +16,7 @@ class MatchForm(forms.ModelForm):
     class Meta:
         model = Match
         fields = [
+            'home_team',
             'away_team',
             'match_date',
             'venue',
@@ -26,16 +28,16 @@ class MatchForm(forms.ModelForm):
             'is_home'
         ]
         widgets = {
+            'home_team': forms.HiddenInput(),
             'match_date': forms.DateTimeInput(
                 attrs={
                     'type': 'datetime-local',
                     'class': 'form-control'
                 }
             ),
-            'away_team': forms.TextInput(
+            'away_team': forms.Select(
                 attrs={
-                    'class': 'form-control',
-                    'placeholder': _('Nombre del equipo rival')
+                    'class': 'form-control form-select'
                 }
             ),
             'venue': forms.TextInput(
@@ -90,11 +92,27 @@ class MatchForm(forms.ModelForm):
         self.fields['notes'].label = _('Notas')
         self.fields['is_home'].label = _('Partido en casa')
 
+        # Configurar queryset para equipo rival
+        active_season = Season.get_active()
+        if active_season:
+            self.fields['away_team'].queryset = Rival.objects.filter(seasons=active_season)
+        else:
+            self.fields['away_team'].queryset = Rival.objects.all()
+
+        self.fields['away_team'].empty_label = _('Seleccionar equipo rival')
+
         # Configurar campos como no requeridos para ciertos casos
         self.fields['venue'].required = False
         self.fields['home_score'].required = False
         self.fields['away_score'].required = False
         self.fields['notes'].required = False
+
+        # Establecer valor por defecto para tipo de partido
+        if not self.instance.pk:  # Solo para nuevos partidos
+            self.fields['match_type'].initial = 'friendly'
+
+        # El campo home_team se establecerá automáticamente en save()
+        self.fields['home_team'].required = False
 
     def clean_match_date(self):
         """Validar que la fecha del partido sea válida"""
@@ -131,6 +149,35 @@ class MatchForm(forms.ModelForm):
             )
 
         return cleaned_data
+
+    def save(self, commit=True):
+        """
+        Guardar el partido estableciendo automáticamente el equipo local y temporada
+        """
+        instance = super().save(commit=False)
+
+        # Establecer automáticamente la temporada activa si no está definida
+        if not instance.season_id:
+            active_season = Season.get_active()
+            if active_season:
+                instance.season = active_season
+            else:
+                from django.core.exceptions import ValidationError
+                raise ValidationError(_('No hay una temporada activa. Debe crear y activar una temporada antes de crear partidos.'))
+
+        # Establecer automáticamente el equipo local si no está definido
+        if not instance.home_team_id:
+            from futgoal.team.models import Team
+            team = Team.objects.first()
+            if team:
+                instance.home_team = team
+            else:
+                from django.core.exceptions import ValidationError
+                raise ValidationError(_('No hay un equipo creado. Debe crear un equipo antes de crear partidos.'))
+
+        if commit:
+            instance.save()
+        return instance
 
 
 class MatchFilterForm(forms.Form):

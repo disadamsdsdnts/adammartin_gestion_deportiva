@@ -6,6 +6,7 @@ from django.utils import timezone
 from futgoal.utils.models import AuditModel
 from futgoal.season.models import Season
 from futgoal.team.models import Team
+from futgoal.rivals.models import Rival
 
 
 class Match(AuditModel):
@@ -44,10 +45,12 @@ class Match(AuditModel):
         related_name='home_matches'
     )
 
-    away_team = models.CharField(
-        _('Equipo visitante'),
-        max_length=200,
-        help_text=_('Nombre del equipo rival')
+    away_team = models.ForeignKey(
+        Rival,
+        verbose_name=_('Equipo visitante'),
+        on_delete=models.CASCADE,
+        related_name='away_matches',
+        help_text=_('Equipo rival')
     )
 
     match_date = models.DateTimeField(
@@ -112,9 +115,9 @@ class Match(AuditModel):
     def __str__(self):
         match_date_str = self.match_date.strftime('%d/%m/%Y %H:%M') if self.match_date else ''
         if self.is_home:
-            return f"{self.home_team.name} vs {self.away_team} - {match_date_str}"
+            return f"{self.home_team.name} vs {self.away_team.name} - {match_date_str}"
         else:
-            return f"{self.away_team} vs {self.home_team.name} - {match_date_str}"
+            return f"{self.away_team.name} vs {self.home_team.name} - {match_date_str}"
 
     def clean(self):
         """Validaciones personalizadas"""

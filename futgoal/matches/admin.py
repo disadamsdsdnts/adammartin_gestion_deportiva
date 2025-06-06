@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from .models import Match
+from .models import Match, MatchNote
 
 
 @admin.register(Match)
@@ -25,7 +25,7 @@ class MatchAdmin(admin.ModelAdmin):
     ]
 
     search_fields = [
-        'away_team',
+        'away_team__name',
         'venue',
         'notes'
     ]
@@ -62,3 +62,58 @@ class MatchAdmin(admin.ModelAdmin):
     def result(self, obj):
         return obj.result
     result.short_description = _('Resultado')
+
+
+@admin.register(MatchNote)
+class MatchNoteAdmin(admin.ModelAdmin):
+    list_display = [
+        'title',
+        'match',
+        'rival_team',
+        'short_content',
+        'created'
+    ]
+
+    list_filter = [
+        'match__status',
+        'match__match_type',
+        'match__season',
+        'created'
+    ]
+
+    search_fields = [
+        'title',
+        'content',
+        'match__away_team__name',
+        'match__home_team__name'
+    ]
+
+    readonly_fields = ['created', 'modified', 'rival_team']
+
+    fieldsets = (
+        (_('Información de la Nota'), {
+            'fields': (
+                'match',
+                'title',
+                'content'
+            )
+        }),
+        (_('Información del Partido'), {
+            'fields': ('rival_team',),
+            'classes': ('collapse',)
+        }),
+        (_('Auditoría'), {
+            'fields': ('created', 'modified'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    date_hierarchy = 'created'
+
+    def short_content(self, obj):
+        return obj.short_content
+    short_content.short_description = _('Contenido Resumido')
+
+    def rival_team(self, obj):
+        return obj.rival_team
+    rival_team.short_description = _('Equipo Rival')

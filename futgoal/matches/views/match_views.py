@@ -11,7 +11,7 @@ from django.views.generic import (
     UpdateView,
     DeleteView
 )
-from django.db.models import Q
+from django.db.models import Q, Count
 
 from futgoal.users.decorators import is_global_admin
 from futgoal.matches.models import Match
@@ -28,7 +28,9 @@ class MatchListView(ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        queryset = Match.objects.select_related('season', 'home_team').all()
+        queryset = Match.objects.select_related('season', 'home_team', 'away_team').prefetch_related('match_notes').annotate(
+            notes_count=Count('match_notes')
+        ).all()
 
         # Aplicar filtros si existen
         status = self.request.GET.get('status')
