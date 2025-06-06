@@ -1,3 +1,3 @@
-from .match_forms import MatchForm, MatchFilterForm
+from .match_forms import MatchForm, MatchFilterForm, MatchImportForm
 
-__all__ = ['MatchForm', 'MatchFilterForm']
+__all__ = ['MatchForm', 'MatchFilterForm', 'MatchImportForm']

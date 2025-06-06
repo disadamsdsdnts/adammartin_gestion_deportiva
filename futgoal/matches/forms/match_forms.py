@@ -177,6 +177,7 @@ class MatchForm(forms.ModelForm):
 
         if commit:
             instance.save()
+
         return instance
 
 
@@ -231,3 +232,206 @@ class MatchFilterForm(forms.Form):
             }
         )
     )
+
+
+class MatchImportForm(forms.Form):
+    """Formulario simplificado para importación masiva de partidos - No hereda de ModelForm para evitar validaciones del modelo"""
+
+    ROLE_CHOICES = [
+        ('1', _('Local')),
+        ('0', _('Visitante'))
+    ]
+
+    TYPE_CHOICES = [
+        ('friendly', _('Amistoso')),
+        ('league', _('Liga')),
+        ('cup', _('Copa')),
+        ('playoff', _('Playoff')),
+        ('training', _('Entrenamiento')),
+    ]
+
+    # Campo personalizado para el rol en el formulario de importación
+    role = forms.ChoiceField(
+        choices=ROLE_CHOICES,
+        label=_('Rol'),
+        help_text=_('Indica si el partido es local o visitante'),
+        widget=forms.Select(
+            attrs={
+                'class': 'shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500'
+            }
+        )
+    )
+
+    # Campo personalizado para el nombre del equipo rival (texto libre)
+    rival_name = forms.CharField(
+        max_length=200,
+        label=_('Equipo rival'),
+        help_text=_('Nombre del equipo rival (se creará automáticamente si no existe)'),
+        widget=forms.TextInput(
+            attrs={
+                'class': 'shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500',
+                'placeholder': _('Ej: Barcelona FC, Real Madrid, etc.')
+            }
+        )
+    )
+
+    # Campos del partido
+    match_date = forms.DateTimeField(
+        label=_('Fecha y hora'),
+        widget=forms.DateTimeInput(
+            attrs={
+                'class': 'shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500',
+                'type': 'datetime-local'
+            }
+        )
+    )
+
+    match_type = forms.ChoiceField(
+        choices=TYPE_CHOICES,
+        label=_('Tipo de partido'),
+        initial='friendly',
+        widget=forms.Select(
+            attrs={
+                'class': 'shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500'
+            }
+        )
+    )
+
+    venue = forms.CharField(
+        max_length=200,
+        required=False,
+        label=_('Lugar del partido'),
+        widget=forms.TextInput(
+            attrs={
+                'class': 'shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500',
+                'placeholder': _('Ej: Camp Nou, Santiago Bernabéu, etc.')
+            }
+        )
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Los labels ya están configurados en la definición de campos
+        # Los valores por defecto ya están configurados en la definición de campos
+
+    def clean_match_date(self):
+        """Validación personalizada para la fecha del partido en importación"""
+        match_date = self.cleaned_data.get('match_date')
+
+        # En importación, permitimos fechas en el pasado
+        # Se marcarán automáticamente como finalizados
+        return match_date
+
+    def clean(self):
+        """Validaciones del formulario de importación"""
+        cleaned_data = super().clean()
+
+        # Verificar que hay una temporada activa
+        if not Season.get_active():
+            raise forms.ValidationError(
+                _('No hay una temporada activa. Debe crear y activar una temporada antes de importar partidos.')
+            )
+
+        # Para importación, no validamos fechas en el pasado
+        # Simplemente ajustamos el estado según la fecha
+        match_date = cleaned_data.get('match_date')
+        if match_date:
+            from django.utils import timezone
+            if match_date < timezone.now():
+                # Si es en el pasado, marcar como finalizado automáticamente
+                cleaned_data['status'] = 'finished'
+            else:
+                # Si es en el futuro, marcar como programado
+                cleaned_data['status'] = 'scheduled'
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        """
+        Crear y guardar el partido estableciendo automáticamente los campos requeridos
+        """
+        # Crear una nueva instancia de Match
+        instance = Match()
+
+        # Establecer los campos básicos desde el formulario
+        instance.match_date = self.cleaned_data['match_date']
+        instance.match_type = self.cleaned_data['match_type']
+        instance.venue = self.cleaned_data.get('venue', '')
+
+        # Obtener el equipo principal del sistema
+        from futgoal.team.models import Team
+        team = Team.objects.first()
+        if not team:
+            from django.core.exceptions import ValidationError
+            raise forms.ValidationError(_('No hay un equipo creado. Debe crear un equipo antes de importar partidos.'))
+
+        # Crear o buscar el equipo rival basado en el nombre
+        rival_name = self.cleaned_data.get('rival_name')
+        if rival_name:
+            # Buscar equipo rival existente (insensible a mayúsculas/minúsculas)
+            rival, created = Rival.objects.get_or_create(
+                name__iexact=rival_name.strip(),
+                defaults={'name': rival_name.strip()}
+            )
+
+            # Si se creó un nuevo rival, asociarlo con la temporada activa
+            if created:
+                active_season = Season.get_active()
+                if active_season:
+                    rival.seasons.add(active_season)
+
+        # Establecer el rol (local/visitante)
+        # En el modelo: home_team siempre es nuestro Team, away_team siempre es el Rival
+        # is_home indica si jugamos en casa (True) o fuera (False)
+        role = self.cleaned_data.get('role')
+        instance.is_home = role == '1'  # '1' = Local (en casa), '0' = Visitante (fuera)
+        instance.home_team = team  # Siempre nuestro equipo
+        instance.away_team = rival  # Siempre el equipo rival
+
+        # Establecer automáticamente la temporada activa
+        if not instance.season_id:
+            active_season = Season.get_active()
+            if active_season:
+                instance.season = active_season
+
+        # Estado según la fecha del partido (ya se estableció en clean())
+        # Si no se estableció en clean(), usar la lógica por defecto
+        if not instance.status:
+            from django.utils import timezone
+            if instance.match_date and instance.match_date < timezone.now():
+                # Si el partido es en el pasado, marcarlo como finalizado
+                instance.status = 'finished'
+            else:
+                # Si el partido es en el futuro, marcarlo como programado
+                instance.status = 'scheduled'
+
+        if commit:
+            # Para importación, deshabilitamos temporalmente la validación del modelo
+            # que impide fechas en el pasado, ya que queremos permitirlas como partidos finalizados
+
+            # Sobrescribir temporalmente el método clean del modelo
+            original_clean = instance.clean
+
+            def clean_import():
+                """Validación modificada para importación que permite fechas pasadas"""
+                from django.core.exceptions import ValidationError
+                # Si el partido está finalizado, debe tener marcador (solo si se proporciona)
+                if instance.status == 'finished':
+                    if hasattr(instance, 'home_score') and hasattr(instance, 'away_score'):
+                        if instance.home_score is not None and instance.away_score is not None:
+                            pass  # Todo bien
+                        elif instance.home_score is None and instance.away_score is None:
+                            pass  # También está bien, partidos sin marcador
+                        else:
+                            raise ValidationError(_('Un partido finalizado debe tener marcador completo o ninguno'))
+                # No validar fechas en el pasado para importación
+
+            instance.clean = clean_import
+
+            try:
+                instance.save()
+            finally:
+                instance.clean = original_clean  # Restaurar validación original
+
+        return instance

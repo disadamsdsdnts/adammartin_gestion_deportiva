@@ -3,7 +3,10 @@ from .match_views import (
     MatchDetailView,
     MatchCreateView,
     MatchUpdateView,
-    MatchDeleteView
+    MatchDeleteView,
+    MatchImportView,
+    MatchImportCSVTemplateView,
+    MatchProcessCSVView
 )
 from .match_note_views import (
     MatchNoteListView,
@@ -20,6 +23,9 @@ __all__ = [
     'MatchCreateView',
     'MatchUpdateView',
     'MatchDeleteView',
+    'MatchImportView',
+    'MatchImportCSVTemplateView',
+    'MatchProcessCSVView',
     'MatchNoteListView',
     'MatchNoteDetailView',
     'MatchNoteCreateView',
