@@ -25,6 +25,9 @@
         {% trans 'Apellidos' %}
       </th>
       <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
+        {% trans 'Estado' %}
+      </th>
+      <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
         {% trans 'Acciones' %}
       </th>
     </tr>
@@ -58,6 +61,18 @@
         {{ player.first_name }}</td>
       <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
         {{ player.last_name }}</td>
+      <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+        {% if player.is_active %}
+        <span
+          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          {% trans 'Activo' %}
+        </span>
+        {% else %}
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+          {% trans 'Inactivo' %}
+        </span>
+        {% endif %}
+      </td>
       <td class="p-4 space-x-2 whitespace-nowrap">
         <a href="{% url 'players:player_detail' player.id %}"
           class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">

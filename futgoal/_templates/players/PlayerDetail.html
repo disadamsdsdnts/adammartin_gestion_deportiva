@@ -39,6 +39,23 @@
                       class="block text-sm font-medium text-gray-700 dark:text-gray-300">{% trans 'Nombre deportivo' %}</label>
                     <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ player.sport_name|default:'-' }}</p>
                   </div>
+                  <div>
+                    <label
+                      class="block text-sm font-medium text-gray-700 dark:text-gray-300">{% trans 'Estado' %}</label>
+                    <p class="mt-1 text-sm">
+                      {% if player.is_active %}
+                      <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        {% trans 'Activo' %}
+                      </span>
+                      {% else %}
+                      <span
+                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                        {% trans 'Inactivo' %}
+                      </span>
+                      {% endif %}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
