@@ -16,6 +16,7 @@ from django.db.models import Q
 from futgoal.users.decorators import is_global_admin
 from futgoal.matches.models import Match
 from futgoal.matches.forms import MatchForm, MatchFilterForm
+from futgoal.season.models import Season
 
 
 @method_decorator([login_required, is_global_admin], name='dispatch')
@@ -56,7 +57,11 @@ class MatchListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        # Obtener la temporada activa
+        active_season = Season.get_active()
+
         context['page_title'] = _('Partidos')
+        context['active_season'] = active_season
         context['breadcrumbs'] = [
             {'title': _('Partidos'), 'url': reverse('matches:match_list')},
         ]

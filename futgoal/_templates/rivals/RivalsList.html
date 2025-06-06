@@ -1,46 +1,13 @@
 {% extends 'layout/LayoutList.html' %}
 {% load i18n %}
 
-{% block table_content %}
-<!-- Header con información de temporada -->
-<div class="p-4 bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-  <div class="flex items-center justify-between">
-    <div class="flex items-center space-x-3">
-      <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-        {% trans 'Lista de Partidos' %}
-      </h3>
-      {% if active_season %}
-      <span class="text-sm text-gray-500 dark:text-gray-400">•</span>
-      <div class="flex items-center space-x-2">
-        <span class="text-sm text-gray-600 dark:text-gray-300">{{ active_season.name }}</span>
-        <a href="{% url 'season:season_list' %}"
-          class="text-xs text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300">
-          {% trans 'cambiar' %}
-        </a>
-      </div>
-      {% else %}
-      <span
-        class="inline-flex items-center px-2 py-1 text-xs font-medium text-red-800 bg-red-100 rounded-md dark:bg-red-900 dark:text-red-300">
-        {% trans 'Sin temporada' %}
-        <a href="{% url 'season:season_list' %}"
-          class="ml-1 text-red-700 hover:text-red-800 hover:underline dark:text-red-400 dark:hover:text-red-300">
-          {% trans 'configurar' %}
-        </a>
-      </span>
-      {% endif %}
-    </div>
+{% block content %}
+{% with page_title="Equipos Rivales" show_actions=True show_search=True %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
 
-    <a href="{% url 'matches:match_create' %}"
-      class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-      <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-        <path fill-rule="evenodd"
-          d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd">
-        </path>
-      </svg>
-      {% trans 'Nuevo Partido' %}
-    </a>
-  </div>
-</div>
+{% block table_content %}
 <table class="min-w-full divide-y divide-gray-200 table-fixed dark:divide-gray-600">
   <thead class="bg-gray-100 dark:bg-gray-700">
     <tr>
@@ -52,19 +19,16 @@
         </div>
       </th>
       <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
-        {% trans 'Fecha' %}
+        {% trans 'Nombre del Rival' %}
       </th>
       <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
-        {% trans 'Equipos' %}
+        {% trans 'Entrenador' %}
       </th>
       <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
-        {% trans 'Resultado' %}
+        {% trans 'Ciudad' %}
       </th>
       <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
-        {% trans 'Estado' %}
-      </th>
-      <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
-        {% trans 'Tipo' %}
+        {% trans 'Campo' %}
       </th>
       <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
         {% trans 'Acciones' %}
@@ -72,73 +36,29 @@
     </tr>
   </thead>
   <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-    {% for match in object_list %}
+    {% for rival in rivals %}
     <tr class="hover:bg-gray-100 dark:hover:bg-gray-700">
       <td class="w-4 p-4">
         <div class="flex items-center">
-          <input id="checkbox-{{ match.id }}" aria-describedby="checkbox-1" type="checkbox"
+          <input id="checkbox-{{ rival.id }}" aria-describedby="checkbox-1" type="checkbox"
             class="w-4 h-4 border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:focus:ring-primary-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600" />
-          <label for="checkbox-{{ match.id }}" class="sr-only">checkbox</label>
+          <label for="checkbox-{{ rival.id }}" class="sr-only">checkbox</label>
         </div>
       </td>
       <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
-        {{ match.match_date|date:'d/m/Y H:i' }}
-      </td>
-      <td class="p-4">
-        <div class="text-base font-medium text-gray-900 dark:text-white">
-          {% if match.is_home %}
-          <span class="text-green-600 font-bold">{{ match.home_team.name }}</span> vs {{ match.away_team }}
-          {% else %}
-          {{ match.away_team }} vs <span class="text-green-600 font-bold">{{ match.home_team.name }}</span>
-          {% endif %}
-        </div>
-        {% if match.venue %}
-        <div class="text-sm text-gray-500">{{ match.venue }}</div>
-        {% endif %}
+        <a href="{% url 'rivals:rival_detail' rival.id %}" class="hover:underline">{{ rival.name }}</a>
       </td>
       <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
-        {% if match.status == 'finished' %}
-        <span
-          class="{% if match.match_result_status == 'victory' %}text-green-600{% elif match.match_result_status == 'defeat' %}text-red-600{% else %}text-yellow-600{% endif %} font-bold">
-          {{ match.result }}
-        </span>
-        {% else %}
-        <span class="text-gray-500">-</span>
-        {% endif %}
-      </td>
-      <td class="p-4">
-        {% if match.status == 'scheduled' %}
-        <span
-          class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
-          {% trans 'Programado' %}
-        </span>
-        {% elif match.status == 'in_progress' %}
-        <span
-          class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300">
-          {% trans 'En curso' %}
-        </span>
-        {% elif match.status == 'finished' %}
-        <span
-          class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">
-          {% trans 'Finalizado' %}
-        </span>
-        {% elif match.status == 'cancelled' %}
-        <span
-          class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300">
-          {% trans 'Cancelado' %}
-        </span>
-        {% elif match.status == 'postponed' %}
-        <span
-          class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-gray-900 dark:text-gray-300">
-          {% trans 'Aplazado' %}
-        </span>
-        {% endif %}
+        {{ rival.coach_name|default:"-" }}
       </td>
       <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
-        {{ match.get_match_type_display }}
+        {{ rival.city|default:"-" }}
+      </td>
+      <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+        {{ rival.field_name|default:"-" }}
       </td>
       <td class="p-4 space-x-2 whitespace-nowrap">
-        <a href="{% url 'matches:match_detail' match.id %}"
+        <a href="{% url 'rivals:rival_detail' rival.id %}"
           class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
           <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
             <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
@@ -146,9 +66,9 @@
               d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
               clip-rule="evenodd"></path>
           </svg>
-          {% trans 'Información' %}
+          {% trans 'Ver' %}
         </a>
-        <a href="{% url 'matches:match_update' match.id %}"
+        <a href="{% url 'rivals:rival_update' rival.id %}"
           class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
           <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
             <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path>
@@ -158,8 +78,8 @@
           </svg>
           {% trans 'Editar' %}
         </a>
-        <button type="button" data-modal-target="delete-match-modal-{{ match.id }}"
-          data-modal-toggle="delete-match-modal-{{ match.id }}"
+        <button type="button" data-modal-target="delete-rival-modal-{{ rival.id }}"
+          data-modal-toggle="delete-rival-modal-{{ rival.id }}"
           class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-800 focus:ring-4 focus:ring-red-300 dark:focus:ring-red-900">
           <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd"
@@ -170,16 +90,22 @@
         </button>
       </td>
     </tr>
+    {% empty %}
+    <tr>
+      <td colspan="6" class="p-4 text-center text-gray-500 dark:text-gray-400">
+        {% trans 'No hay equipos rivales registrados' %}
+      </td>
+    </tr>
     {% endfor %}
   </tbody>
 </table>
 {% endblock %}
 
 {% block modals %}
-{% for match in object_list %}
+{% for rival in rivals %}
 <div
   class="fixed left-0 right-0 z-50 items-center justify-center hidden overflow-x-hidden overflow-y-auto top-4 md:inset-0 h-modal sm:h-full"
-  id="delete-match-modal-{{ match.id }}">
+  id="delete-rival-modal-{{ rival.id }}">
   <div class="relative w-full h-full max-w-md px-4 md:h-auto">
     <!-- Modal content -->
     <div class="relative bg-white rounded-lg shadow dark:bg-gray-800">
@@ -187,7 +113,7 @@
       <div class="flex justify-end p-2">
         <button type="button"
           class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-700 dark:hover:text-white"
-          data-modal-toggle="delete-match-modal-{{ match.id }}">
+          data-modal-toggle="delete-rival-modal-{{ rival.id }}">
           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd"
               d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
@@ -203,14 +129,14 @@
             d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
         </svg>
         <h3 class="mt-5 mb-6 text-lg text-gray-500 dark:text-gray-400">
-          {% trans '¿Estás seguro de que quieres eliminar este partido?' %}</h3>
-        <form method="post" action="{% url 'matches:match_delete' match.id %}">
+          {% trans '¿Estás seguro de que quieres eliminar este equipo rival?' %}</h3>
+        <form method="post" action="{% url 'rivals:rival_delete' rival.id %}">
           {% csrf_token %}
           <button type="submit"
             class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-base inline-flex items-center px-3 py-2.5 text-center mr-2 dark:focus:ring-red-800">{% trans 'Sí, estoy seguro' %}</button>
           <button type="button"
             class="text-gray-900 bg-white hover:bg-gray-100 focus:ring-4 focus:ring-primary-300 border border-gray-200 font-medium inline-flex items-center rounded-lg text-base px-3 py-2.5 text-center dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700"
-            data-modal-toggle="delete-match-modal-{{ match.id }}">{% trans 'No, cancelar' %}</button>
+            data-modal-toggle="delete-rival-modal-{{ rival.id }}">{% trans 'No, cancelar' %}</button>
         </form>
       </div>
     </div>
