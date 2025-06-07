@@ -36,11 +36,20 @@ class BaseMatchListView(ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        queryset = Match.objects.select_related('season', 'home_team', 'away_team').prefetch_related('match_notes').annotate(  # pylint: disable=no-member
-            notes_count=Count('match_notes')
-        ).all()
+        # Por defecto, filtrar por temporada activa
+        active_season = Season.get_active()
 
-        # Aplicar filtros si existen
+        if active_season:
+            queryset = Match.objects.select_related('season', 'home_team', 'away_team').prefetch_related('match_notes').annotate(  # pylint: disable=no-member
+                notes_count=Count('match_notes')
+            ).filter(season=active_season)
+        else:
+            # Si no hay temporada activa, mostrar todos
+            queryset = Match.objects.select_related('season', 'home_team', 'away_team').prefetch_related('match_notes').annotate(  # pylint: disable=no-member
+                notes_count=Count('match_notes')
+            ).all()
+
+        # Aplicar filtros adicionales si existen
         status = self.request.GET.get('status')
         match_type = self.request.GET.get('match_type')
         season = self.request.GET.get('season')
@@ -53,6 +62,7 @@ class BaseMatchListView(ListView):
         if match_type:
             queryset = queryset.filter(match_type=match_type)
 
+        # Si se especifica una temporada diferente en el filtro, sobrescribir el filtro por defecto
         if season:
             queryset = queryset.filter(season_id=season)
 
@@ -62,7 +72,7 @@ class BaseMatchListView(ListView):
         if date_to:
             queryset = queryset.filter(match_date__date__lte=date_to)
 
-        return queryset
+        return queryset.order_by('-match_date')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -108,10 +118,16 @@ class UpcomingMatchListView(ListView):
     def get_queryset(self):
         from django.db.models import Q
 
+        # Por defecto, filtrar por temporada activa
+        active_season = Season.get_active()
+
         # Filtrar partidos próximos: futuros o programados
-        queryset = Match.objects.filter(  # pylint: disable=no-member
-            Q(match_date__gte=timezone.now()) | Q(status='scheduled')
-        ).distinct().order_by('match_date')
+        base_filter = Q(match_date__gte=timezone.now()) | Q(status='scheduled')
+
+        if active_season:
+            queryset = Match.objects.filter(base_filter, season=active_season).distinct().order_by('match_date')  # pylint: disable=no-member
+        else:
+            queryset = Match.objects.filter(base_filter).distinct().order_by('match_date')  # pylint: disable=no-member
 
         return queryset
 
@@ -153,11 +169,16 @@ class PreviousMatchListView(ListView):
     def get_queryset(self):
         from django.db.models import Q
 
+        # Por defecto, filtrar por temporada activa
+        active_season = Season.get_active()
+
         # Filtrar partidos anteriores: pasados y finalizados/cancelados
-        queryset = Match.objects.filter(  # pylint: disable=no-member
-            Q(match_date__lt=timezone.now()) &
-            ~Q(status='scheduled')  # Excluir los programados que están en próximos
-        ).distinct().order_by('-match_date')
+        base_filter = Q(match_date__lt=timezone.now()) & ~Q(status='scheduled')
+
+        if active_season:
+            queryset = Match.objects.filter(base_filter, season=active_season).distinct().order_by('-match_date')  # pylint: disable=no-member
+        else:
+            queryset = Match.objects.filter(base_filter).distinct().order_by('-match_date')  # pylint: disable=no-member
 
         return queryset
 
@@ -573,10 +594,14 @@ class InProgressMatchListView(ListView):
     paginate_by = 20
 
     def get_queryset(self):
+        # Por defecto, filtrar por temporada activa
+        active_season = Season.get_active()
+
         # Filtrar solo partidos en curso
-        queryset = Match.objects.filter(  # pylint: disable=no-member
-            status='in_progress'
-        ).order_by('-match_date')
+        if active_season:
+            queryset = Match.objects.filter(status='in_progress', season=active_season).order_by('-match_date')  # pylint: disable=no-member
+        else:
+            queryset = Match.objects.filter(status='in_progress').order_by('-match_date')  # pylint: disable=no-member
 
         return queryset
 
@@ -616,10 +641,14 @@ class PostponedMatchListView(ListView):
     paginate_by = 20
 
     def get_queryset(self):
+        # Por defecto, filtrar por temporada activa
+        active_season = Season.get_active()
+
         # Filtrar solo partidos aplazados
-        queryset = Match.objects.filter(  # pylint: disable=no-member
-            status='postponed'
-        ).order_by('-match_date')
+        if active_season:
+            queryset = Match.objects.filter(status='postponed', season=active_season).order_by('-match_date')  # pylint: disable=no-member
+        else:
+            queryset = Match.objects.filter(status='postponed').order_by('-match_date')  # pylint: disable=no-member
 
         return queryset
 
@@ -659,10 +688,14 @@ class CancelledMatchListView(ListView):
     paginate_by = 20
 
     def get_queryset(self):
+        # Por defecto, filtrar por temporada activa
+        active_season = Season.get_active()
+
         # Filtrar solo partidos cancelados
-        queryset = Match.objects.filter(  # pylint: disable=no-member
-            status='cancelled'
-        ).order_by('-match_date')
+        if active_season:
+            queryset = Match.objects.filter(status='cancelled', season=active_season).order_by('-match_date')  # pylint: disable=no-member
+        else:
+            queryset = Match.objects.filter(status='cancelled').order_by('-match_date')  # pylint: disable=no-member
 
         return queryset
 
