@@ -297,7 +297,7 @@
                             {% trans 'Importación exitosa' %}
                         </h3>
                         <div class="mt-2 text-sm text-green-700 dark:text-green-400">
-                            <p>${data.created_count} {% trans 'partidos importados correctamente' %}</p>
+                            <p>${data.created_count || 0} {% trans 'partidos importados correctamente' %}</p>
                         </div>
                     </div>
                 </div>
@@ -394,8 +394,14 @@
           },
           body: JSON.stringify(matchesData)
         })
-        .then(response => response.json())
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
         .then(data => {
+          console.log('Respuesta del servidor:', data);
           showResults(data);
         })
         .catch(error => {
@@ -442,6 +448,14 @@
     function addRowsFromCSV(matchesData) {
       clearTable();
 
+      // Validar que matchesData existe y es un array
+      if (!matchesData || !Array.isArray(matchesData)) {
+        console.warn('matchesData no es válido:', matchesData);
+        const initialRow = createMatchRow();
+        tableBody.appendChild(initialRow);
+        return;
+      }
+
       matchesData.forEach(matchData => {
         const row = createMatchRow();
         const inputs = row.querySelectorAll('input, select');
@@ -487,18 +501,28 @@
           },
           body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
         .then(data => {
+          console.log('Respuesta del servidor CSV:', data);
           if (data.success) {
             // Limpiar selección de archivo
             csvFileInput.value = '';
             csvFileName.textContent = '';
 
+            // Validar que los datos existen antes de procesarlos
+            const matchesData = data.matches_data || [];
+            const totalRows = data.total_rows || 0;
+
             // Añadir filas a la tabla
-            addRowsFromCSV(data.matches_data);
+            addRowsFromCSV(matchesData);
 
             // Mostrar mensaje de éxito
-            let message = `${data.total_rows} {% trans 'partidos cargados desde CSV' %}`;
+            let message = `${totalRows} {% trans 'partidos cargados desde CSV' %}`;
             if (data.errors && data.errors.length > 0) {
               message += `. ${data.errors.length} {% trans 'filas con errores fueron omitidas' %}`;
             }

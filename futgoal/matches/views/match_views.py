@@ -350,14 +350,20 @@ class MatchImportView(View):
                     'errors': errors
                 })
             else:
-                if created_matches:
+                created_count = len(created_matches)
+                if created_count > 0:
                     messages.success(
                         request,
                         _('Se han importado %(count)d partidos correctamente') % {
-                            'count': len(created_matches)
+                            'count': created_count
                         }
                     )
-                return JsonResponse({'success': True})
+
+                return JsonResponse({
+                    'success': True,
+                    'created_count': created_count,
+                    'created_matches': created_matches
+                })
 
         except json.JSONDecodeError:
             return JsonResponse({
@@ -384,23 +390,36 @@ class MatchImportView(View):
 
 @method_decorator([login_required, is_global_admin], name='dispatch')
 class MatchImportCSVTemplateView(View):
-    """Vista para descargar la plantilla CSV"""
+    """Vista para descargar la plantilla CSV de importación básica"""
 
     def get(self, request, *args, **kwargs):
-        """Generar y devolver la plantilla CSV"""
+        """Generar y devolver la plantilla CSV para importación básica"""
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="plantilla_partidos.csv"'
+        response['Content-Disposition'] = 'attachment; filename="plantilla_importar_partidos.csv"'
 
         writer = csv.writer(response)
         writer.writerow([
-            'Rival',
+            'Equipo rival',
             'Rol (Local/Visitante)',
-            'Fecha y Hora (DD/MM/YYYY HH:MM)',
-            'Estadio',
-            'Tipo de Partido (amistoso, liga, copa, playoff, entrenamiento)',
-            'Estado (programado, en_curso, finalizado, cancelado, aplazado)',
-            'Goles Local',
-            'Goles Visitante'
+            'Fecha y hora (DD/MM/YYYY HH:MM)',
+            'Tipo de partido',
+            'Lugar del partido'
+        ])
+
+        # Añadir algunas filas de ejemplo
+        writer.writerow([
+            'Barcelona FC',
+            'Local',
+            '25/12/2024 15:30',
+            'amistoso',
+            'Camp Nou'
+        ])
+        writer.writerow([
+            'Real Madrid',
+            'Visitante',
+            '01/01/2025 20:00',
+            'liga',
+            'Santiago Bernabéu'
         ])
 
         return response
@@ -440,14 +459,23 @@ class MatchProcessCSVView(View):
             matches_to_process = []
             errors = []
             for row_num, row in enumerate(reader, start=2):
+                # Saltar filas vacías
+                if not any(row):
+                    continue
+
                 if len(row) < 4:
                     errors.append({
                         'row': row_num,
-                        'message': _('Fila incompleta. Se requieren al menos 4 columnas.')
+                        'message': _('Fila incompleta. Se requieren al menos 4 columnas (Equipo rival, Rol, Fecha y hora, Tipo de partido).')
                     })
                     continue
 
-                rival_name, role, match_date_str, venue, match_type, status, home_score, away_score = (row + [None]*4)[:8]
+                # Formato simplificado: Equipo rival, Rol, Fecha y hora, Tipo de partido, Lugar del partido
+                rival_name = row[0].strip() if len(row) > 0 else ''
+                role = row[1].strip() if len(row) > 1 else ''
+                match_date_str = row[2].strip() if len(row) > 2 else ''
+                match_type = row[3].strip() if len(row) > 3 else 'friendly'
+                venue = row[4].strip() if len(row) > 4 else ''
 
                 # Validaciones básicas
                 if not all([rival_name, role, match_date_str]):
@@ -457,21 +485,23 @@ class MatchProcessCSVView(View):
                     })
                     continue
 
-                is_home = role.strip().lower() == 'local'
-                if role.strip().lower() not in ['local', 'visitante']:
+                # Validar rol
+                if role.lower() not in ['local', 'visitante']:
                     errors.append({
                         'row': row_num,
                         'message': _('Rol inválido. Use "Local" o "Visitante"')
                     })
                     continue
 
+                is_home = role.lower() == 'local'
+
+                # Validar y parsear fecha
                 try:
-                    # Intentar analizar con varios formatos
                     dt = None
                     formats_to_try = ['%d/%m/%Y %H:%M', '%d-%m-%Y %H:%M', '%Y-%m-%d %H:%M']
                     for fmt in formats_to_try:
                         try:
-                            dt = datetime.strptime(match_date_str.strip(), fmt)
+                            dt = datetime.strptime(match_date_str, fmt)
                             break
                         except ValueError:
                             continue
@@ -481,33 +511,50 @@ class MatchProcessCSVView(View):
 
                     match_date = timezone.make_aware(dt)
 
-                except ValueError as e:
+                except ValueError:
                     errors.append({
                         'row': row_num,
                         'message': _('Formato de fecha y hora inválido. Use DD/MM/YYYY HH:MM')
                     })
                     continue
 
+                # Validar tipo de partido
+                valid_match_types = ['friendly', 'league', 'cup', 'playoff', 'training', 'amistoso', 'liga', 'copa']
+                if match_type.lower() not in valid_match_types:
+                    errors.append({
+                        'row': row_num,
+                        'message': _('Tipo de partido inválido. Use: amistoso, liga, copa, playoff, entrenamiento')
+                    })
+                    continue
+
+                # Convertir tipo de partido a formato interno
+                match_type_mapping = {
+                    'amistoso': 'friendly',
+                    'liga': 'league',
+                    'copa': 'cup',
+                    'entrenamiento': 'training'
+                }
+                match_type_internal = match_type_mapping.get(match_type.lower(), match_type.lower())
+
                 matches_to_process.append({
-                    'rival': rival_name.strip(),
-                    'is_home': is_home,
-                    'match_date': match_date.isoformat(),
-                    'venue': venue.strip() if venue else '',
-                    'match_type': match_type.strip().lower() if match_type else 'friendly',
-                    'status': status.strip().lower() if status else 'scheduled',
-                    'home_score': int(home_score) if home_score and home_score.strip().isdigit() else None,
-                    'away_score': int(away_score) if away_score and away_score.strip().isdigit() else None,
+                    'rival_name': rival_name,
+                    'role': '1' if is_home else '0',  # Para compatibilidad con el formulario
+                    'match_date': match_date.strftime('%Y-%m-%dT%H:%M'),  # Formato datetime-local
+                    'match_type': match_type_internal,
+                    'venue': venue
                 })
 
             if errors:
                 return JsonResponse({
                     'success': False,
-                    'validation_errors': errors
+                    'errors': errors
                 })
 
             return JsonResponse({
                 'success': True,
-                'matches': matches_to_process
+                'matches_data': matches_to_process,
+                'total_rows': len(matches_to_process),
+                'errors': []
             })
 
         except Exception as e:
