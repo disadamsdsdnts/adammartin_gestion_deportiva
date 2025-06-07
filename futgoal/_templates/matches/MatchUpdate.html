@@ -26,21 +26,6 @@
 
             <div class="grid grid-cols-6 gap-6">
               <div class="col-span-6 sm:col-span-3">
-                <label for="{{ form.home_team.id_for_label }}"
-                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Equipo local' %}</label>
-                <select name="{{ form.home_team.name }}" id="{{ form.home_team.id_for_label }}"
-                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  required>
-                  <option value="">{% trans 'Selecciona un equipo' %}</option>
-                  {% for choice in form.home_team %}
-                  {{ choice.tag }}
-                  {% endfor %}
-                </select>
-                {% if form.home_team.errors %}
-                <p class="mt-2 text-sm text-red-600">{{ form.home_team.errors.0 }}</p>
-                {% endif %}
-              </div>
-              <div class="col-span-6 sm:col-span-3">
                 <label for="{{ form.away_team.id_for_label }}"
                   class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Equipo visitante' %}</label>
                 <select name="{{ form.away_team.name }}" id="{{ form.away_team.id_for_label }}"
