@@ -8,6 +8,28 @@ from futgoal.team.models import Team
 from futgoal.rivals.models import Rival
 
 
+class DateTimeLocalInput(forms.DateTimeInput):
+    """
+    Widget personalizado para datetime-local que maneja correctamente
+    el formato de fecha tanto para valores iniciales como para errores de validación.
+    """
+    input_type = 'datetime-local'
+
+    def format_value(self, value):
+        if value is None:
+            return ''
+
+        # Si ya es una cadena (como cuando hay errores de validación), devolverla tal como está
+        if isinstance(value, str):
+            return value
+
+        # Si es un objeto datetime, formatearlo para datetime-local
+        if hasattr(value, 'strftime'):
+            return value.strftime('%Y-%m-%dT%H:%M')
+
+        return value
+
+
 class MatchForm(forms.ModelForm):
     """
     Formulario para crear y editar partidos.
@@ -29,10 +51,10 @@ class MatchForm(forms.ModelForm):
         ]
         widgets = {
             'home_team': forms.HiddenInput(),
-            'match_date': forms.DateTimeInput(
+            'match_date': DateTimeLocalInput(
                 attrs={
-                    'type': 'datetime-local',
-                    'class': 'form-control'
+                    'class': 'shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500',
+                    'required': True
                 }
             ),
             'away_team': forms.Select(
@@ -117,15 +139,9 @@ class MatchForm(forms.ModelForm):
     def clean_match_date(self):
         """Validar que la fecha del partido sea válida"""
         match_date = self.cleaned_data.get('match_date')
-        status = self.cleaned_data.get('status', 'scheduled')
 
-        if match_date and status == 'scheduled':
-            # Solo validar para partidos programados
-            if match_date < timezone.now():
-                raise forms.ValidationError(
-                    _('No se puede programar un partido en el pasado')
-                )
-
+        # Simplemente retornar la fecha sin validaciones de tiempo pasado
+        # Esto permite crear partidos antiguos olvidados y editar partidos existentes
         return match_date
 
     def clean(self):

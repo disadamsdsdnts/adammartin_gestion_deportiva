@@ -121,10 +121,6 @@ class Match(AuditModel):
 
     def clean(self):
         """Validaciones personalizadas"""
-        if self.match_date and self.match_date < timezone.now():
-            if self.status == 'scheduled':
-                raise ValidationError(_('No se puede programar un partido en el pasado'))
-
         if self.status == 'finished':
             if self.home_score is None or self.away_score is None:
                 raise ValidationError(_('Un partido finalizado debe tener marcador'))
