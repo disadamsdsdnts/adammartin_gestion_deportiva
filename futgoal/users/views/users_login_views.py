@@ -69,10 +69,31 @@ class DashboardView(TemplateView):
 
         # Obtener próximos partidos (máximo 5)
         from futgoal.matches.models import Match
-        upcoming_matches = Match.objects.filter(
-            status='scheduled',
-            match_date__gt=timezone.now()
-        ).select_related('away_team', 'season').order_by('match_date')[:5]
+        from futgoal.season.models import Season
+
+        try:
+            # Obtener la temporada activa
+            active_season = Season.get_active()
+
+            if active_season:
+                # Filtrar próximos partidos por temporada activa
+                upcoming_matches = Match.objects.filter(
+                    status='scheduled',
+                    match_date__gt=timezone.now(),
+                    season=active_season
+                ).select_related('away_team', 'season').order_by('match_date')[:5]
+            else:
+                # Si no hay temporada activa, mostrar todos los próximos partidos
+                upcoming_matches = Match.objects.filter(
+                    status='scheduled',
+                    match_date__gt=timezone.now()
+                ).select_related('away_team', 'season').order_by('match_date')[:5]
+        except:
+            # En caso de error, mostrar todos los próximos partidos
+            upcoming_matches = Match.objects.filter(
+                status='scheduled',
+                match_date__gt=timezone.now()
+            ).select_related('away_team', 'season').order_by('match_date')[:5]
 
         context['upcoming_matches'] = upcoming_matches
 
@@ -126,15 +147,11 @@ class DashboardView(TemplateView):
         context['upcoming_birthdays'] = upcoming_birthdays[:5]
 
         # Obtener estadísticas de la temporada actual
-        from futgoal.season.models import Season
         from django.db.models import Q, Count
 
-        try:
-            # Obtener la temporada actual
-            current_season = Season.objects.get(is_active=True)
-
+        if active_season:
             # Obtener todos los partidos de la temporada actual
-            season_matches = Match.objects.filter(season=current_season)
+            season_matches = Match.objects.filter(season=active_season)
 
             # Contar estadísticas
             total_matches = season_matches.count()
@@ -179,9 +196,8 @@ class DashboardView(TemplateView):
             }
 
             context['season_stats'] = season_stats
-
-        except Season.DoesNotExist:
-            # Si no hay temporada actual, no mostrar estadísticas
+        else:
+            # Si no hay temporada activa, no mostrar estadísticas
             context['season_stats'] = None
 
         return context

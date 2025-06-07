@@ -10,7 +10,12 @@
     <!-- Próximos Partidos Card -->
     <div class="w-full p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
       <div class="flex items-center justify-between mb-4">
-        <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white">{% trans 'Próximos Partidos' %}</h5>
+        <div>
+          <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white">{% trans 'Próximos Partidos' %}</h5>
+          {% if upcoming_matches %}
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{% trans 'Temporada actual' %}</p>
+          {% endif %}
+        </div>
         <a href="{% url 'matches:match_list' %}"
           class="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">
           {% trans 'Ver todos' %}
