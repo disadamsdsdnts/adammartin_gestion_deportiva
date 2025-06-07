@@ -116,6 +116,65 @@ class DashboardView(TemplateView):
         upcoming_birthdays.sort(key=lambda x: x['days_until'])
         context['upcoming_birthdays'] = upcoming_birthdays[:5]
 
+        # Obtener estadísticas de la temporada actual
+        from futgoal.season.models import Season
+        from django.db.models import Q, Count
+
+        try:
+            # Obtener la temporada actual
+            current_season = Season.objects.get(is_active=True)
+
+            # Obtener todos los partidos de la temporada actual
+            season_matches = Match.objects.filter(season=current_season)
+
+            # Contar estadísticas
+            total_matches = season_matches.count()
+
+            # Para contar wins/draws/losses necesitamos evaluar cada partido finalizado
+            wins = 0
+            draws = 0
+            losses = 0
+
+            finished_matches = season_matches.filter(status='finished')
+            for match in finished_matches:
+                result_status = match.match_result_status
+                if result_status == 'victory':
+                    wins += 1
+                elif result_status == 'draw':
+                    draws += 1
+                elif result_status == 'defeat':
+                    losses += 1
+
+            pending = season_matches.filter(status='scheduled').count()
+
+            # Calcular porcentajes
+            if total_matches > 0:
+                win_percentage = round((wins / total_matches) * 100, 1)
+                draw_percentage = round((draws / total_matches) * 100, 1)
+                loss_percentage = round((losses / total_matches) * 100, 1)
+                pending_percentage = round((pending / total_matches) * 100, 1)
+            else:
+                win_percentage = draw_percentage = loss_percentage = pending_percentage = 0
+
+            # Crear diccionario con estadísticas
+            season_stats = {
+                'wins': wins,
+                'draws': draws,
+                'losses': losses,
+                'pending': pending,
+                'total_matches': total_matches,
+                'win_percentage': win_percentage,
+                'draw_percentage': draw_percentage,
+                'loss_percentage': loss_percentage,
+                'pending_percentage': pending_percentage,
+            }
+
+            context['season_stats'] = season_stats
+
+        except Season.DoesNotExist:
+            # Si no hay temporada actual, no mostrar estadísticas
+            context['season_stats'] = None
+
         return context
 
 
