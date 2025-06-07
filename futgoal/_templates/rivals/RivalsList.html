@@ -82,7 +82,12 @@
 <div class="p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
   <div class="flex flex-wrap items-center justify-between gap-2">
     <div class="flex items-center space-x-2">
-      {% if active_season %}
+      {% if show_all %}
+      <span
+        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+        {% trans 'Mostrando todos los rivales' %}
+      </span>
+      {% elif active_season %}
       <span
         class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
         {% trans 'Temporada Activa' %}: {{ active_season.name }}
@@ -95,15 +100,15 @@
       {% endif %}
     </div>
     <div class="flex items-center space-x-2">
-      {% if request.GET.filter_season %}
+      {% if show_all %}
       <a href="{% url 'rivals:rival_list' %}"
         class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-primary-300 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
-        {% trans 'Mostrar todos' %}
+        {% trans 'Solo temporada activa' %}
       </a>
       {% else %}
-      <a href="{% url 'rivals:rival_list' %}?filter_season=1"
+      <a href="{% url 'rivals:rival_list' %}?show_all=1"
         class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-primary-300 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
-        {% trans 'Solo temporada activa' %}
+        {% trans 'Mostrar todos' %}
       </a>
       {% endif %}
     </div>

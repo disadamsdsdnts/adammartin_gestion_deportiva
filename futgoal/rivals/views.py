@@ -27,18 +27,20 @@ class RivalListView(ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        # Mostrar todos los equipos por defecto, filtrar por temporada solo si se solicita
+        # Por defecto mostrar solo rivales de la temporada activa, mostrar todos solo si se solicita
         show_all = self.request.GET.get('show_all', '')
-        filter_by_season = self.request.GET.get('filter_season', '')
 
-        if filter_by_season and not show_all:
+        if show_all:
+            # Mostrar todos los rivales cuando se solicite explícitamente
+            queryset = Rival.objects.all()
+        else:
+            # Por defecto, filtrar por temporada activa
             active_season = Season.get_active()
             if active_season:
                 queryset = Rival.objects.filter(seasons=active_season)
             else:
+                # Si no hay temporada activa, mostrar todos
                 queryset = Rival.objects.all()
-        else:
-            queryset = Rival.objects.all()
 
         # Filtro de búsqueda
         search = self.request.GET.get('search', '')
@@ -56,7 +58,7 @@ class RivalListView(ListView):
         context = super().get_context_data(**kwargs)
 
         active_season = Season.get_active()
-        filter_by_season = self.request.GET.get('filter_season', '')
+        show_all = self.request.GET.get('show_all', '')
 
         context['page_title'] = _('Equipos Rivales')
         context['breadcrumbs'] = [
@@ -66,7 +68,7 @@ class RivalListView(ListView):
 
         # Información adicional de contexto
         context['active_season'] = active_season
-        context['filter_by_season'] = filter_by_season
+        context['show_all'] = show_all
 
         return context
 
