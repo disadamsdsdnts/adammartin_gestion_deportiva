@@ -10,7 +10,7 @@
         {% if active_tab == 'all' %}
           border-blue-600 text-blue-600 dark:border-blue-500 dark:text-blue-500
         {% else %}
-          border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300
+          border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 dark:text-white dark:hover:text-gray-300
         {% endif %}" id="all-tab" role="tab" aria-controls="all"
         aria-selected="{% if active_tab == 'all' %}true{% else %}false{% endif %}">
         {% trans 'Todos' %}
@@ -21,7 +21,7 @@
         {% if active_tab == 'upcoming' %}
           border-blue-600 text-blue-600 dark:border-blue-500 dark:text-blue-500
         {% else %}
-          border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300
+          border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 dark:text-white dark:hover:text-gray-300
         {% endif %}" id="upcoming-tab" role="tab" aria-controls="upcoming"
         aria-selected="{% if active_tab == 'upcoming' %}true{% else %}false{% endif %}">
         {% trans 'Próximos' %}
@@ -32,7 +32,7 @@
         {% if active_tab == 'previous' %}
           border-blue-600 text-blue-600 dark:border-blue-500 dark:text-blue-500
         {% else %}
-          border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300
+          border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 dark:text-white dark:hover:text-gray-300
         {% endif %}" id="previous-tab" role="tab" aria-controls="previous"
         aria-selected="{% if active_tab == 'previous' %}true{% else %}false{% endif %}">
         {% trans 'Anteriores' %}
@@ -43,7 +43,7 @@
         {% if active_tab == 'postponed' %}
           border-blue-600 text-blue-600 dark:border-blue-500 dark:text-blue-500
         {% else %}
-          border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300
+          border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 dark:text-white dark:hover:text-gray-300
         {% endif %}" id="postponed-tab" role="tab" aria-controls="postponed"
         aria-selected="{% if active_tab == 'postponed' %}true{% else %}false{% endif %}">
         {% trans 'Aplazados' %}
@@ -54,7 +54,7 @@
         {% if active_tab == 'cancelled' %}
           border-blue-600 text-blue-600 dark:border-blue-500 dark:text-blue-500
         {% else %}
-          border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300
+          border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 dark:text-white dark:hover:text-gray-300
         {% endif %}" id="cancelled-tab" role="tab" aria-controls="cancelled"
         aria-selected="{% if active_tab == 'cancelled' %}true{% else %}false{% endif %}">
         {% trans 'Cancelados' %}
