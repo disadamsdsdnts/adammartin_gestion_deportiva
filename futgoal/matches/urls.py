@@ -8,6 +8,7 @@ urlpatterns = [
     path('all/', views.AllMatchListView.as_view(), name='all_match_list'),
     path('upcoming/', views.UpcomingMatchListView.as_view(), name='upcoming_match_list'),
     path('previous/', views.PreviousMatchListView.as_view(), name='previous_match_list'),
+    path('in-progress/', views.InProgressMatchListView.as_view(), name='in_progress_match_list'),
     path('postponed/', views.PostponedMatchListView.as_view(), name='postponed_match_list'),
     path('cancelled/', views.CancelledMatchListView.as_view(), name='cancelled_match_list'),
     path('create/', views.MatchCreateView.as_view(), name='match_create'),

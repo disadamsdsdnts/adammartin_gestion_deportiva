@@ -518,6 +518,49 @@ class MatchProcessCSVView(View):
 
 
 @method_decorator([login_required, is_global_admin], name='dispatch')
+class InProgressMatchListView(ListView):
+    """Vista para listar partidos en curso"""
+    template_name = 'matches/MatchesList.html'
+    model = Match
+    context_object_name = 'matches'
+    paginate_by = 20
+
+    def get_queryset(self):
+        # Filtrar solo partidos en curso
+        queryset = Match.objects.filter(  # pylint: disable=no-member
+            status='in_progress'
+        ).order_by('-match_date')
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Obtener la temporada activa
+        try:
+            active_season = Season.get_active()
+        except:
+            active_season = None
+
+        context['page_title'] = _('Partidos en Curso')
+        context['active_season'] = active_season
+        context['active_tab'] = 'in_progress'
+        context['breadcrumbs'] = [
+            {'title': _('Partidos'), 'url': reverse('matches:match_list')},
+            {'title': _('En Curso')}
+        ]
+        context['actions'] = [
+            {
+                'title': _('Nuevo Partido'),
+                'url': reverse('matches:match_create'),
+                'primary': True,
+                'icon': '<i class="bi bi-plus-lg"></i>'
+            },
+        ]
+        return context
+
+
+@method_decorator([login_required, is_global_admin], name='dispatch')
 class PostponedMatchListView(ListView):
     """Vista para listar partidos aplazados"""
     template_name = 'matches/MatchesList.html'

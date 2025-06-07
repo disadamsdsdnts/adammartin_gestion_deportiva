@@ -28,6 +28,17 @@
       </a>
     </li>
     <li class="mr-2" role="presentation">
+      <a href="{% url 'matches:in_progress_match_list' %}" class="inline-block p-4 border-b-2 rounded-t-lg
+        {% if active_tab == 'in_progress' %}
+          border-blue-600 text-blue-600 dark:border-blue-500 dark:text-blue-500
+        {% else %}
+          border-transparent text-gray-500 hover:text-gray-600 hover:border-gray-300 dark:text-white dark:hover:text-gray-300
+        {% endif %}" id="in-progress-tab" role="tab" aria-controls="in_progress"
+        aria-selected="{% if active_tab == 'in_progress' %}true{% else %}false{% endif %}">
+        {% trans 'En Curso' %}
+      </a>
+    </li>
+    <li class="mr-2" role="presentation">
       <a href="{% url 'matches:previous_match_list' %}" class="inline-block p-4 border-b-2 rounded-t-lg
         {% if active_tab == 'previous' %}
           border-blue-600 text-blue-600 dark:border-blue-500 dark:text-blue-500
