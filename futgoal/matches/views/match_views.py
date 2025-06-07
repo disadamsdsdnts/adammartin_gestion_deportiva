@@ -18,6 +18,7 @@ import json
 import csv
 import io
 from datetime import datetime
+from django.utils import timezone
 
 from futgoal.users.decorators import is_global_admin
 from futgoal.matches.models import Match
@@ -27,15 +28,15 @@ from futgoal.rivals.models import Rival
 
 
 @method_decorator([login_required, is_global_admin], name='dispatch')
-class MatchListView(ListView):
-    """Vista para listar partidos"""
+class BaseMatchListView(ListView):
+    """Vista base para listar partidos con filtros"""
     template_name = 'matches/MatchesList.html'
     model = Match
     context_object_name = 'matches'
     paginate_by = 20
 
     def get_queryset(self):
-        queryset = Match.objects.select_related('season', 'home_team', 'away_team').prefetch_related('match_notes').annotate(
+        queryset = Match.objects.select_related('season', 'home_team', 'away_team').prefetch_related('match_notes').annotate(  # pylint: disable=no-member
             notes_count=Count('match_notes')
         ).all()
 
@@ -93,6 +94,97 @@ class MatchListView(ListView):
         # Añadir formulario de filtros
         context['filter_form'] = MatchFilterForm(self.request.GET)
 
+        return context
+
+
+@method_decorator([login_required, is_global_admin], name='dispatch')
+class UpcomingMatchListView(ListView):
+    """Vista para listar próximos partidos"""
+    template_name = 'matches/MatchesList.html'
+    model = Match
+    context_object_name = 'matches'
+    paginate_by = 20
+
+    def get_queryset(self):
+        from django.db.models import Q
+
+        # Filtrar partidos próximos: futuros o programados
+        queryset = Match.objects.filter(  # pylint: disable=no-member
+            Q(match_date__gte=timezone.now()) | Q(status='scheduled')
+        ).distinct().order_by('match_date')
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Obtener la temporada activa
+        try:
+            active_season = Season.get_active()
+        except:
+            active_season = None
+
+        context['page_title'] = _('Próximos Partidos')
+        context['active_season'] = active_season
+        context['active_tab'] = 'upcoming'
+        context['breadcrumbs'] = [
+            {'title': _('Partidos'), 'url': reverse('matches:match_list')},
+            {'title': _('Próximos')}
+        ]
+        context['actions'] = [
+            {
+                'title': _('Nuevo Partido'),
+                'url': reverse('matches:match_create'),
+                'primary': True,
+                'icon': '<i class="bi bi-plus-lg"></i>'
+            },
+        ]
+        return context
+
+
+@method_decorator([login_required, is_global_admin], name='dispatch')
+class PreviousMatchListView(ListView):
+    """Vista para listar partidos anteriores"""
+    template_name = 'matches/MatchesList.html'
+    model = Match
+    context_object_name = 'matches'
+    paginate_by = 20
+
+    def get_queryset(self):
+        from django.db.models import Q
+
+        # Filtrar partidos anteriores: pasados y finalizados/cancelados
+        queryset = Match.objects.filter(  # pylint: disable=no-member
+            Q(match_date__lt=timezone.now()) &
+            ~Q(status='scheduled')  # Excluir los programados que están en próximos
+        ).distinct().order_by('-match_date')
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Obtener la temporada activa
+        try:
+            active_season = Season.get_active()
+        except:
+            active_season = None
+
+        context['page_title'] = _('Partidos Anteriores')
+        context['active_season'] = active_season
+        context['active_tab'] = 'previous'
+        context['breadcrumbs'] = [
+            {'title': _('Partidos'), 'url': reverse('matches:match_list')},
+            {'title': _('Anteriores')}
+        ]
+        context['actions'] = [
+            {
+                'title': _('Nuevo Partido'),
+                'url': reverse('matches:match_create'),
+                'primary': True,
+                'icon': '<i class="bi bi-plus-lg"></i>'
+            },
+        ]
         return context
 
 
@@ -195,7 +287,7 @@ class MatchDeleteView(DeleteView):
             {'title': _('Partidos'), 'url': reverse('matches:match_list')},
             {'title': _('Eliminar')},
         ]
-        context['delete_message'] = _('¿Está seguro de que desea eliminar el partido "{}"?').format(self.object)
+        context['delete_message'] = str(_('¿Está seguro de que desea eliminar el partido "{}"?')).format(self.object)
         return context
 
     def get_success_url(self):
@@ -234,7 +326,7 @@ class MatchImportView(View):
                     try:
                         match = form.save()
                         created_matches.append({
-                            'id': match.id,
+                            'id': match.id,  # pylint: disable=no-member
                             'name': str(match)
                         })
                     except Exception as e:
@@ -249,26 +341,23 @@ class MatchImportView(View):
                             errors.append({
                                 'row': index + 1,
                                 'field': field,
-                                'message': str(error)
+                                'message': error
                             })
 
-            # Preparar respuesta
-            response_data = {
-                'success': len(errors) == 0,
-                'created_count': len(created_matches),
-                'errors': errors,
-                'created_matches': created_matches
-            }
-
-            if response_data['success']:
-                messages.success(
-                    request,
-                    _('Se han importado %(count)d partidos correctamente') % {
-                        'count': len(created_matches)
-                    }
-                )
-
-            return JsonResponse(response_data)
+            if errors:
+                return JsonResponse({
+                    'success': False,
+                    'errors': errors
+                })
+            else:
+                if created_matches:
+                    messages.success(
+                        request,
+                        _('Se han importado %(count)d partidos correctamente') % {
+                            'count': len(created_matches)
+                        }
+                    )
+                return JsonResponse({'success': True})
 
         except json.JSONDecodeError:
             return JsonResponse({
@@ -295,48 +384,23 @@ class MatchImportView(View):
 
 @method_decorator([login_required, is_global_admin], name='dispatch')
 class MatchImportCSVTemplateView(View):
-    """Vista para descargar plantilla CSV de importación"""
+    """Vista para descargar la plantilla CSV"""
 
     def get(self, request, *args, **kwargs):
-        """Generar y descargar plantilla CSV"""
-        response = HttpResponse(content_type='text/csv; charset=utf-8')
+        """Generar y devolver la plantilla CSV"""
+        response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="plantilla_partidos.csv"'
 
-        # Añadir BOM para Excel
-        response.write('\ufeff')
-
         writer = csv.writer(response)
-
-        # Escribir headers
         writer.writerow([
-            'Equipo rival',
+            'Rival',
             'Rol (Local/Visitante)',
-            'Fecha y hora (DD/MM/YYYY HH:MM)',
-            'Tipo de partido',
-            'Lugar del partido'
-        ])
-
-        # Escribir algunas filas de ejemplo
-        writer.writerow([
-            'Barcelona FC',
-            'Local',
-            '25/12/2024 19:00',
-            'Amistoso',
-            'Camp Nou'
-        ])
-        writer.writerow([
-            'Real Madrid',
-            'Visitante',
-            '15/01/2025 21:30',
-            'Liga',
-            'Santiago Bernabéu'
-        ])
-        writer.writerow([
-            'Valencia CF',
-            'Local',
-            '20/02/2025 18:00',
-            'Copa',
-            'Mestalla'
+            'Fecha y Hora (DD/MM/YYYY HH:MM)',
+            'Estadio',
+            'Tipo de Partido (amistoso, liga, copa, playoff, entrenamiento)',
+            'Estado (programado, en_curso, finalizado, cancelado, aplazado)',
+            'Goles Local',
+            'Goles Visitante'
         ])
 
         return response
@@ -344,10 +408,10 @@ class MatchImportCSVTemplateView(View):
 
 @method_decorator([login_required, is_global_admin], name='dispatch')
 class MatchProcessCSVView(View):
-    """Vista para procesar archivo CSV subido"""
+    """Vista para procesar el archivo CSV de partidos"""
 
     def post(self, request, *args, **kwargs):
-        """Procesar archivo CSV y devolver datos JSON"""
+        """Procesar el archivo CSV subido"""
         try:
             if 'csv_file' not in request.FILES:
                 return JsonResponse({
@@ -356,8 +420,6 @@ class MatchProcessCSVView(View):
                 })
 
             csv_file = request.FILES['csv_file']
-
-            # Validar que es un archivo CSV
             if not csv_file.name.endswith('.csv'):
                 return JsonResponse({
                     'success': False,
@@ -366,140 +428,217 @@ class MatchProcessCSVView(View):
 
             # Leer el archivo CSV
             try:
-                # Intentar detectar el encoding
-                file_content = csv_file.read()
-                csv_file.seek(0)
-
-                # Intentar UTF-8 primero, luego latin-1
-                try:
-                    decoded_content = file_content.decode('utf-8-sig')
-                except UnicodeDecodeError:
-                    try:
-                        decoded_content = file_content.decode('latin-1')
-                    except UnicodeDecodeError:
-                        decoded_content = file_content.decode('cp1252')
-
-                # Crear un objeto StringIO para csv.reader
-                csv_content = io.StringIO(decoded_content)
-                reader = csv.reader(csv_content, delimiter=',')
-
-                matches_data = []
-                errors = []
-
-                # Saltar la primera fila (headers)
-                next(reader, None)
-
-                for row_num, row in enumerate(reader, start=2):
-                    if len(row) < 4:  # Verificar que tenga al menos 4 columnas obligatorias
-                        errors.append({
-                            'row': row_num,
-                            'message': _('Fila incompleta. Se requieren al menos 4 columnas.')
-                        })
-                        continue
-
-                    # Obtener campos obligatorios
-                    rival_name, role, match_date_str, match_type = [cell.strip() for cell in row[:4]]
-
-                    # Obtener campo opcional venue (lugar del partido)
-                    venue = row[4].strip() if len(row) > 4 else ''
-
-                    # Validar que todos los campos requeridos tienen contenido
-                    if not all([rival_name, role, match_date_str]):
-                        errors.append({
-                            'row': row_num,
-                            'message': _('Faltan campos obligatorios (Equipo rival, Rol, Fecha y hora)')
-                        })
-                        continue
-
-                    # El nombre del rival se usará directamente (se creará automáticamente si no existe)
-
-                    # Validar y convertir rol
-                    role_value = None
-                    role_lower = role.lower()
-                    if role_lower in ['local', 'home', 'casa']:
-                        role_value = '1'  # True para local
-                    elif role_lower in ['visitante', 'away', 'fuera']:
-                        role_value = '0'  # False para visitante
-                    else:
-                        errors.append({
-                            'row': row_num,
-                            'message': _('Rol inválido. Use "Local" o "Visitante"')
-                        })
-                        continue
-
-                    # Validar y convertir fecha y hora
-                    match_date = None
-                    try:
-                        # Intentar diferentes formatos de fecha y hora
-                        for datetime_format in [
-                            '%d/%m/%Y %H:%M',
-                            '%Y-%m-%d %H:%M',
-                            '%d-%m-%Y %H:%M',
-                            '%m/%d/%Y %H:%M',
-                            '%d/%m/%Y %H:%M:%S',
-                            '%Y-%m-%d %H:%M:%S'
-                        ]:
-                            try:
-                                match_date = datetime.strptime(match_date_str, datetime_format)
-                                break
-                            except ValueError:
-                                continue
-
-                        if match_date is None:
-                            raise ValueError(_('Formato de fecha y hora no válido'))
-
-                    except ValueError as e:
-                        errors.append({
-                            'row': row_num,
-                            'message': _('Formato de fecha y hora inválido. Use DD/MM/YYYY HH:MM')
-                        })
-                        continue
-
-                    # Convertir fecha al formato ISO para JavaScript
-                    match_date_iso = match_date.strftime('%Y-%m-%dT%H:%M')
-
-                    # Validar tipo de partido (opcional, por defecto 'friendly')
-                    valid_match_types = dict(Match.MATCH_TYPE_CHOICES)
-                    match_type_key = match_type.lower() if match_type else 'friendly'
-
-                    # Mapear nombres en español a códigos
-                    type_mapping = {
-                        'amistoso': 'friendly',
-                        'liga': 'league',
-                        'copa': 'cup',
-                        'playoff': 'playoff',
-                        'entrenamiento': 'training'
-                    }
-
-                    if match_type_key in type_mapping:
-                        match_type_key = type_mapping[match_type_key]
-                    elif match_type_key not in valid_match_types:
-                        match_type_key = 'friendly'  # Por defecto
-
-                    matches_data.append({
-                        'rival_name': rival_name,
-                        'role': role_value,
-                        'match_date': match_date_iso,
-                        'match_type': match_type_key,
-                        'venue': venue,
-                        'row': row_num
-                    })
-
-                return JsonResponse({
-                    'success': True,
-                    'matches_data': matches_data,
-                    'total_rows': len(matches_data),
-                    'errors': errors
-                })
-
+                decoded_file = csv_file.read().decode('utf-8')
+                reader = csv.reader(io.StringIO(decoded_file))
+                header = next(reader)  # Saltar la cabecera
             except Exception as e:
                 return JsonResponse({
                     'success': False,
-                    'error': _('Error al procesar el archivo CSV: %(error)s') % {'error': str(e)}
+                    'error': _('Error al leer el archivo CSV: %(error)s') % {'error': str(e)}
                 })
+
+            matches_to_process = []
+            errors = []
+            for row_num, row in enumerate(reader, start=2):
+                if len(row) < 4:
+                    errors.append({
+                        'row': row_num,
+                        'message': _('Fila incompleta. Se requieren al menos 4 columnas.')
+                    })
+                    continue
+
+                rival_name, role, match_date_str, venue, match_type, status, home_score, away_score = (row + [None]*4)[:8]
+
+                # Validaciones básicas
+                if not all([rival_name, role, match_date_str]):
+                    errors.append({
+                        'row': row_num,
+                        'message': _('Faltan campos obligatorios (Equipo rival, Rol, Fecha y hora)')
+                    })
+                    continue
+
+                is_home = role.strip().lower() == 'local'
+                if role.strip().lower() not in ['local', 'visitante']:
+                    errors.append({
+                        'row': row_num,
+                        'message': _('Rol inválido. Use "Local" o "Visitante"')
+                    })
+                    continue
+
+                try:
+                    # Intentar analizar con varios formatos
+                    dt = None
+                    formats_to_try = ['%d/%m/%Y %H:%M', '%d-%m-%Y %H:%M', '%Y-%m-%d %H:%M']
+                    for fmt in formats_to_try:
+                        try:
+                            dt = datetime.strptime(match_date_str.strip(), fmt)
+                            break
+                        except ValueError:
+                            continue
+
+                    if dt is None:
+                        raise ValueError(_('Formato de fecha y hora no válido'))
+
+                    match_date = timezone.make_aware(dt)
+
+                except ValueError as e:
+                    errors.append({
+                        'row': row_num,
+                        'message': _('Formato de fecha y hora inválido. Use DD/MM/YYYY HH:MM')
+                    })
+                    continue
+
+                matches_to_process.append({
+                    'rival': rival_name.strip(),
+                    'is_home': is_home,
+                    'match_date': match_date.isoformat(),
+                    'venue': venue.strip() if venue else '',
+                    'match_type': match_type.strip().lower() if match_type else 'friendly',
+                    'status': status.strip().lower() if status else 'scheduled',
+                    'home_score': int(home_score) if home_score and home_score.strip().isdigit() else None,
+                    'away_score': int(away_score) if away_score and away_score.strip().isdigit() else None,
+                })
+
+            if errors:
+                return JsonResponse({
+                    'success': False,
+                    'validation_errors': errors
+                })
+
+            return JsonResponse({
+                'success': True,
+                'matches': matches_to_process
+            })
 
         except Exception as e:
             return JsonResponse({
                 'success': False,
                 'error': _('Error interno del servidor: %(error)s') % {'error': str(e)}
             })
+
+
+@method_decorator([login_required, is_global_admin], name='dispatch')
+class PostponedMatchListView(ListView):
+    """Vista para listar partidos aplazados"""
+    template_name = 'matches/MatchesList.html'
+    model = Match
+    context_object_name = 'matches'
+    paginate_by = 20
+
+    def get_queryset(self):
+        # Filtrar solo partidos aplazados
+        queryset = Match.objects.filter(  # pylint: disable=no-member
+            status='postponed'
+        ).order_by('-match_date')
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Obtener la temporada activa
+        try:
+            active_season = Season.get_active()
+        except:
+            active_season = None
+
+        context['page_title'] = _('Partidos Aplazados')
+        context['active_season'] = active_season
+        context['active_tab'] = 'postponed'
+        context['breadcrumbs'] = [
+            {'title': _('Partidos'), 'url': reverse('matches:match_list')},
+            {'title': _('Aplazados')}
+        ]
+        context['actions'] = [
+            {
+                'title': _('Nuevo Partido'),
+                'url': reverse('matches:match_create'),
+                'primary': True,
+                'icon': '<i class="bi bi-plus-lg"></i>'
+            },
+        ]
+        return context
+
+
+@method_decorator([login_required, is_global_admin], name='dispatch')
+class CancelledMatchListView(ListView):
+    """Vista para listar partidos cancelados"""
+    template_name = 'matches/MatchesList.html'
+    model = Match
+    context_object_name = 'matches'
+    paginate_by = 20
+
+    def get_queryset(self):
+        # Filtrar solo partidos cancelados
+        queryset = Match.objects.filter(  # pylint: disable=no-member
+            status='cancelled'
+        ).order_by('-match_date')
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Obtener la temporada activa
+        try:
+            active_season = Season.get_active()
+        except:
+            active_season = None
+
+        context['page_title'] = _('Partidos Cancelados')
+        context['active_season'] = active_season
+        context['active_tab'] = 'cancelled'
+        context['breadcrumbs'] = [
+            {'title': _('Partidos'), 'url': reverse('matches:match_list')},
+            {'title': _('Cancelados')}
+        ]
+        context['actions'] = [
+            {
+                'title': _('Nuevo Partido'),
+                'url': reverse('matches:match_create'),
+                'primary': True,
+                'icon': '<i class="bi bi-plus-lg"></i>'
+            },
+        ]
+        return context
+
+
+@method_decorator([login_required, is_global_admin], name='dispatch')
+class AllMatchListView(ListView):
+    """Vista para listar todos los partidos"""
+    template_name = 'matches/MatchesList.html'
+    model = Match
+    context_object_name = 'matches'
+    paginate_by = 20
+
+    def get_queryset(self):
+        # Mostrar todos los partidos ordenados por fecha descendente
+        queryset = Match.objects.all().order_by('-match_date')  # pylint: disable=no-member
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Obtener la temporada activa
+        try:
+            active_season = Season.get_active()
+        except:
+            active_season = None
+
+        context['page_title'] = _('Todos los Partidos')
+        context['active_season'] = active_season
+        context['active_tab'] = 'all'
+        context['breadcrumbs'] = [
+            {'title': _('Partidos'), 'url': reverse('matches:match_list')},
+            {'title': _('Todos')}
+        ]
+        context['actions'] = [
+            {
+                'title': _('Nuevo Partido'),
+                'url': reverse('matches:match_create'),
+                'primary': True,
+                'icon': '<i class="bi bi-plus-lg"></i>'
+            },
+        ]
+        return context

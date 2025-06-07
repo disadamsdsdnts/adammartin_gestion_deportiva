@@ -113,7 +113,7 @@ class Match(AuditModel):
         ordering = ['-match_date']
 
     def __str__(self):
-        match_date_str = self.match_date.strftime('%d/%m/%Y %H:%M') if self.match_date else ''
+        match_date_str = self.match_date.strftime('%d/%m/%Y %H:%M') if self.match_date else ''  # pylint: disable=no-member
         if self.is_home:
             return f"{self.home_team.name} vs {self.away_team.name} - {match_date_str}"
         else:
@@ -183,5 +183,5 @@ class Match(AuditModel):
     def days_until_match(self):
         """Retorna los días que faltan para el partido"""
         if self.match_date and self.match_date > timezone.now():
-            return (self.match_date.date() - timezone.now().date()).days
+            return (self.match_date.date() - timezone.now().date()).days  # pylint: disable=no-member
         return 0

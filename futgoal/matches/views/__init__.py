@@ -1,5 +1,9 @@
 from .match_views import (
-    MatchListView,
+    UpcomingMatchListView,
+    PreviousMatchListView,
+    PostponedMatchListView,
+    CancelledMatchListView,
+    AllMatchListView,
     MatchDetailView,
     MatchCreateView,
     MatchUpdateView,
@@ -18,7 +22,11 @@ from .match_note_views import (
 )
 
 __all__ = [
-    'MatchListView',
+    'UpcomingMatchListView',
+    'PreviousMatchListView',
+    'PostponedMatchListView',
+    'CancelledMatchListView',
+    'AllMatchListView',
     'MatchDetailView',
     'MatchCreateView',
     'MatchUpdateView',

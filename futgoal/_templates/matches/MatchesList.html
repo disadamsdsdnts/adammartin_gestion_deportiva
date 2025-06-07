@@ -2,6 +2,67 @@
 {% load i18n %}
 
 {% block table_content %}
+<!-- Tabs -->
+<div class="mb-4 border-b border-gray-200 dark:border-gray-700">
+  <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" role="tablist">
+    <li class="mr-2" role="presentation">
+      <a href="{% url 'matches:all_match_list' %}" class="inline-block p-4 border-b-2 rounded-t-lg
+        {% if active_tab == 'all' %}
+          border-blue-600 text-blue-600 dark:border-blue-500 dark:text-blue-500
+        {% else %}
+          border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300
+        {% endif %}" id="all-tab" role="tab" aria-controls="all"
+        aria-selected="{% if active_tab == 'all' %}true{% else %}false{% endif %}">
+        {% trans 'Todos' %}
+      </a>
+    </li>
+    <li class="mr-2" role="presentation">
+      <a href="{% url 'matches:upcoming_match_list' %}" class="inline-block p-4 border-b-2 rounded-t-lg
+        {% if active_tab == 'upcoming' %}
+          border-blue-600 text-blue-600 dark:border-blue-500 dark:text-blue-500
+        {% else %}
+          border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300
+        {% endif %}" id="upcoming-tab" role="tab" aria-controls="upcoming"
+        aria-selected="{% if active_tab == 'upcoming' %}true{% else %}false{% endif %}">
+        {% trans 'Próximos' %}
+      </a>
+    </li>
+    <li class="mr-2" role="presentation">
+      <a href="{% url 'matches:previous_match_list' %}" class="inline-block p-4 border-b-2 rounded-t-lg
+        {% if active_tab == 'previous' %}
+          border-blue-600 text-blue-600 dark:border-blue-500 dark:text-blue-500
+        {% else %}
+          border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300
+        {% endif %}" id="previous-tab" role="tab" aria-controls="previous"
+        aria-selected="{% if active_tab == 'previous' %}true{% else %}false{% endif %}">
+        {% trans 'Anteriores' %}
+      </a>
+    </li>
+    <li class="mr-2" role="presentation">
+      <a href="{% url 'matches:postponed_match_list' %}" class="inline-block p-4 border-b-2 rounded-t-lg
+        {% if active_tab == 'postponed' %}
+          border-blue-600 text-blue-600 dark:border-blue-500 dark:text-blue-500
+        {% else %}
+          border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300
+        {% endif %}" id="postponed-tab" role="tab" aria-controls="postponed"
+        aria-selected="{% if active_tab == 'postponed' %}true{% else %}false{% endif %}">
+        {% trans 'Aplazados' %}
+      </a>
+    </li>
+    <li class="mr-2" role="presentation">
+      <a href="{% url 'matches:cancelled_match_list' %}" class="inline-block p-4 border-b-2 rounded-t-lg
+        {% if active_tab == 'cancelled' %}
+          border-blue-600 text-blue-600 dark:border-blue-500 dark:text-blue-500
+        {% else %}
+          border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300
+        {% endif %}" id="cancelled-tab" role="tab" aria-controls="cancelled"
+        aria-selected="{% if active_tab == 'cancelled' %}true{% else %}false{% endif %}">
+        {% trans 'Cancelados' %}
+      </a>
+    </li>
+  </ul>
+</div>
+
 <!-- Header con información de temporada -->
 <div class="p-4 bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
   <div class="flex items-center justify-between">
@@ -87,7 +148,7 @@
     </tr>
   </thead>
   <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-    {% for match in object_list %}
+    {% for match in matches %}
     <tr class="hover:bg-gray-100 dark:hover:bg-gray-700">
       <td class="w-4 p-4">
         <div class="flex items-center">

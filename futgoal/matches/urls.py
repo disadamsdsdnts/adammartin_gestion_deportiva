@@ -4,7 +4,12 @@ from . import views
 app_name = 'matches'
 
 urlpatterns = [
-    path('', views.MatchListView.as_view(), name='match_list'),
+    path('', views.AllMatchListView.as_view(), name='match_list'),
+    path('all/', views.AllMatchListView.as_view(), name='all_match_list'),
+    path('upcoming/', views.UpcomingMatchListView.as_view(), name='upcoming_match_list'),
+    path('previous/', views.PreviousMatchListView.as_view(), name='previous_match_list'),
+    path('postponed/', views.PostponedMatchListView.as_view(), name='postponed_match_list'),
+    path('cancelled/', views.CancelledMatchListView.as_view(), name='cancelled_match_list'),
     path('create/', views.MatchCreateView.as_view(), name='match_create'),
     path('import/', views.MatchImportView.as_view(), name='match_import'),
     path('import/csv-template/', views.MatchImportCSVTemplateView.as_view(), name='match_import_csv_template'),
