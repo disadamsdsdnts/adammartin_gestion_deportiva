@@ -61,25 +61,9 @@ class User(AbstractUser):
         verbose_name=_("Cargo que ocupa"),
     )
 
-    base_salary = models.IntegerField(
-        blank=True,
-        null=True,
-        verbose_name=_("Salario base"),
-    )
-
     pre_email = models.CharField(_("Pre Email"), max_length=140, null=True, blank=True)
 
     full_name = models.CharField(_("Nombre Completo"), max_length=140, null=True, blank=True)
-
-    # Sale Team, foreign key to Group model
-    sale_team = models.ForeignKey(
-        Group,
-        related_name="closers",
-        verbose_name=_("Equipo de ventas"),
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-    )
 
     uuid = models.CharField(
         blank=True,

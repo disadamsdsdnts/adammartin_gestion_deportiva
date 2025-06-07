@@ -167,8 +167,6 @@ class UserAdminCreateForm(forms.ModelForm):
             'is_active',
             'is_superuser',
             'position',
-            'base_salary',
-            'sale_team',
             'groups'
         )
 

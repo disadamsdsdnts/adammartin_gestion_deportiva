@@ -29,8 +29,7 @@ class UserAdmin(BaseUserAdmin):
         'is_staff',
         'is_superuser',
         'date_joined',
-        'last_login',
-        'sale_team'
+        'last_login'
     ]
 
     search_fields = [
@@ -60,8 +59,7 @@ class UserAdmin(BaseUserAdmin):
                 'first_name',
                 'last_name',
                 'full_name',
-                'position',
-                'base_salary'
+                'position'
             )
         }),
         (_('Permisos'), {
@@ -78,7 +76,6 @@ class UserAdmin(BaseUserAdmin):
         }),
         (_('Configuración Avanzada'), {
             'fields': (
-                'sale_team',
                 'uuid',
                 'remember_key',
                 'magic_link_field',
@@ -113,7 +110,7 @@ class UserAdmin(BaseUserAdmin):
 
     def get_queryset(self, request):
         """Optimize queryset with select_related."""
-        return super().get_queryset(request).select_related('sale_team')
+        return super().get_queryset(request)
 
 
 @admin.register(ActionLogUser)
