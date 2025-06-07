@@ -121,10 +121,17 @@
               <div class="mb-4">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans 'Información Deportiva' %}</h3>
                 <div class="mt-4 space-y-4">
-                  <div>
-                    <label
-                      class="block text-sm font-medium text-gray-700 dark:text-gray-300">{% trans 'Posición' %}</label>
-                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ player.position|default:'-' }}</p>
+                  <div class="grid grid-cols-2 gap-4">
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{% trans 'Posición' %}</label>
+                      <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ player.position|default:'-' }}</p>
+                    </div>
+                    <div>
+                      <label
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">{% trans 'Dorsal' %}</label>
+                      <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ player.dorsal|default:'-' }}</p>
+                    </div>
                   </div>
                 </div>
               </div>

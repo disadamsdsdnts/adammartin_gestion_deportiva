@@ -54,6 +54,12 @@ class Player(AuditModel):
         blank=True,
         null=True
     )
+    dorsal = models.PositiveIntegerField(
+        _('Dorsal'),
+        blank=True,
+        null=True,
+        help_text=_('Número de dorsal del jugador')
+    )
     country = models.CharField(
         _('País'),
         max_length=100,

@@ -25,6 +25,9 @@
         {% trans 'Apellidos' %}
       </th>
       <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
+        {% trans 'Dorsal' %}
+      </th>
+      <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
         {% trans 'Estado' %}
       </th>
       <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
@@ -61,6 +64,15 @@
         {{ player.first_name }}</td>
       <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
         {{ player.last_name }}</td>
+      <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
+        {% if player.dorsal %}
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+          #{{ player.dorsal }}
+        </span>
+        {% else %}
+        <span class="text-gray-400">-</span>
+        {% endif %}
+      </td>
       <td class="p-4 text-base font-medium text-gray-900 whitespace-nowrap dark:text-white">
         {% if player.is_active %}
         <span
