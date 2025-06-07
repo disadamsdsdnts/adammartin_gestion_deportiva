@@ -5,6 +5,7 @@ from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse, reverse_lazy
 from .models import Team
+from .forms import TeamUpdateForm
 
 class TeamListView(ListView):
     model = Team
@@ -41,24 +42,66 @@ class TeamUpdateView(LoginRequiredMixin, UpdateView):
     model = Team
     template_name = 'team/TeamForm.html'
     context_object_name = 'team'
-    fields = ['name', 'description', 'logo', 'coach', 'city', 'country', 'foundation_date', 'website']
+    form_class = TeamUpdateForm
 
     def get_object(self, queryset=None):
-        return Team.objects.first()
+        return Team.get_or_create_team()
 
     def get_success_url(self):
-        return reverse('team:detail')
+        # Verificar si viene de una configuración inicial
+        is_initial_setup = self.request.GET.get('setup') == 'initial'
+
+        if is_initial_setup:
+            return reverse('dashboard')
+        else:
+            return reverse('team:detail')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        # Verificar si es configuración inicial
+        is_initial_setup = self.request.GET.get('setup') == 'initial'
+        team = self.get_object()
+
+        if is_initial_setup or not team.name or not team.name.strip():
+            kwargs['is_initial_setup'] = True
+
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['page_title'] = _('Editar Equipo')
-        context['breadcrumbs'] = [
-            {'title': _('Equipo'), 'url': reverse_lazy('team:detail')},
-            {'title': _('Editar')}
-        ]
+
+        # Verificar si es configuración inicial
+        is_initial_setup = self.request.GET.get('setup') == 'initial'
+        team = self.get_object()
+
+        if is_initial_setup or not team.name or not team.name.strip():
+            context['page_title'] = _('Configuración inicial del equipo')
+            context['breadcrumbs'] = [
+                {'title': _('Configuración inicial')}
+            ]
+            context['is_initial_setup'] = True
+        else:
+            context['page_title'] = _('Editar Equipo')
+            context['breadcrumbs'] = [
+                {'title': _('Equipo'), 'url': reverse_lazy('team:detail')},
+                {'title': _('Editar')}
+            ]
+            context['is_initial_setup'] = False
+
         return context
 
     def form_valid(self, form):
+        # Verificar si es configuración inicial antes de guardar
+        is_initial_setup = not self.object.name or not self.object.name.strip()
+
         response = super().form_valid(form)
-        messages.success(self.request, _('Equipo actualizado correctamente'))
+
+        if is_initial_setup:
+            messages.success(
+                self.request,
+                _('¡Perfecto! Tu equipo ha sido configurado. ¡Bienvenido a la gestión deportiva!')
+            )
+        else:
+            messages.success(self.request, _('Equipo actualizado correctamente'))
+
         return response

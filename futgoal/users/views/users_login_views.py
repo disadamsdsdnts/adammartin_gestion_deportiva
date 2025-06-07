@@ -49,6 +49,20 @@ decorators = [
 class DashboardView(TemplateView):
     template_name = 'users/dashboard/Dashboard.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        # Verificar si el equipo tiene datos básicos configurados
+        from futgoal.team.models import Team
+
+        if not Team.is_configured():
+            messages.add_message(
+                request,
+                messages.INFO,
+                _('¡Bienvenido! Por favor, configura los datos básicos de tu equipo para comenzar.')
+            )
+            return HttpResponseRedirect(reverse('team:update') + '?setup=initial')
+
+        return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         breadcrumbs = [
@@ -58,7 +72,7 @@ class DashboardView(TemplateView):
         context['breadcrumbs'] = breadcrumbs
         context['actions'] = []
 
-                # Obtener próximos partidos (máximo 5)
+        # Obtener próximos partidos (máximo 5)
         from futgoal.matches.models import Match
         upcoming_matches = Match.objects.filter(
             status='scheduled',
@@ -67,7 +81,7 @@ class DashboardView(TemplateView):
 
         context['upcoming_matches'] = upcoming_matches
 
-                # Obtener próximos cumpleaños (máximo 5)
+        # Obtener próximos cumpleaños (máximo 5)
         from futgoal.players.models import Player
         from datetime import datetime, timedelta
 
@@ -80,7 +94,7 @@ class DashboardView(TemplateView):
             birth_date__isnull=False
         ).values('id', 'first_name', 'last_name', 'sport_name', 'birth_date', 'photo')
 
-                # Calcular próximos cumpleaños
+        # Calcular próximos cumpleaños
         upcoming_birthdays = []
         for player in players:
             birth_date = player['birth_date']

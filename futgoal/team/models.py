@@ -52,4 +52,26 @@ class Team(SingletonModel):
         verbose_name_plural = _('Equipo')
 
     def __str__(self):
-        return self.name
+        return str(self.name or _('Equipo sin nombre'))
+
+    @classmethod
+    def is_configured(cls):
+        """
+        Verifica si el equipo tiene datos básicos configurados.
+        Retorna True si el equipo existe y tiene al menos un nombre válido.
+        """
+        try:
+            team = cls.objects.first()
+            return team and team.name and team.name.strip()
+        except cls.DoesNotExist:
+            return False
+
+    @classmethod
+    def get_or_create_team(cls):
+        """
+        Obtiene el equipo existente o crea uno nuevo si no existe.
+        """
+        team = cls.objects.first()
+        if not team:
+            team = cls.objects.create(name='')
+        return team
