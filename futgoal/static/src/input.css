@@ -3,7 +3,15 @@
 @import "tailwindcss";
 @import "flowbite/src/themes/default";
 @plugin "flowbite/plugin";
+
+/* Configurar las fuentes de archivos para escanear clases */
 @source "../../node_modules/flowbite/";
+@source "../../templates/";
+@source "../../**/templates/";
+@source "../../**/*.html";
+@source "../../**/*.py";
+@source "../../**/forms/*.py";
+@source "../../**/views/*.py";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
