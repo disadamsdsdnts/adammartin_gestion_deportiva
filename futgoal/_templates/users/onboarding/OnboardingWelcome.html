@@ -1,0 +1,148 @@
+{% extends "layout/LayoutOnboarding.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-4xl w-full space-y-8">
+
+    <!-- Progress bar -->
+    <div class="flex items-center justify-center mb-8">
+      <div class="flex items-center w-full max-w-lg">
+        <div class="flex items-center text-blue-600 relative">
+          <div
+            class="rounded-full transition duration-500 ease-in-out h-12 w-12 py-3 border-2 border-blue-600 bg-blue-600 text-white flex items-center justify-center">
+            <span class="text-white font-bold text-sm">1</span>
+          </div>
+        </div>
+        <div class="flex-auto border-t-2 border-gray-300 transition duration-500 ease-in-out"></div>
+        <div class="flex items-center text-gray-500 relative">
+          <div
+            class="rounded-full transition duration-500 ease-in-out h-12 w-12 py-3 border-2 border-gray-300 bg-white text-gray-500 flex items-center justify-center">
+            <span class="text-gray-500 font-bold text-sm">2</span>
+          </div>
+        </div>
+        <div class="flex-auto border-t-2 border-gray-300 transition duration-500 ease-in-out"></div>
+        <div class="flex items-center text-gray-500 relative">
+          <div
+            class="rounded-full transition duration-500 ease-in-out h-12 w-12 py-3 border-2 border-gray-300 bg-white text-gray-500 flex items-center justify-center">
+            <span class="text-gray-500 font-bold text-sm">3</span>
+          </div>
+        </div>
+        <div class="flex-auto border-t-2 border-gray-300 transition duration-500 ease-in-out"></div>
+        <div class="flex items-center text-gray-500 relative">
+          <div
+            class="rounded-full transition duration-500 ease-in-out h-12 w-12 py-3 border-2 border-gray-300 bg-white text-gray-500 flex items-center justify-center">
+            <span class="text-gray-500 font-bold text-sm">4</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Welcome content -->
+    <div class="text-center">
+      <div class="mx-auto h-32 w-32 text-blue-600 mb-8">
+        <svg fill="currentColor" viewBox="0 0 24 24" class="w-32 h-32">
+          <path
+            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+        </svg>
+      </div>
+
+      <h2 class="mt-6 text-3xl font-extrabold text-gray-900 dark:text-white">
+        {% trans '¡Bienvenido a FutGoal!' %}
+      </h2>
+
+      <p class="mt-4 text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+        {% trans 'Estás a punto de comenzar a gestionar tu equipo de manera profesional. Vamos a configurar algunos datos básicos para que puedas empezar cuanto antes.' %}
+      </p>
+    </div>
+
+    <!-- Steps overview -->
+    <div class="mt-12">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Step 1 -->
+        <div class="text-center">
+          <div class="mx-auto h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+            <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans 'Configurar tu equipo' %}</h3>
+          <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+            {% trans 'Ingresa el nombre de tu equipo y otros datos básicos' %}
+          </p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="text-center">
+          <div class="mx-auto h-16 w-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+            <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans 'Crear temporada' %}</h3>
+          <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+            {% trans 'Define la temporada deportiva en la que vas a trabajar' %}
+          </p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="text-center">
+          <div class="mx-auto h-16 w-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
+            <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">{% trans '¡Todo listo!' %}</h3>
+          <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+            {% trans 'Ya puedes empezar a gestionar jugadores, partidos y más' %}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Next steps info -->
+    <div class="mt-12 bg-blue-50 dark:bg-blue-900 rounded-lg p-6">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+              clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">
+            {% trans 'Después de la configuración inicial podrás:' %}
+          </h3>
+          <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
+            <ul class="list-disc list-inside space-y-1">
+              <li>{% trans 'Agregar jugadores a tu plantilla' %}</li>
+              <li>{% trans 'Crear equipos rivales' %}</li>
+              <li>{% trans 'Programar partidos y competiciones' %}</li>
+              <li>{% trans 'Gestionar convocatorias y alineaciones' %}</li>
+              <li>{% trans 'Llevar estadísticas detalladas' %}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="flex items-center justify-center pt-8">
+      <a href="{% url 'onboarding_team' %}"
+        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg focus:outline-none focus:shadow-outline transition duration-150 ease-in-out flex items-center">
+        {% trans 'Comenzar configuración' %}
+        <svg class="ml-2 -mr-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd"
+            d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+            clip-rule="evenodd"></path>
+        </svg>
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

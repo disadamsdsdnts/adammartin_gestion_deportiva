@@ -1,0 +1,197 @@
+{% extends "layout/LayoutOnboarding.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-4xl w-full space-y-8">
+
+    <!-- Progress bar -->
+    <div class="flex items-center justify-center mb-8">
+      <div class="flex items-center w-full max-w-lg">
+        <div class="flex items-center text-blue-600 relative">
+          <div
+            class="rounded-full transition duration-500 ease-in-out h-12 w-12 py-3 border-2 border-blue-600 bg-blue-600 text-white flex items-center justify-center">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clip-rule="evenodd"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="flex-auto border-t-2 border-blue-600 transition duration-500 ease-in-out"></div>
+        <div class="flex items-center text-blue-600 relative">
+          <div
+            class="rounded-full transition duration-500 ease-in-out h-12 w-12 py-3 border-2 border-blue-600 bg-blue-600 text-white flex items-center justify-center">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clip-rule="evenodd"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="flex-auto border-t-2 border-blue-600 transition duration-500 ease-in-out"></div>
+        <div class="flex items-center text-blue-600 relative">
+          <div
+            class="rounded-full transition duration-500 ease-in-out h-12 w-12 py-3 border-2 border-blue-600 bg-blue-600 text-white flex items-center justify-center">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clip-rule="evenodd"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="flex-auto border-t-2 border-blue-600 transition duration-500 ease-in-out"></div>
+        <div class="flex items-center text-blue-600 relative">
+          <div
+            class="rounded-full transition duration-500 ease-in-out h-12 w-12 py-3 border-2 border-blue-600 bg-blue-600 text-white flex items-center justify-center">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                clip-rule="evenodd"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success content -->
+    <div class="text-center">
+      <div class="mx-auto h-32 w-32 text-green-600 mb-8">
+        <svg fill="currentColor" viewBox="0 0 24 24" class="w-32 h-32">
+          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+        </svg>
+      </div>
+
+      <h2 class="mt-6 text-3xl font-extrabold text-gray-900 dark:text-white">
+        {% trans '¡Configuración completada!' %}
+      </h2>
+
+      <p class="mt-4 text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+        {% trans 'Excelente, ya tienes todo configurado para empezar a gestionar tu equipo. Tu sistema está listo para usar.' %}
+      </p>
+    </div>
+
+    <!-- Summary -->
+    <div class="bg-green-50 dark:bg-green-900 rounded-lg p-6">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+              clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-green-800 dark:text-green-200">
+            {% trans 'Configuración realizada:' %}
+          </h3>
+          <div class="mt-2 text-sm text-green-700 dark:text-green-300">
+            <ul class="list-disc list-inside space-y-1">
+              <li><strong>{% trans 'Equipo:' %}</strong> {{ team.name }}</li>
+              <li><strong>{% trans 'Temporada activa:' %}</strong> {{ active_season.name }}</li>
+              <li>{% trans 'Sistema listo para usar' %}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Next steps -->
+    <div class="mt-12">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white text-center mb-8">
+        {% trans '¿Qué puedes hacer ahora?' %}
+      </h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Dashboard -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-shadow">
+          <div class="mx-auto h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+            <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </div>
+          <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">{% trans 'Dashboard' %}</h4>
+          <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">{% trans 'Ver el panel de control principal' %}</p>
+          <a href="{% url 'dashboard' %}"
+            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
+            {% trans 'Ir al Dashboard' %}
+          </a>
+        </div>
+
+        <!-- Players -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-shadow">
+          <div class="mx-auto h-12 w-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
+            <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+            </svg>
+          </div>
+          <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">{% trans 'Jugadores' %}</h4>
+          <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">{% trans 'Agregar jugadores a tu plantilla' %}</p>
+          <a href="{% url 'players:player_create' %}"
+            class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors">
+            {% trans 'Crear Jugador' %}
+          </a>
+        </div>
+
+        <!-- Rivals -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-shadow">
+          <div class="mx-auto h-12 w-12 bg-orange-100 rounded-full flex items-center justify-center mb-4">
+            <svg class="h-6 w-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </div>
+          <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">{% trans 'Equipos Rivales' %}</h4>
+          <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">{% trans 'Crear equipos rivales' %}</p>
+          <a href="{% url 'rivals:rival_create' %}"
+            class="inline-flex items-center px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white text-sm font-medium rounded-lg transition-colors">
+            {% trans 'Crear Rival' %}
+          </a>
+        </div>
+
+        <!-- Matches -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition-shadow">
+          <div class="mx-auto h-12 w-12 bg-purple-100 rounded-full flex items-center justify-center mb-4">
+            <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">{% trans 'Partidos' %}</h4>
+          <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">{% trans 'Programar un nuevo partido' %}</p>
+          <a href="{% url 'matches:match_create' %}"
+            class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors">
+            {% trans 'Crear Partido' %}
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Final message -->
+    <div class="mt-12 text-center">
+      <div class="p-6 bg-blue-50 dark:bg-blue-900 rounded-lg">
+        <h3 class="text-lg font-medium text-blue-900 dark:text-blue-200 mb-2">
+          {% trans '¡Gracias por elegir FutGoal!' %}
+        </h3>
+        <p class="text-blue-700 dark:text-blue-300">
+          {% trans 'Esperamos que disfrutes gestionando tu equipo. Si necesitas ayuda, puedes acceder a la documentación desde el menú de configuración.' %}
+        </p>
+      </div>
+    </div>
+
+    <!-- Main action button -->
+    <div class="flex items-center justify-center pt-8">
+      <a href="{% url 'dashboard' %}"
+        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg focus:outline-none focus:shadow-outline transition duration-150 ease-in-out flex items-center text-lg">
+        <svg class="mr-3 -ml-1 w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+        </svg>
+        {% trans 'Comenzar a gestionar mi equipo' %}
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

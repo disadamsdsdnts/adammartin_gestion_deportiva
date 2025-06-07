@@ -13,6 +13,12 @@ from futgoal.users.views import (
     Error404View
 )
 from futgoal.users.views.user_views import UserProfileView
+from futgoal.users.views.onboarding_views import (
+    OnboardingWelcomeView,
+    OnboardingTeamView,
+    OnboardingSeasonView,
+    OnboardingCompleteView,
+)
 
 
 urlpatterns = [
@@ -28,6 +34,12 @@ urlpatterns = [
 
     # URL de perfil directa
     path('profile/', UserProfileView.as_view(), name='profile'),
+
+    # Onboarding URLs (en root para que DashboardView pueda acceder sin namespace)
+    path('onboarding/', OnboardingWelcomeView.as_view(), name='onboarding_welcome'),
+    path('onboarding/team/', OnboardingTeamView.as_view(), name='onboarding_team'),
+    path('onboarding/season/', OnboardingSeasonView.as_view(), name='onboarding_season'),
+    path('onboarding/complete/', OnboardingCompleteView.as_view(), name='onboarding_complete'),
 
     path('auth/',
          include(('futgoal.users.urls.user_auth_urls', 'users'),

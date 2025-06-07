@@ -14,6 +14,12 @@ from futgoal.users.views import (
     RememberEmailSended,
 )
 from futgoal.users.views.user_views import UserProfileView
+from futgoal.users.views.onboarding_views import (
+    OnboardingWelcomeView,
+    OnboardingTeamView,
+    OnboardingSeasonView,
+    OnboardingCompleteView,
+)
 
 
 urlpatterns = [
@@ -24,4 +30,10 @@ urlpatterns = [
     path('reset-password/', RememberPassword.as_view(), name='remember_password_form'),
     re_path('reset-password/type-your-password/(?P<remember_key>[0-9a-f]{32})/', TypeYourPassword.as_view(), name='type_your_password'),
     path('reset-password/email-sended/', RememberEmailSended.as_view(), name='remember_password_email_sended'),
+
+    # Onboarding URLs
+    path('onboarding/', OnboardingWelcomeView.as_view(), name='onboarding_welcome'),
+    path('onboarding/team/', OnboardingTeamView.as_view(), name='onboarding_team'),
+    path('onboarding/season/', OnboardingSeasonView.as_view(), name='onboarding_season'),
+    path('onboarding/complete/', OnboardingCompleteView.as_view(), name='onboarding_complete'),
 ]

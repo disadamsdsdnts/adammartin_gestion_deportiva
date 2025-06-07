@@ -50,16 +50,11 @@ class DashboardView(TemplateView):
     template_name = 'users/dashboard/Dashboard.html'
 
     def dispatch(self, request, *args, **kwargs):
-        # Verificar si el equipo tiene datos básicos configurados
-        from futgoal.team.models import Team
+        # Verificar si necesita onboarding
+        from futgoal.users.views.onboarding_views import needs_onboarding
 
-        if not Team.is_configured():
-            messages.add_message(
-                request,
-                messages.INFO,
-                _('¡Bienvenido! Por favor, configura los datos básicos de tu equipo para comenzar.')
-            )
-            return HttpResponseRedirect(reverse('team:update') + '?setup=initial')
+        if needs_onboarding():
+            return HttpResponseRedirect(reverse('onboarding_welcome'))
 
         return super().dispatch(request, *args, **kwargs)
 
