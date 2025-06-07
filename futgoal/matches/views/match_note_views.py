@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
@@ -22,7 +23,19 @@ class MatchNoteListView(ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        return MatchNote.objects.select_related('match', 'match__home_team', 'match__away_team', 'match__season')
+        queryset = MatchNote.objects.select_related('match', 'match__home_team', 'match__away_team', 'match__season')
+
+        # Agregar funcionalidad de búsqueda
+        search_query = self.request.GET.get('search', '')
+        if search_query:
+            queryset = queryset.filter(
+                Q(title__icontains=search_query) |
+                Q(content__icontains=search_query) |
+                Q(match__away_team__name__icontains=search_query) |
+                Q(match__home_team__name__icontains=search_query)
+            )
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -40,6 +53,11 @@ class MatchNoteListView(ListView):
                 'icon': '<i class="bi bi-arrow-left"></i>'
             },
         ]
+
+        # Agregar funcionalidad de búsqueda
+        context['search_placeholder'] = _('Buscar notas por título, contenido o equipo...')
+        context['search_query'] = self.request.GET.get('search', '')
+
         return context
 
 

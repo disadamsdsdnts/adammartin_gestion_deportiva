@@ -1,6 +1,19 @@
 {% extends 'layout/LayoutList.html' %}
 {% load i18n %}
 
+{% block extra_head %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Conservar el valor de búsqueda en el campo
+    const searchInput = document.getElementById('search');
+    if (searchInput && '{{ search_query }}') {
+      searchInput.value = '{{ search_query }}';
+    }
+  });
+
+</script>
+{% endblock %}
+
 {% block table_content %}
 <table class="min-w-full divide-y divide-gray-200 table-fixed dark:divide-gray-600">
   <thead class="bg-gray-100 dark:bg-gray-700">
