@@ -735,8 +735,14 @@ class AllMatchListView(ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        # Mostrar todos los partidos ordenados por fecha descendente
-        queryset = Match.objects.all().order_by('-match_date')  # pylint: disable=no-member
+        # Por defecto, filtrar por temporada activa
+        active_season = Season.get_active()
+
+        if active_season:
+            queryset = Match.objects.filter(season=active_season).order_by('-match_date')  # pylint: disable=no-member
+        else:
+            # Si no hay temporada activa, mostrar todos
+            queryset = Match.objects.all().order_by('-match_date')  # pylint: disable=no-member
 
         return queryset
 
@@ -749,7 +755,7 @@ class AllMatchListView(ListView):
         except:
             active_season = None
 
-        context['page_title'] = _('Todos los Partidos')
+        context['page_title'] = _('Partidos') if active_season else _('Todos los Partidos')
         context['active_season'] = active_season
         context['active_tab'] = 'all'
         context['breadcrumbs'] = [
