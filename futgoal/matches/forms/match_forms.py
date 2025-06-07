@@ -451,3 +451,179 @@ class MatchImportForm(forms.Form):
                 instance.clean = original_clean  # Restaurar validación original
 
         return instance
+
+
+class MatchBulkUpdateForm(forms.Form):
+    """Formulario para actualización masiva de partidos existentes"""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        """Validaciones del formulario de actualización masiva"""
+        cleaned_data = super().clean()
+
+        # Verificar que hay una temporada activa
+        if not Season.get_active():
+            raise forms.ValidationError(
+                _('No hay una temporada activa. Debe crear y activar una temporada antes de actualizar partidos.')
+            )
+
+        return cleaned_data
+
+    def process_matches_data(self, matches_data):
+        """
+        Procesar y actualizar partidos existentes o crear nuevos
+        """
+        from futgoal.team.models import Team
+        from django.utils import timezone
+        from django.db import transaction
+
+        # Función auxiliar para convertir scores a enteros
+        def parse_score(score):
+            """Convierte score a entero, manejando tanto enteros como floats"""
+            if score is None:
+                return None
+            try:
+                # Si ya es un entero, devolverlo directamente
+                if isinstance(score, int):
+                    return score
+                # Si es float, convertir a entero
+                if isinstance(score, float):
+                    return int(score)
+                # Si es string, intentar convertir
+                if isinstance(score, str):
+                    if not score.strip():
+                        return None
+                    float_score = float(score.strip())
+                    return int(float_score)
+                return None
+            except (ValueError, TypeError):
+                return None
+
+        updated_matches = []
+        created_matches = []
+        errors = []
+
+        # Obtener el equipo principal
+        team = Team.objects.first()
+        if not team:
+            raise forms.ValidationError(_('No hay un equipo creado. Debe crear un equipo antes de actualizar partidos.'))
+
+        active_season = Season.get_active()
+        if not active_season:
+            raise forms.ValidationError(_('No hay una temporada activa.'))
+
+        with transaction.atomic():
+            for index, match_data in enumerate(matches_data):
+                try:
+                    # Buscar partido existente por fecha, equipo rival y tipo
+                    rival_name = match_data.get('rival_name', '').strip()
+                    match_date_raw = match_data.get('match_date')
+                    match_type = match_data.get('match_type', 'friendly')
+                    is_home = match_data.get('is_home', True)
+
+                    if not rival_name or not match_date_raw:
+                        errors.append({
+                            'row': index + 1,
+                            'message': _('Datos incompletos: se requiere nombre del rival y fecha')
+                        })
+                        continue
+
+                    # Convertir fecha de string a datetime si es necesario
+                    if isinstance(match_date_raw, str):
+                        from django.utils.dateparse import parse_datetime
+                        match_date = parse_datetime(match_date_raw)
+                        if not match_date:
+                            errors.append({
+                                'row': index + 1,
+                                'message': _('Formato de fecha inválido')
+                            })
+                            continue
+                    else:
+                        match_date = match_date_raw
+
+                    # Crear o obtener el rival
+                    rival, created = Rival.objects.get_or_create(
+                        name__iexact=rival_name,
+                        defaults={'name': rival_name}
+                    )
+
+                    if created:
+                        rival.seasons.add(active_season)
+
+                    # Buscar partido existente con criterios específicos
+                    # Buscamos por fecha (con tolerancia de 1 hora), rival y tipo
+                    from datetime import timedelta
+                    match_date_start = match_date - timedelta(hours=1)
+                    match_date_end = match_date + timedelta(hours=1)
+
+                    existing_match = Match.objects.filter(
+                        season=active_season,
+                        away_team=rival,
+                        match_date__range=(match_date_start, match_date_end),
+                        match_type=match_type
+                    ).first()
+
+                    if existing_match:
+                        # Actualizar partido existente
+                        existing_match.match_date = match_date
+                        existing_match.venue = match_data.get('venue', existing_match.venue)
+                        existing_match.is_home = is_home
+                        existing_match.status = match_data.get('status', existing_match.status)
+
+                        # Actualizar marcador si se proporciona
+                        home_score = parse_score(match_data.get('home_score'))
+                        away_score = parse_score(match_data.get('away_score'))
+                        if home_score is not None and away_score is not None:
+                            existing_match.home_score = home_score
+                            existing_match.away_score = away_score
+                            if existing_match.status == 'scheduled':
+                                existing_match.status = 'finished'
+
+                        existing_match.save()
+                        updated_matches.append({
+                            'id': existing_match.id,
+                            'name': str(existing_match),
+                            'action': 'updated'
+                        })
+                    else:
+                        # Crear nuevo partido
+                        new_match = Match(
+                            season=active_season,
+                            home_team=team,
+                            away_team=rival,
+                            match_date=match_date,
+                            venue=match_data.get('venue', ''),
+                            match_type=match_type,
+                            is_home=is_home,
+                            status=match_data.get('status', 'scheduled')
+                        )
+
+                        # Establecer marcador si se proporciona
+                        home_score = parse_score(match_data.get('home_score'))
+                        away_score = parse_score(match_data.get('away_score'))
+                        if home_score is not None and away_score is not None:
+                            new_match.home_score = home_score
+                            new_match.away_score = away_score
+                            if new_match.status == 'scheduled':
+                                new_match.status = 'finished'
+
+                        new_match.save()
+                        created_matches.append({
+                            'id': new_match.id,
+                            'name': str(new_match),
+                            'action': 'created'
+                        })
+
+                except Exception as e:
+                    errors.append({
+                        'row': index + 1,
+                        'message': str(e)
+                    })
+
+        return {
+            'updated': updated_matches,
+            'created': created_matches,
+            'errors': errors
+        }

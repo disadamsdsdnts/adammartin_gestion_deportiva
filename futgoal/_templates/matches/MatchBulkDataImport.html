@@ -1,0 +1,871 @@
+{% extends 'layout/LayoutBase.html' %}
+{% load i18n %}
+
+{% block content %}
+{% include 'layout/_page-header.html' with title=page_title breadcrumb_items=breadcrumbs %}
+
+<div class="flex flex-col">
+  <div class="overflow-x-auto">
+    <div class="inline-block min-w-full align-middle">
+      <div class="overflow-hidden shadow">
+        <div class="p-6 bg-white dark:bg-gray-800">
+
+          <!-- Advertencia principal -->
+          <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900 dark:border-red-700">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-red-800 dark:text-red-300">
+                  {% trans '⚠️ ACTUALIZACIÓN COMPLETA DE DATOS' %}
+                </h3>
+                <div class="mt-2 text-sm text-red-700 dark:text-red-400">
+                  <p class="font-semibold mb-2">
+                    {% trans 'Esta funcionalidad actualizará TODOS los partidos de la temporada actual.' %}</p>
+                  <ul class="list-disc list-inside space-y-1">
+                    <li>{% trans 'Se actualizarán los partidos existentes que coincidan con los datos del archivo' %}
+                    </li>
+                    <li>{% trans 'Se crearán nuevos partidos que no existan' %}</li>
+                    <li>{% trans 'Los datos del archivo sobrescribirán los datos actuales' %}</li>
+                    <li class="font-semibold text-red-800 dark:text-red-200">
+                      {% trans 'Esta acción puede modificar muchos registros a la vez' %}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información de temporada -->
+          {% if active_season %}
+          <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg dark:bg-blue-900 dark:border-blue-700">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                    clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-blue-800 dark:text-blue-300">
+                  {% trans 'Temporada activa' %}
+                </h3>
+                <div class="mt-1 text-sm text-blue-700 dark:text-blue-400">
+                  <p>{% trans 'Trabajando con la temporada:' %} <strong>{{ active_season.name }}</strong></p>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900 dark:border-red-700">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-red-800 dark:text-red-300">
+                  {% trans 'Sin temporada activa' %}
+                </h3>
+                <div class="mt-1 text-sm text-red-700 dark:text-red-400">
+                  <p>{% trans 'Debe configurar una temporada activa antes de actualizar datos.' %}</p>
+                  <a href="{% url 'season:season_list' %}" class="underline hover:no-underline">
+                    {% trans 'Ir a configuración de temporadas' %}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Sección de descarga de datos actuales -->
+          <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg dark:bg-green-900 dark:border-green-700">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd"
+                    d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                    clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-green-800 dark:text-green-300">
+                  {% trans 'Descargar datos actuales' %}
+                </h3>
+                <div class="mt-2 text-sm text-green-700 dark:text-green-400">
+                  <p class="mb-3">
+                    {% trans 'Descargue un archivo CSV con todos los datos actuales de la temporada. Puede modificar este archivo y volver a subirlo para actualizar los datos.' %}
+                  </p>
+
+                  <a href="{% url 'matches:match_bulk_data_export' %}"
+                    class="inline-flex items-center px-3 py-2 text-xs font-medium text-green-800 bg-green-100 rounded-lg hover:bg-green-200 dark:bg-green-800 dark:text-green-200 dark:hover:bg-green-700">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                      </path>
+                    </svg>
+                    {% trans 'Descargar datos completos (CSV)' %}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sección de importación -->
+          <div
+            class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg dark:bg-yellow-900 dark:border-yellow-700">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd"
+                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                    clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-300">
+                  {% trans 'Subir archivo actualizado' %}
+                </h3>
+                <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-400">
+                  <p class="mb-3">
+                    {% trans 'Seleccione el archivo CSV con los datos actualizados. El sistema comparará los datos y actualizará los existentes o creará nuevos partidos.' %}
+                  </p>
+
+                  <div class="flex items-center gap-2">
+                    <input type="file" id="csv-file-input" accept=".csv" class="hidden">
+                    <label for="csv-file-input"
+                      class="inline-flex items-center px-3 py-2 text-xs font-medium text-yellow-800 bg-yellow-100 rounded-lg hover:bg-yellow-200 cursor-pointer dark:bg-yellow-800 dark:text-yellow-200 dark:hover:bg-yellow-700">
+                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                        </path>
+                      </svg>
+                      {% trans 'Seleccionar archivo CSV' %}
+                    </label>
+                    <span id="csv-file-name" class="text-xs text-yellow-600 dark:text-yellow-400"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botones de acción -->
+          <div class="flex flex-wrap gap-4">
+            <button id="process-csv-btn" type="button" disabled
+              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-300 disabled:cursor-not-allowed dark:disabled:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                </path>
+              </svg>
+              {% trans 'Procesar CSV' %}
+            </button>
+
+            <button id="import-data-btn" type="button" disabled data-modal-target="confirmation-modal"
+              data-modal-toggle="confirmation-modal"
+              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed dark:disabled:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+              <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:2"
+                  d="M13 9v4H9" />
+                <path style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:2"
+                  d="m3 3 10 10m.89-8H20a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-6.11" />
+              </svg>
+              {% trans 'ACTUALIZAR DATOS' %}
+            </button>
+
+            <a href="{% url 'matches:match_list' %}"
+              class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
+              {% trans 'Cancelar' %}
+            </a>
+          </div>
+
+          <!-- Área de resultados de procesamiento -->
+          <div id="process-results" class="mt-6 hidden">
+            <!-- Los resultados del procesamiento se mostrarán aquí -->
+          </div>
+
+          <!-- Área de resultados de importación -->
+          <div id="import-results" class="mt-6 hidden">
+            <!-- Los resultados de la importación se mostrarán aquí -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación -->
+<div id="confirmation-modal" tabindex="-1" aria-hidden="true"
+  class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+  <div class="relative w-full max-w-lg max-h-full">
+    <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-800">
+      <!-- Modal header -->
+      <button type="button"
+        class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+        data-modal-hide="confirmation-modal">
+        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+        </svg>
+        <span class="sr-only">{% trans 'Cerrar modal' %}</span>
+      </button>
+
+      <!-- Modal body -->
+      <div class="p-6 text-center">
+        <svg class="mx-auto mb-4 text-red-600 w-12 h-12 dark:text-red-400" aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
+          </path>
+        </svg>
+        <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+          {% trans 'Confirmar actualización masiva' %}
+        </h3>
+        <div id="confirmation-details" class="mb-5 p-3 bg-gray-50 rounded-md dark:bg-gray-700">
+          <!-- Los detalles se mostrarán aquí -->
+        </div>
+
+        <p class="mb-5 text-sm font-semibold text-red-600 dark:text-red-400">
+          {% trans '¿Está seguro de que desea continuar? Esta acción no se puede deshacer.' %}
+        </p>
+
+        <button id="confirm-import-btn" type="button"
+          class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+          <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M6.653 14.03a.922.922 0 1 1 1.304-1.304l3.703 3.704 7.778-7.778a.922.922 0 1 1 1.304 1.304l-8.375 8.375a1 1 0 0 1-1.415 0z" />
+            <path clip-rule="evenodd"
+              d="M14 1C6.82 1 1 6.82 1 14s5.82 13 13 13 13-5.82 13-13S21.18 1 14 1M3 14C3 7.925 7.925 3 14 3s11 4.925 11 11-4.925 11-11 11S3 20.075 3 14"
+              fill-rule="evenodd" />
+          </svg>
+          {% trans 'Sí, actualizar datos' %}
+        </button>
+
+        <button data-modal-hide="confirmation-modal" type="button"
+          class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+          {% trans 'Cancelar' %}
+        </button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de errores -->
+<div id="errors-modal" tabindex="-1" aria-hidden="true"
+  class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+  <div class="relative w-full max-w-4xl max-h-full">
+    <!-- Modal content -->
+    <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
+      <!-- Modal header -->
+      <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600 border-gray-200">
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+          <svg class="w-6 h-6 mr-2 text-red-600 inline" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+              clip-rule="evenodd"></path>
+          </svg>
+          {% trans 'Errores en la actualización' %}
+        </h3>
+        <button type="button"
+          class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+          data-modal-hide="errors-modal">
+          <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+          </svg>
+          <span class="sr-only">{% trans 'Cerrar modal' %}</span>
+        </button>
+      </div>
+      <!-- Modal body -->
+      <div class="p-6 space-y-6 max-h-96 overflow-y-auto">
+        <div id="errors-content">
+          <!-- El contenido de errores se insertará aquí -->
+        </div>
+      </div>
+      <!-- Modal footer -->
+      <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+        <button data-modal-hide="errors-modal" type="button"
+          class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
+          {% trans 'Cerrar' %}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de éxito -->
+<div id="success-modal" tabindex="-1" aria-hidden="true"
+  class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+  <div class="relative w-full max-w-2xl max-h-full">
+    <!-- Modal content -->
+    <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
+      <!-- Modal header -->
+      <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600 border-gray-200">
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+          <svg class="w-6 h-6 mr-2 text-green-600 inline" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+              clip-rule="evenodd"></path>
+          </svg>
+          {% trans 'Actualización completada' %}
+        </h3>
+        <button type="button"
+          class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+          data-modal-hide="success-modal">
+          <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+          </svg>
+          <span class="sr-only">{% trans 'Cerrar modal' %}</span>
+        </button>
+      </div>
+      <!-- Modal body -->
+      <div class="p-6 space-y-6">
+        <div id="success-content">
+          <!-- El contenido de éxito se insertará aquí -->
+        </div>
+      </div>
+      <!-- Modal footer -->
+      <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+        <button data-modal-hide="success-modal" type="button"
+          class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+          {% trans 'Cerrar' %}
+        </button>
+        <a href="{% url 'matches:all_match_list' %}"
+          class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+          {% trans 'Ir a la lista de partidos' %}
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const csvFileInput = document.getElementById('csv-file-input');
+    const csvFileName = document.getElementById('csv-file-name');
+    const processCsvBtn = document.getElementById('process-csv-btn');
+    const importDataBtn = document.getElementById('import-data-btn');
+    const processResults = document.getElementById('process-results');
+    const importResults = document.getElementById('import-results');
+    const confirmImportBtn = document.getElementById('confirm-import-btn');
+    const confirmationDetails = document.getElementById('confirmation-details');
+
+    let processedData = null;
+
+    // Manejar selección de archivo
+    csvFileInput.addEventListener('change', function () {
+      if (this.files.length > 0) {
+        csvFileName.textContent = this.files[0].name;
+        processCsvBtn.disabled = false;
+        importDataBtn.disabled = true;
+        processResults.classList.add('hidden');
+        importResults.classList.add('hidden');
+        processedData = null;
+      } else {
+        csvFileName.textContent = '';
+        processCsvBtn.disabled = true;
+        importDataBtn.disabled = true;
+      }
+    });
+
+    // Procesar CSV
+    processCsvBtn.addEventListener('click', function () {
+      const file = csvFileInput.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append('csv_file', file);
+
+      processCsvBtn.disabled = true;
+      processCsvBtn.innerHTML = `
+                <svg class="animate-spin w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {% trans 'Procesando...' %}
+            `;
+
+      fetch('{% url "matches:match_bulk_data_process_csv" %}', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          processCsvBtn.disabled = false;
+          processCsvBtn.innerHTML = `
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    {% trans 'Procesar CSV' %}
+                `;
+
+          if (data.success) {
+            processedData = data.matches;
+            showProcessResults(data);
+            importDataBtn.disabled = false;
+          } else {
+            showProcessError(data);
+          }
+        })
+        .catch(error => {
+          processCsvBtn.disabled = false;
+          processCsvBtn.innerHTML = `
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    {% trans 'Procesar CSV' %}
+                `;
+          console.error('Error:', error);
+          showProcessError({
+            error: '{% trans "Error de conexión" %}'
+          });
+        });
+    });
+
+    // Listener para cuando se está por mostrar el modal
+    document.addEventListener('flowbite:modal:show', function (event) {
+      if (event.target.id === 'confirmation-modal') {
+        if (!processedData) return;
+
+        // Calcular estadísticas
+        const stats = {
+          total: processedData.length,
+          byType: {},
+          byStatus: {},
+          withResults: 0
+        };
+
+        processedData.forEach(match => {
+          // Validar que el objeto tiene la estructura esperada
+          if (!match.display) {
+            console.error('Match sin display:', match);
+            return;
+          }
+
+          // Contar por tipo
+          const type = match.display.match_type || 'Sin tipo';
+          stats.byType[type] = (stats.byType[type] || 0) + 1;
+
+          // Contar por estado
+          const status = match.display.status || 'Sin estado';
+          stats.byStatus[status] = (stats.byStatus[status] || 0) + 1;
+
+          // Contar con resultado
+          if (match.display.result && match.display.result !== 'Sin resultado') {
+            stats.withResults++;
+          }
+        });
+
+        let typesList = Object.entries(stats.byType).length > 0 ?
+          Object.entries(stats.byType).map(([type, count]) => `${type}: ${count}`).join(', ') :
+          'No hay datos';
+        let statusList = Object.entries(stats.byStatus).length > 0 ?
+          Object.entries(stats.byStatus).map(([status, count]) => `${status}: ${count}`).join(', ') :
+          'No hay datos';
+
+        confirmationDetails.innerHTML = `
+          <div class="text-sm space-y-3">
+            <div>
+              <p class="font-semibold text-gray-900 dark:text-white">{% trans 'Resumen de actualización:' %}</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-blue-50 dark:bg-blue-900 p-3 rounded-md">
+                <p class="font-medium text-blue-800 dark:text-blue-300">{% trans 'Total de partidos' %}</p>
+                <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">${stats.total}</p>
+              </div>
+
+              <div class="bg-green-50 dark:bg-green-900 p-3 rounded-md">
+                <p class="font-medium text-green-800 dark:text-green-300">{% trans 'Con resultados' %}</p>
+              <p class="text-2xl font-bold text-green-600 dark:text-green-400">${stats.withResults}</p>
+            </div>
+          </div>
+
+          <div>
+            <p class="font-medium text-gray-700 dark:text-gray-300">{% trans 'Por tipo:' %}</p>
+            <p class="text-gray-600 dark:text-gray-400">${typesList}</p>
+          </div>
+
+          <div>
+            <p class="font-medium text-gray-700 dark:text-gray-300">{% trans 'Por estado:' %}</p>
+            <p class="text-gray-600 dark:text-gray-400">${statusList}</p>
+          </div>
+
+          <div class="border-t pt-3">
+            <p class="text-gray-600 dark:text-gray-400">{% trans 'Los partidos existentes se actualizarán y se crearán nuevos partidos según sea necesario.' %}</p>
+          </div>
+        </div>
+      `;
+      }
+    });
+
+    // Confirmar importación
+    confirmImportBtn.addEventListener('click', function () {
+      // Cerrar el modal primero
+      const modal = document.getElementById('confirmation-modal');
+      if (modal) {
+        const modalInstance = FlowbiteInstances.getInstance('Modal', 'confirmation-modal');
+        if (modalInstance) {
+          modalInstance.hide();
+        }
+      }
+      performImport();
+    });
+
+    // Realizar importación
+    function performImport() {
+      if (!processedData) return;
+
+      importDataBtn.disabled = true;
+      importDataBtn.innerHTML = `
+                <svg class="animate-spin w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {% trans 'Actualizando...' %}
+            `;
+
+      fetch('{% url "matches:match_bulk_data_import" %}', {
+          method: 'POST',
+          body: JSON.stringify(processedData),
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          importDataBtn.disabled = false;
+          importDataBtn.innerHTML = `
+                    <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:2" d="M13 9v4H9" />
+                        <path style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:2" d="m3 3 10 10m.89-8H20a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-6.11" />
+                    </svg>
+                    {% trans 'ACTUALIZAR DATOS' %}
+                `;
+
+          if (data.success) {
+            showImportSuccess(data);
+            // Limpiar datos procesados después del éxito
+            processedData = null;
+            importDataBtn.disabled = true;
+            processResults.classList.add('hidden');
+          } else {
+            showImportError(data);
+          }
+        })
+        .catch(error => {
+          importDataBtn.disabled = false;
+          importDataBtn.innerHTML = `
+                    <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:2" d="M13 9v4H9" />
+                        <path style="fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:2" d="m3 3 10 10m.89-8H20a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-6.11" />
+                    </svg>
+                    {% trans 'ACTUALIZAR DATOS' %}
+                `;
+          console.error('Error completo:', error);
+          showImportError({
+            errors: [{
+              message: `{% trans "Error de conexión: " %}${error.message || error}`
+            }]
+          });
+        });
+    }
+
+    // Mostrar resultados del procesamiento
+    function showProcessResults(data) {
+      let tableRows = '';
+      data.matches.forEach((match, index) => {
+        const statusColor = getStatusColor(match.display.status);
+        const typeColor = getTypeColor(match.display.match_type);
+
+        tableRows += `
+          <tr class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+            <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">${index + 1}</td>
+            <td class="px-4 py-3 text-sm text-gray-900 dark:text-white font-medium">${match.display.rival_name}</td>
+            <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">${match.display.role}</td>
+            <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">${match.display.match_date}</td>
+            <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">${match.display.venue}</td>
+            <td class="px-4 py-3 text-sm">
+              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${typeColor}">
+                ${match.display.match_type}
+              </span>
+            </td>
+            <td class="px-4 py-3 text-sm">
+              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusColor}">
+                ${match.display.status}
+              </span>
+            </td>
+            <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300 text-center">${match.display.result}</td>
+          </tr>
+        `;
+      });
+
+      processResults.innerHTML = `
+        <div class="p-4 bg-green-50 border border-green-200 rounded-lg dark:bg-green-900 dark:border-green-700 mb-6">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-green-800 dark:text-green-300">
+                {% trans 'CSV procesado correctamente' %}
+              </h3>
+              <div class="mt-2 text-sm text-green-700 dark:text-green-400">
+                <p>{% trans 'Se encontraron' %} <strong>${data.total_matches}</strong> {% trans 'partidos para procesar.' %}</p>
+                <p class="mt-1">{% trans 'Revise los datos en la tabla y confirme si desea continuar con la actualización.' %}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+          <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+              {% trans 'Vista previa de los datos a actualizar' %} (${data.total_matches} {% trans 'partidos' %})
+            </h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead class="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">#</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{% trans 'Rival' %}</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{% trans 'Rol' %}</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{% trans 'Fecha y Hora' %}</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{% trans 'Estadio' %}</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{% trans 'Tipo' %}</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{% trans 'Estado' %}</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{% trans 'Resultado' %}</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                ${tableRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+      processResults.classList.remove('hidden');
+
+      // Hacer scroll hacia los resultados del procesamiento
+      setTimeout(() => {
+        processResults.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
+    }
+
+    // Función para obtener color según el estado
+    function getStatusColor(status) {
+      switch (status.toLowerCase()) {
+        case 'programado':
+        case 'scheduled':
+          return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+        case 'en_curso':
+        case 'in_progress':
+          return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+        case 'finalizado':
+        case 'finished':
+          return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+        case 'cancelado':
+        case 'cancelled':
+          return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+        case 'aplazado':
+        case 'postponed':
+          return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+        default:
+          return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+      }
+    }
+
+    // Función para obtener color según el tipo
+    function getTypeColor(type) {
+      switch (type.toLowerCase()) {
+        case 'amistoso':
+        case 'friendly':
+          return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+        case 'liga':
+        case 'league':
+          return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+        case 'copa':
+        case 'cup':
+          return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300';
+        case 'playoff':
+          return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+        case 'entrenamiento':
+        case 'training':
+          return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+        default:
+          return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+      }
+    }
+
+    // Mostrar errores del procesamiento
+    function showProcessError(data) {
+      let errorContent = `
+                <div class="p-4 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900 dark:border-red-700">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800 dark:text-red-300">
+                                {% trans 'Error al procesar el CSV' %}
+                            </h3>
+                            <div class="mt-2 text-sm text-red-700 dark:text-red-400">
+            `;
+
+      if (data.error) {
+        errorContent += `<p>${data.error}</p>`;
+      }
+
+      if (data.validation_errors && data.validation_errors.length > 0) {
+        errorContent +=
+          `<div class="mt-2"><strong>{% trans 'Errores encontrados:' %}</strong><ul class="list-disc list-inside mt-1">`;
+        data.validation_errors.forEach(error => {
+          errorContent += `<li>{% trans 'Fila' %} ${error.row}: ${error.message}</li>`;
+        });
+        errorContent += `</ul></div>`;
+      }
+
+      errorContent += `
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+      processResults.innerHTML = errorContent;
+      processResults.classList.remove('hidden');
+
+      // Hacer scroll hacia la zona de errores
+      setTimeout(() => {
+        processResults.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
+      }, 100);
+    }
+
+    // Mostrar éxito de importación
+    function showImportSuccess(data) {
+      document.getElementById('success-content').innerHTML = `
+        <div class="text-center">
+          <svg class="mx-auto h-16 w-16 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+          </svg>
+          <div class="mt-4">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+              {% trans '¡Actualización completada exitosamente!' %}
+            </h3>
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              {% trans 'Todos los partidos han sido procesados correctamente.' %}
+            </p>
+          </div>
+        </div>
+        <div class="mt-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="text-center p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
+              <div class="text-3xl font-bold text-blue-600 dark:text-blue-400">${data.summary.updated || 0}</div>
+              <div class="text-sm text-blue-700 dark:text-blue-300">{% trans 'Partidos actualizados' %}</div>
+            </div>
+            <div class="text-center p-4 bg-green-50 dark:bg-green-900 rounded-lg">
+              <div class="text-3xl font-bold text-green-600 dark:text-green-400">${data.summary.created || 0}</div>
+              <div class="text-sm text-green-700 dark:text-green-300">{% trans 'Partidos creados' %}</div>
+            </div>
+            <div class="text-center p-4 bg-purple-50 dark:bg-purple-900 rounded-lg">
+              <div class="text-3xl font-bold text-purple-600 dark:text-purple-400">${data.summary.total || 0}</div>
+              <div class="text-sm text-purple-700 dark:text-purple-300">{% trans 'Total procesados' %}</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Mostrar el modal de éxito
+      const successModalElement = document.getElementById('success-modal');
+      const successModal = new window.Modal(successModalElement);
+      successModal.show();
+    }
+
+    // Mostrar errores de importación
+    function showImportError(data) {
+      let errorContent = `
+        <div class="text-center">
+          <svg class="mx-auto h-16 w-16 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+          </svg>
+          <div class="mt-4">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+              {% trans 'Error en la actualización' %}
+            </h3>
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              {% trans 'Se encontraron errores durante el proceso de actualización.' %}
+            </p>
+          </div>
+        </div>
+      `;
+
+      if (data.errors && data.errors.length > 0) {
+        errorContent += `
+          <div class="mt-6">
+            <div class="bg-red-50 dark:bg-red-900 rounded-lg p-4">
+              <h4 class="text-sm font-medium text-red-800 dark:text-red-300 mb-3">
+                {% trans 'Errores encontrados:' %}
+              </h4>
+              <div class="space-y-2 max-h-64 overflow-y-auto">
+        `;
+        data.errors.forEach((error, index) => {
+          errorContent += `
+            <div class="flex items-start space-x-2 text-sm text-red-700 dark:text-red-400">
+              <span class="flex-shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-200 dark:bg-red-800 text-red-800 dark:text-red-200 text-xs font-medium">
+                ${index + 1}
+              </span>
+              <span>${error.row ? '<strong>Fila ' + error.row + ':</strong> ' : ''}${error.message}</span>
+            </div>
+          `;
+        });
+        errorContent += `
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      document.getElementById('errors-content').innerHTML = errorContent;
+
+      // Mostrar el modal de errores
+      const errorsModalElement = document.getElementById('errors-modal');
+      const errorsModal = new window.Modal(errorsModalElement);
+      errorsModal.show();
+    }
+  });
+
+</script>
+{% endblock %}

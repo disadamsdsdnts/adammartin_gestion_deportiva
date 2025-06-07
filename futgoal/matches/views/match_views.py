@@ -685,3 +685,386 @@ class AllMatchListView(ListView):
             },
         ]
         return context
+
+
+@method_decorator([login_required, is_global_admin], name='dispatch')
+class MatchBulkDataImportView(View):
+    """Vista para importación masiva de todos los datos de partidos"""
+    template_name = 'matches/MatchBulkDataImport.html'
+
+    def get(self, request, *args, **kwargs):
+        """Mostrar el formulario de importación de datos completa"""
+        context = self.get_context_data()
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        """Procesar la importación masiva de datos"""
+        from futgoal.matches.forms.match_forms import MatchBulkUpdateForm
+
+        try:
+            # Obtener los datos JSON del POST
+            matches_data = json.loads(request.body)
+
+            if not matches_data:
+                return JsonResponse({
+                    'success': False,
+                    'errors': [{'message': _('No se recibieron datos para procesar')}]
+                })
+
+            # Usar el formulario para procesar los datos
+            form = MatchBulkUpdateForm()
+            result = form.process_matches_data(matches_data)
+
+            if result['errors']:
+                return JsonResponse({
+                    'success': False,
+                    'errors': result['errors']
+                })
+            else:
+                total_processed = len(result['updated']) + len(result['created'])
+                message_parts = []
+
+                if result['updated']:
+                    message_parts.append(_('%(count)d partidos actualizados') % {
+                        'count': len(result['updated'])
+                    })
+
+                if result['created']:
+                    message_parts.append(_('%(count)d partidos creados') % {
+                        'count': len(result['created'])
+                    })
+
+                if message_parts:
+                    messages.success(
+                        request,
+                        _('. ').join(message_parts) + '.'
+                    )
+
+                return JsonResponse({
+                    'success': True,
+                    'summary': {
+                        'updated': len(result['updated']),
+                        'created': len(result['created']),
+                        'total': total_processed
+                    }
+                })
+
+        except json.JSONDecodeError:
+            return JsonResponse({
+                'success': False,
+                'errors': [{'message': _('Datos inválidos')}]
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'errors': [{'message': str(e)}]
+            })
+
+    def get_context_data(self, **kwargs):
+        """Obtener datos del contexto"""
+        # Obtener temporada activa
+        try:
+            active_season = Season.get_active()
+        except:
+            active_season = None
+
+        context = {
+            'page_title': _('Actualizar Datos Completos'),
+            'active_season': active_season,
+            'breadcrumbs': [
+                {'title': _('Partidos'), 'url': reverse_lazy('matches:match_list')},
+                {'title': _('Actualizar Datos Completos')}
+            ]
+        }
+        return context
+
+
+@method_decorator([login_required, is_global_admin], name='dispatch')
+class MatchBulkDataExportView(View):
+    """Vista para exportar todos los datos actuales de partidos"""
+
+    def get(self, request, *args, **kwargs):
+        """Generar y devolver el CSV con todos los datos actuales"""
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="partidos_temporada_actual.csv"'
+
+        # Tablas de conversión de valores internos a descriptivos
+        MATCH_TYPE_EXPORT = {
+            'friendly': 'amistoso',
+            'league': 'liga',
+            'cup': 'copa',
+            'playoff': 'playoff',
+            'training': 'entrenamiento'
+        }
+
+        MATCH_STATUS_EXPORT = {
+            'scheduled': 'programado',
+            'in_progress': 'en_curso',
+            'finished': 'finalizado',
+            'cancelled': 'cancelado',
+            'postponed': 'aplazado'
+        }
+
+        writer = csv.writer(response)
+        writer.writerow([
+            'Rival',
+            'Rol (Local/Visitante)',
+            'Fecha y Hora (DD/MM/YYYY HH:MM)',
+            'Estadio',
+            'Tipo de Partido (amistoso, liga, copa, playoff, entrenamiento)',
+            'Estado (programado, en_curso, finalizado, cancelado, aplazado)',
+            'Goles Local',
+            'Goles Visitante'
+        ])
+
+        # Obtener todos los partidos de la temporada activa
+        try:
+            active_season = Season.get_active()
+            if active_season:
+                matches = Match.objects.filter(season=active_season).order_by('match_date')
+            else:
+                matches = Match.objects.all().order_by('match_date')
+        except:
+            matches = Match.objects.all().order_by('match_date')
+
+        for match in matches:
+            # Determinar el rol usando los valores de las cabeceras
+            role = 'Local' if match.is_home else 'Visitante'
+
+            # Formatear la fecha
+            formatted_date = match.match_date.strftime('%d/%m/%Y %H:%M')
+
+            # Convertir tipo de partido a valor descriptivo
+            match_type_display = MATCH_TYPE_EXPORT.get(match.match_type, match.match_type)
+
+            # Convertir estado a valor descriptivo
+            status_display = MATCH_STATUS_EXPORT.get(match.status, match.status)
+
+            # Obtener scores, pueden ser None
+            home_score = match.home_score if match.home_score is not None else ''
+            away_score = match.away_score if match.away_score is not None else ''
+
+            writer.writerow([
+                match.away_team.name,
+                role,
+                formatted_date,
+                match.venue or '',
+                match_type_display,
+                status_display,
+                home_score,
+                away_score
+            ])
+
+        return response
+
+
+@method_decorator([login_required, is_global_admin], name='dispatch')
+class MatchBulkDataProcessCSVView(View):
+    """Vista para procesar el archivo CSV de importación completa"""
+
+    def post(self, request, *args, **kwargs):
+        """Procesar el archivo CSV subido para importación completa"""
+        try:
+                        # Tablas de conversión para importación (admite tanto valores descriptivos como internos)
+            MATCH_TYPE_IMPORT = {
+                # Valores descriptivos (los que exportamos)
+                'amistoso': 'friendly',
+                'liga': 'league',
+                'copa': 'cup',
+                'playoff': 'playoff',
+                'entrenamiento': 'training',
+                # Valores internos (para compatibilidad)
+                'friendly': 'friendly',
+                'league': 'league',
+                'cup': 'cup',
+                'training': 'training'
+            }
+
+            MATCH_STATUS_IMPORT = {
+                # Valores descriptivos (los que exportamos)
+                'programado': 'scheduled',
+                'en_curso': 'in_progress',
+                'finalizado': 'finished',
+                'cancelado': 'cancelled',
+                'aplazado': 'postponed',
+                # Valores internos (para compatibilidad)
+                'scheduled': 'scheduled',
+                'in_progress': 'in_progress',
+                'finished': 'finished',
+                'cancelled': 'cancelled',
+                'postponed': 'postponed'
+            }
+
+            # Mapeos inversos para mostrar valores descriptivos en la tabla
+            MATCH_TYPE_DISPLAY = {
+                'friendly': 'Amistoso',
+                'league': 'Liga',
+                'cup': 'Copa',
+                'playoff': 'Playoff',
+                'training': 'Entrenamiento'
+            }
+
+            MATCH_STATUS_DISPLAY = {
+                'scheduled': 'Programado',
+                'in_progress': 'En curso',
+                'finished': 'Finalizado',
+                'cancelled': 'Cancelado',
+                'postponed': 'Aplazado'
+            }
+
+            if 'csv_file' not in request.FILES:
+                return JsonResponse({
+                    'success': False,
+                    'error': _('No se ha seleccionado ningún archivo')
+                })
+
+            csv_file = request.FILES['csv_file']
+            if not csv_file.name.endswith('.csv'):
+                return JsonResponse({
+                    'success': False,
+                    'error': _('El archivo debe tener extensión .csv')
+                })
+
+            # Leer el archivo CSV
+            try:
+                decoded_file = csv_file.read().decode('utf-8')
+                reader = csv.reader(io.StringIO(decoded_file))
+                header = next(reader)  # Saltar la cabecera
+            except Exception as e:
+                return JsonResponse({
+                    'success': False,
+                    'error': _('Error al leer el archivo CSV: %(error)s') % {'error': str(e)}
+                })
+
+            matches_to_process = []
+            errors = []
+            for row_num, row in enumerate(reader, start=2):
+                if len(row) < 4:
+                    errors.append({
+                        'row': row_num,
+                        'message': _('Fila incompleta. Se requieren al menos 4 columnas.')
+                    })
+                    continue
+
+                rival_name, role, match_date_str, venue, match_type, status, home_score, away_score = (row + [None]*4)[:8]
+
+                # Validaciones básicas
+                if not all([rival_name, role, match_date_str]):
+                    errors.append({
+                        'row': row_num,
+                        'message': _('Faltan campos obligatorios (Equipo rival, Rol, Fecha y hora)')
+                    })
+                    continue
+
+                is_home = role.strip().lower() == 'local'
+                if role.strip().lower() not in ['local', 'visitante']:
+                    errors.append({
+                        'row': row_num,
+                        'message': _('Rol inválido. Use "Local" o "Visitante"')
+                    })
+                    continue
+
+                try:
+                    # Intentar analizar con varios formatos
+                    dt = None
+                    formats_to_try = ['%d/%m/%Y %H:%M', '%d-%m-%Y %H:%M', '%Y-%m-%d %H:%M']
+                    for fmt in formats_to_try:
+                        try:
+                            dt = datetime.strptime(match_date_str.strip(), fmt)
+                            break
+                        except ValueError:
+                            continue
+
+                    if dt is None:
+                        raise ValueError(_('Formato de fecha y hora no válido'))
+
+                    match_date = timezone.make_aware(dt)
+
+                except ValueError as e:
+                    errors.append({
+                        'row': row_num,
+                        'message': _('Formato de fecha y hora inválido. Use DD/MM/YYYY HH:MM')
+                    })
+                    continue
+
+                # Convertir tipo de partido usando la tabla de conversión
+                match_type_clean = match_type.strip().lower() if match_type else 'amistoso'
+                match_type_internal = MATCH_TYPE_IMPORT.get(match_type_clean, 'friendly')
+                if match_type_clean and match_type_clean not in MATCH_TYPE_IMPORT:
+                    errors.append({
+                        'row': row_num,
+                        'message': _('Tipo de partido inválido: "%(type)s". Use: amistoso, liga, copa, playoff, entrenamiento') % {'type': match_type.strip()}
+                    })
+                    continue
+
+                # Convertir estado usando la tabla de conversión
+                status_clean = status.strip().lower() if status else 'programado'
+                status_internal = MATCH_STATUS_IMPORT.get(status_clean, 'scheduled')
+                if status_clean and status_clean not in MATCH_STATUS_IMPORT:
+                    errors.append({
+                        'row': row_num,
+                        'message': _('Estado inválido: "%(status)s". Use: programado, en_curso, finalizado, cancelado, aplazado') % {'status': status.strip()}
+                    })
+                    continue
+
+                # Función auxiliar para convertir scores a enteros
+                def parse_score(score_str):
+                    """Convierte string a entero, manejando tanto enteros como floats"""
+                    if not score_str or not score_str.strip():
+                        return None
+                    try:
+                        # Intentar convertir a float primero (maneja tanto "2" como "2.0")
+                        float_score = float(score_str.strip())
+                        # Convertir a entero
+                        return int(float_score)
+                    except (ValueError, TypeError):
+                        return None
+
+                # Crear objetos con datos para la tabla de vista previa
+                match_data = {
+                    'rival_name': rival_name.strip(),
+                    'is_home': is_home,
+                    'match_date': match_date,
+                    'venue': venue.strip() if venue else '',
+                    'match_type': match_type_internal,
+                    'status': status_internal,
+                    'home_score': parse_score(home_score),
+                    'away_score': parse_score(away_score),
+                }
+
+                                # Obtener los scores parseados para mostrar en la tabla
+                parsed_home_score = match_data['home_score']
+                parsed_away_score = match_data['away_score']
+
+                # Agregar datos formateados para mostrar en la tabla
+                match_data['display'] = {
+                    'rival_name': rival_name.strip(),
+                    'role': 'Local' if is_home else 'Visitante',
+                    'match_date': match_date.strftime('%d/%m/%Y %H:%M'),
+                    'venue': venue.strip() if venue else _('Sin especificar'),
+                    'match_type': MATCH_TYPE_DISPLAY.get(match_type_internal, match_type_internal.title()),
+                    'status': MATCH_STATUS_DISPLAY.get(status_internal, status_internal.title()),
+                    'home_score': str(parsed_home_score) if parsed_home_score is not None else '-',
+                    'away_score': str(parsed_away_score) if parsed_away_score is not None else '-',
+                    'result': f"{parsed_home_score} - {parsed_away_score}" if (parsed_home_score is not None and parsed_away_score is not None) else _('Sin resultado')
+                }
+
+                matches_to_process.append(match_data)
+
+            if errors:
+                return JsonResponse({
+                    'success': False,
+                    'validation_errors': errors
+                })
+
+            return JsonResponse({
+                'success': True,
+                'matches': matches_to_process,
+                'total_matches': len(matches_to_process)
+            })
+
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': _('Error interno del servidor: %(error)s') % {'error': str(e)}
+            })

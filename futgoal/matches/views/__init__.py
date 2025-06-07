@@ -1,4 +1,5 @@
 from .match_views import (
+    BaseMatchListView,
     UpcomingMatchListView,
     PreviousMatchListView,
     InProgressMatchListView,
@@ -11,7 +12,10 @@ from .match_views import (
     MatchDeleteView,
     MatchImportView,
     MatchImportCSVTemplateView,
-    MatchProcessCSVView
+    MatchProcessCSVView,
+    MatchBulkDataImportView,
+    MatchBulkDataExportView,
+    MatchBulkDataProcessCSVView,
 )
 from .match_note_views import (
     MatchNoteListView,
