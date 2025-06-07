@@ -12,6 +12,7 @@ from futgoal.users.views import (
     DashboardView,
     Error404View
 )
+from futgoal.users.views.user_views import UserProfileView
 
 
 urlpatterns = [
@@ -25,6 +26,9 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
 
+    # URL de perfil directa
+    path('profile/', UserProfileView.as_view(), name='profile'),
+
     path('auth/',
          include(('futgoal.users.urls.user_auth_urls', 'users'),
                  namespace='auth')
@@ -33,8 +37,8 @@ urlpatterns = [
     # django-allauth URLs
     path('accounts/', include('allauth.urls')),
 
-    path('users/',
-         include(('futgoal.users.urls.user_urls', 'users'),
+    path('',
+         include(('futgoal.users.urls', 'users'),
                  namespace='users')
          ),
 
