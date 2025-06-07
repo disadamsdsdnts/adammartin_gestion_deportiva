@@ -1,0 +1,157 @@
+{% extends 'layout/LayoutBase.html' %}
+{% load i18n %}
+
+{% block content %}
+{% include 'layout/_page-header.html' with title=page_title breadcrumb_items=breadcrumbs %}
+
+<div class="flex flex-col">
+  <div class="overflow-x-auto">
+    <div class="inline-block min-w-full align-middle">
+      <div class="overflow-hidden shadow">
+        <div class="p-6 bg-white dark:bg-gray-800">
+          <form method="post" action="{% url 'profile' %}">
+            {% csrf_token %}
+
+            {% if form.errors %}
+            <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800"
+              role="alert">
+              <ul class="list-disc pl-5">
+                {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                <li>{{ field|title }}: {{ error }}</li>
+                {% endfor %}
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+
+            <div class="grid grid-cols-6 gap-6">
+              <!-- Información Personal -->
+              <div class="col-span-6">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                  <svg class="inline w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                      clip-rule="evenodd"></path>
+                  </svg>
+                  {% trans 'Información Personal' %}
+                </h3>
+              </div>
+
+              <div class="col-span-6 sm:col-span-3">
+                <label for="{{ form.first_name.id_for_label }}"
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Nombre' %}</label>
+                <input type="text" name="{{ form.first_name.name }}" id="{{ form.first_name.id_for_label }}"
+                  value="{{ form.first_name.value|default:'' }}"
+                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  required />
+                {% if form.first_name.errors %}
+                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ form.first_name.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <div class="col-span-6 sm:col-span-3">
+                <label for="{{ form.last_name.id_for_label }}"
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Apellidos' %}</label>
+                <input type="text" name="{{ form.last_name.name }}" id="{{ form.last_name.id_for_label }}"
+                  value="{{ form.last_name.value|default:'' }}"
+                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  required />
+                {% if form.last_name.errors %}
+                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ form.last_name.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <div class="col-span-6 sm:col-span-3">
+                <label for="{{ form.email.id_for_label }}"
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Email' %}</label>
+                <input type="email" name="{{ form.email.name }}" id="{{ form.email.id_for_label }}"
+                  value="{{ form.email.value|default:'' }}"
+                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  required />
+                {% if form.email.errors %}
+                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ form.email.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <div class="col-span-6 sm:col-span-3">
+                <label for="{{ form.position.id_for_label }}"
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Cargo' %}</label>
+                <input type="text" name="{{ form.position.name }}" id="{{ form.position.id_for_label }}"
+                  value="{{ form.position.value|default:'' }}"
+                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" />
+                {% if form.position.errors %}
+                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ form.position.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <!-- Cambiar Contraseña -->
+              <div class="col-span-6">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4 mt-6">
+                  <svg class="inline w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd"
+                      d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                      clip-rule="evenodd"></path>
+                  </svg>
+                  {% trans 'Cambiar Contraseña' %}
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  {% trans 'Dejar en blanco si no desea cambiar la contraseña' %}
+                </p>
+              </div>
+
+              <div class="col-span-6 sm:col-span-3">
+                <label for="{{ form.password1.id_for_label }}"
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Nueva Contraseña' %}</label>
+                <input type="password" name="{{ form.password1.name }}" id="{{ form.password1.id_for_label }}"
+                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  placeholder="{% trans 'Dejar en blanco para no cambiar' %}" />
+                {% if form.password1.errors %}
+                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ form.password1.errors.0 }}</p>
+                {% endif %}
+                {% if form.password1.help_text %}
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">{{ form.password1.help_text }}</p>
+                {% endif %}
+              </div>
+
+              <div class="col-span-6 sm:col-span-3">
+                <label for="{{ form.password2.id_for_label }}"
+                  class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Confirmar Nueva Contraseña' %}</label>
+                <input type="password" name="{{ form.password2.name }}" id="{{ form.password2.id_for_label }}"
+                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  placeholder="{% trans 'Confirmar nueva contraseña' %}" />
+                {% if form.password2.errors %}
+                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ form.password2.errors.0 }}</p>
+                {% endif %}
+                {% if form.password2.help_text %}
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">{{ form.password2.help_text }}</p>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="flex items-center justify-end pt-6 space-x-2 border-t border-gray-200 dark:border-gray-600">
+              <a href="{% url 'dashboard' %}"
+                class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+                {% trans 'Cancelar' %}
+              </a>
+              <button type="submit"
+                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                <svg class="inline w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd"></path>
+                </svg>
+                {% trans 'Guardar Cambios' %}
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

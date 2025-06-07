@@ -28,6 +28,7 @@ from futgoal.users.models import User
 from futgoal.users.forms.user_form import(
     UserCreateForm,
     UserUpdateForm,
+    UserProfileForm,
 )
 
 from futgoal.users.decorators import (
@@ -179,3 +180,50 @@ class GaUserDeleteView(DeleteView):
         return reverse_lazy(
             'users:ga_user_list'
         )
+
+
+@method_decorator([login_required], name='dispatch')
+class UserProfileView(UpdateView):
+    """Vista para que el usuario edite su propio perfil"""
+    template_name = 'users/UserProfile.html'
+    model = User
+    form_class = UserProfileForm
+
+    def get_object(self):
+        """Devolver el usuario actual"""
+        return self.request.user
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        breadcrumbs = [
+            {'title': _('Dashboard'), 'url': reverse('dashboard')},
+            {'title': _('Mi Perfil')},
+        ]
+        context['page_title'] = _('Mi Perfil')
+        context['breadcrumbs'] = breadcrumbs
+
+        return context
+
+    def get_success_url(self):
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            _('Perfil actualizado correctamente')
+        )
+        return reverse_lazy('profile')
+
+    def form_valid(self, form):
+        """Si se cambió la contraseña, actualizar la sesión"""
+        response = super().form_valid(form)
+
+        if form.cleaned_data.get('password1'):
+            # Actualizar la sesión para que no se cierre después del cambio de contraseña
+            update_session_auth_hash(self.request, self.object)
+            messages.add_message(
+                self.request,
+                messages.INFO,
+                _('Contraseña actualizada correctamente')
+            )
+
+        return response
