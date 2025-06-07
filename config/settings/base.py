@@ -99,6 +99,14 @@ ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 
+# Personalización de mensajes de allauth
+ACCOUNT_MESSAGES = {
+    'logged_in': {
+        'level': 'success',
+        'message': 'Sesión iniciada correctamente como %(email)s',
+    },
+}
+
 # Social account settings
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -129,7 +137,7 @@ AUTHENTICATION_BACKENDS = [
 # OAuth settings
 SOCIALACCOUNT_LOGIN_ON_GET = True
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'
-ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'
+ACCOUNT_ADAPTER = 'futgoal.users.adapters.CustomAccountAdapter'
 
 ROOT_URLCONF = 'config.urls'
 
