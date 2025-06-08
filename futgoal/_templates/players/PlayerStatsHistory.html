@@ -1,0 +1,322 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">
+            {% trans "Historial de Estadísticas" %} - {{ player.full_name }}
+          </h3>
+        </div>
+
+        <div class="card-body">
+          <!-- Información del Jugador -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <div class="card border-0 bg-light">
+                <div class="card-body">
+                  <div class="d-flex align-items-center">
+                    {% if player.photo %}
+                    <img src="{{ player.photo.url }}" class="rounded-circle me-3" width="80" height="80"
+                      alt="{{ player.full_name }}">
+                    {% else %}
+                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-3"
+                      style="width: 80px; height: 80px;">
+                      <i class="bi bi-person-fill text-white" style="font-size: 2rem;"></i>
+                    </div>
+                    {% endif %}
+                    <div class="flex-grow-1">
+                      <h4 class="mb-1">{{ player.full_name }}</h4>
+                      {% if player.sport_name %}
+                      <p class="mb-1 text-muted">"{{ player.sport_name }}"</p>
+                      {% endif %}
+                      <div>
+                        {% if player.position %}
+                        <span class="badge bg-info me-2">{{ player.position }}</span>
+                        {% endif %}
+                        {% if player.dorsal %}
+                        <span class="badge bg-dark">#{{ player.dorsal }}</span>
+                        {% endif %}
+                      </div>
+                    </div>
+                    <div class="text-end">
+                      <div class="row text-center">
+                        <div class="col">
+                          <div class="fw-bold text-success">{{ career_stats.total_goals }}</div>
+                          <small class="text-muted">{% trans "Goles" %}</small>
+                        </div>
+                        <div class="col">
+                          <div class="fw-bold text-info">{{ career_stats.total_assists }}</div>
+                          <small class="text-muted">{% trans "Asistencias" %}</small>
+                        </div>
+                        <div class="col">
+                          <div class="fw-bold text-primary">{{ career_stats.total_matches }}</div>
+                          <small class="text-muted">{% trans "Partidos" %}</small>
+                        </div>
+                        <div class="col">
+                          <div class="fw-bold text-secondary">{{ career_stats.total_minutes }}</div>
+                          <small class="text-muted">{% trans "Minutos" %}</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Estadísticas por Temporada -->
+          {% if season_stats %}
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5>{% trans "Estadísticas por Temporada" %}</h5>
+              <div class="table-responsive">
+                <table class="table table-striped">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>{% trans "Temporada" %}</th>
+                      <th class="text-center">{% trans "Partidos" %}</th>
+                      <th class="text-center">{% trans "Minutos" %}</th>
+                      <th class="text-center">{% trans "Goles" %}</th>
+                      <th class="text-center">{% trans "Asistencias" %}</th>
+                      <th class="text-center">{% trans "T.A." %}</th>
+                      <th class="text-center">{% trans "T.R." %}</th>
+                      <th class="text-center">{% trans "Promedio" %}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for season_stat in season_stats %}
+                    <tr>
+                      <td>
+                        <strong>{{ season_stat.season_name }}</strong>
+                        {% if season_stat.is_active %}
+                        <span class="badge bg-success ms-2">{% trans "Activa" %}</span>
+                        {% endif %}
+                      </td>
+                      <td class="text-center">{{ season_stat.matches }}</td>
+                      <td class="text-center">{{ season_stat.minutes }}</td>
+                      <td class="text-center">
+                        <span class="badge bg-success">{{ season_stat.goals }}</span>
+                      </td>
+                      <td class="text-center">
+                        <span class="badge bg-info">{{ season_stat.assists }}</span>
+                      </td>
+                      <td class="text-center">
+                        {% if season_stat.yellow_cards > 0 %}
+                        <span class="badge bg-warning">{{ season_stat.yellow_cards }}</span>
+                        {% else %}
+                        <span class="text-muted">0</span>
+                        {% endif %}
+                      </td>
+                      <td class="text-center">
+                        {% if season_stat.red_cards > 0 %}
+                        <span class="badge bg-danger">{{ season_stat.red_cards }}</span>
+                        {% else %}
+                        <span class="text-muted">0</span>
+                        {% endif %}
+                      </td>
+                      <td class="text-center">
+                        {% if season_stat.avg_rating %}
+                        {{ season_stat.avg_rating|floatformat:1 }}/10
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Historial de Partidos -->
+          <div class="row">
+            <div class="col-12">
+              <h5>{% trans "Historial de Partidos" %}</h5>
+
+              {% if player_stats %}
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead class="table-light">
+                    <tr>
+                      <th style="width: 120px;">{% trans "Fecha" %}</th>
+                      <th>{% trans "Rival" %}</th>
+                      <th class="text-center" style="width: 80px;">{% trans "Estado" %}</th>
+                      <th class="text-center" style="width: 70px;">{% trans "Min." %}</th>
+                      <th class="text-center" style="width: 60px;">{% trans "Goles" %}</th>
+                      <th class="text-center" style="width: 60px;">{% trans "Asist." %}</th>
+                      <th class="text-center" style="width: 60px;">{% trans "T.A." %}</th>
+                      <th class="text-center" style="width: 60px;">{% trans "T.R." %}</th>
+                      <th class="text-center" style="width: 70px;">{% trans "Calif." %}</th>
+                      <th style="width: 100px;">{% trans "Acciones" %}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for stat in player_stats %}
+                    <tr>
+                      <td>
+                        <div class="fw-bold">{{ stat.match.match_date|date:"d/m/Y" }}</div>
+                        <small class="text-muted">{{ stat.match.match_date|date:"H:i" }}</small>
+                      </td>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          {% if stat.match.away_team.logo %}
+                          <img src="{{ stat.match.away_team.logo.url }}" class="me-2" width="20" height="20"
+                            alt="{{ stat.match.away_team.name }}">
+                          {% endif %}
+                          <div>
+                            <div class="fw-bold">{{ stat.match.away_team.name }}</div>
+                            <small class="text-muted">
+                              {% if stat.match.is_home %}
+                              <i class="bi bi-house"></i> {% trans "Local" %}
+                              {% else %}
+                              <i class="bi bi-airplane"></i> {% trans "Visitante" %}
+                              {% endif %}
+                            </small>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="text-center">
+                        {% if stat.status == 'starter' %}
+                        <span class="badge bg-success">{% trans "Titular" %}</span>
+                        {% elif stat.status == 'substitute' %}
+                        <span class="badge bg-info">{% trans "Suplente" %}</span>
+                        {% elif stat.status == 'bench' %}
+                        <span class="badge bg-warning">{% trans "Banquillo" %}</span>
+                        {% else %}
+                        <span class="badge bg-secondary">{% trans "N/D" %}</span>
+                        {% endif %}
+                      </td>
+                      <td class="text-center">
+                        <strong>{{ stat.minutes_played }}</strong>
+                      </td>
+                      <td class="text-center">
+                        {% if stat.goals > 0 %}
+                        <span class="badge bg-success">{{ stat.goals }}</span>
+                        {% else %}
+                        <span class="text-muted">0</span>
+                        {% endif %}
+                      </td>
+                      <td class="text-center">
+                        {% if stat.assists > 0 %}
+                        <span class="badge bg-info">{{ stat.assists }}</span>
+                        {% else %}
+                        <span class="text-muted">0</span>
+                        {% endif %}
+                      </td>
+                      <td class="text-center">
+                        {% if stat.yellow_cards > 0 %}
+                        <span class="badge bg-warning">{{ stat.yellow_cards }}</span>
+                        {% else %}
+                        <span class="text-muted">0</span>
+                        {% endif %}
+                      </td>
+                      <td class="text-center">
+                        {% if stat.red_cards > 0 %}
+                        <span class="badge bg-danger">{{ stat.red_cards }}</span>
+                        {% else %}
+                        <span class="text-muted">0</span>
+                        {% endif %}
+                      </td>
+                      <td class="text-center">
+                        {% if stat.rating %}
+                        <div class="d-flex align-items-center justify-content-center">
+                          <span class="fw-bold">{{ stat.rating }}</span>
+                          <small class="text-muted">/10</small>
+                        </div>
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                      </td>
+                      <td>
+                        <div class="btn-group btn-group-sm">
+                          <a href="{% url 'matches:player_stats_detail' stat.pk %}"
+                            class="btn btn-outline-primary btn-sm" title="{% trans 'Ver Detalle' %}">
+                            <i class="bi bi-eye"></i>
+                          </a>
+                          <a href="{% url 'matches:match_detail' stat.match.pk %}" class="btn btn-outline-info btn-sm"
+                            title="{% trans 'Ver Partido' %}">
+                            <i class="bi bi-calendar-event"></i>
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                      <td colspan="10" class="text-center text-muted py-4">
+                        {% trans "Este jugador aún no tiene estadísticas registradas" %}
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Paginación -->
+              {% if is_paginated %}
+              <nav aria-label="{% trans 'Navegación de páginas' %}">
+                <ul class="pagination justify-content-center">
+                  {% if page_obj.has_previous %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page=1">{% trans "Primera" %}</a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">{% trans "Anterior" %}</a>
+                  </li>
+                  {% endif %}
+
+                  <li class="page-item active">
+                    <span class="page-link">
+                      {% trans "Página" %} {{ page_obj.number }} {% trans "de" %} {{ page_obj.paginator.num_pages }}
+                    </span>
+                  </li>
+
+                  {% if page_obj.has_next %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">{% trans "Siguiente" %}</a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">{% trans "Última" %}</a>
+                  </li>
+                  {% endif %}
+                </ul>
+              </nav>
+              {% endif %}
+
+              {% else %}
+              <div class="alert alert-info text-center">
+                <h6 class="alert-heading">{% trans "Sin Estadísticas" %}</h6>
+                <p class="mb-0">{% trans "Este jugador aún no tiene estadísticas registradas en ningún partido." %}</p>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <a href="{% url 'players:player_detail' player.pk %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i>
+                {% trans "Volver al Jugador" %}
+              </a>
+              <a href="{% url 'matches:player_stats_list' %}" class="btn btn-outline-primary">
+                <i class="bi bi-list"></i>
+                {% trans "Ver Todas las Estadísticas" %}
+              </a>
+            </div>
+            <div class="text-muted small">
+              {% trans "Total de registros:" %} {{ career_stats.total_matches }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

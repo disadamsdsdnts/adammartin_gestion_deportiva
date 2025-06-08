@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from .models import Match, MatchNote
+from .models import Match, MatchNote, MatchPlayerStats
 
 
 @admin.register(Match)
@@ -117,3 +117,79 @@ class MatchNoteAdmin(admin.ModelAdmin):
     def rival_team(self, obj):
         return obj.rival_team
     rival_team.short_description = _('Equipo Rival')
+
+
+@admin.register(MatchPlayerStats)
+class MatchPlayerStatsAdmin(admin.ModelAdmin):
+    list_display = [
+        'match',
+        'player',
+        'status',
+        'minutes_played',
+        'goals',
+        'assists',
+        'yellow_cards',
+        'red_cards',
+        'rating'
+    ]
+
+    list_filter = [
+        'status',
+        'match__season',
+        'match__match_date',
+        'goals',
+        'assists',
+        'yellow_cards',
+        'red_cards'
+    ]
+
+    search_fields = [
+        'player__first_name',
+        'player__last_name',
+        'player__sport_name',
+        'match__away_team__name'
+    ]
+
+    readonly_fields = ['created', 'modified']
+
+    fieldsets = (
+        (_('Información Básica'), {
+            'fields': (
+                'match',
+                'player',
+                'status'
+            )
+        }),
+        (_('Estadísticas de Juego'), {
+            'fields': (
+                'minutes_played',
+                'goals',
+                'assists',
+                'yellow_cards',
+                'red_cards'
+            )
+        }),
+        (_('Sustituciones'), {
+            'fields': (
+                'substitution_in',
+                'substitution_out'
+            ),
+            'classes': ('collapse',)
+        }),
+        (_('Evaluación'), {
+            'fields': (
+                'rating',
+                'performance_notes'
+            ),
+            'classes': ('collapse',)
+        }),
+        (_('Auditoría'), {
+            'fields': ('created', 'modified'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    date_hierarchy = 'match__match_date'
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('match', 'player', 'match__season')

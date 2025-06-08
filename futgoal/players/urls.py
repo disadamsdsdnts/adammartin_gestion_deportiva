@@ -2,7 +2,9 @@ from django.urls import include, path, re_path
 from django.views.decorators.csrf import csrf_exempt
 
 from .views import PlayerList, PlayerCreate, PlayerDetail, PlayerUpdate, PlayerDelete, PlayerImportView, PlayerImportCSVTemplateView, PlayerProcessCSVView
+from futgoal.matches.views.match_player_stats_views import PlayerStatsHistoryView
 
+app_name = 'players'
 
 urlpatterns = [
     # path(
@@ -49,5 +51,10 @@ urlpatterns = [
         '<pk>/delete/',
         PlayerDelete.as_view(),
         name='player_delete'
+    ),
+    path(
+        '<pk>/stats-history/',
+        PlayerStatsHistoryView.as_view(),
+        name='player_stats_history'
     ),
 ]

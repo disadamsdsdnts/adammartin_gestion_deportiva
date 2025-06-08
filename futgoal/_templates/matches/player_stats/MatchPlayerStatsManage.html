@@ -1,0 +1,414 @@
+{% extends 'layout/LayoutBase.html' %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+{% block content %}
+{% include 'layout/_page-header.html' with title=page_title breadcrumb_items=breadcrumbs %}
+
+<div class="flex flex-col">
+  <div class="overflow-x-auto">
+    <div class="inline-block min-w-full align-middle">
+      <div class="overflow-hidden shadow">
+        <div class="p-6 bg-white dark:bg-gray-800">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+              {% trans "Gestionar Estadísticas" %} - {{ match }}
+            </h3>
+            <span
+              class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+              {{ match.match_date|date:"d/m/Y H:i" }}
+            </span>
+          </div>
+          <!-- Información del Partido -->
+          <div class="mb-6">
+            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+              <div class="flex justify-between items-center">
+                <div>
+                  <h5 class="text-lg font-medium text-blue-900 dark:text-blue-300 mb-1">{{ match }}</h5>
+                  <p class="text-sm text-blue-800 dark:text-blue-200">
+                    {{ match.match_date|date:"d/m/Y H:i" }} -
+                    {% if match.is_home %}
+                    <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z">
+                      </path>
+                    </svg>
+                    {% trans "Local" %}
+                    {% else %}
+                    <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z">
+                      </path>
+                    </svg>
+                    {% trans "Visitante" %}
+                    {% endif %}
+                    {% if match.venue %} - {{ match.venue }}{% endif %}
+                  </p>
+                </div>
+                <div>
+                  <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                    {{ match.get_status_display }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <form method="post">
+            {% csrf_token %}
+            {{ formset.management_form }}
+
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+                <thead class="bg-gray-50 dark:bg-gray-700">
+                  <tr>
+                    <th scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+                      style="width: 200px;">
+                      {% trans "Jugador" %}
+                    </th>
+                    <th scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+                      style="width: 120px;">
+                      {% trans "Estado" %}
+                    </th>
+                    <th scope="col"
+                      class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+                      style="width: 80px;">
+                      {% trans "Asistió" %}
+                    </th>
+                    <th scope="col"
+                      class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+                      style="width: 80px;">
+                      {% trans "Minutos" %}
+                    </th>
+                    <th scope="col"
+                      class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+                      style="width: 70px;">
+                      {% trans "Goles" %}
+                    </th>
+                    <th scope="col"
+                      class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+                      style="width: 70px;">
+                      {% trans "Asist." %}
+                    </th>
+                    <th scope="col"
+                      class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+                      style="width: 70px;">
+                      {% trans "T.A." %}
+                    </th>
+                    <th scope="col"
+                      class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+                      style="width: 70px;">
+                      {% trans "T.R." %}
+                    </th>
+                    <th scope="col"
+                      class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+                      style="width: 80px;">
+                      {% trans "Calif." %}
+                    </th>
+                    <th scope="col"
+                      class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+                      style="width: 100px;">
+                      {% trans "Sust. In" %}
+                    </th>
+                    <th scope="col"
+                      class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+                      style="width: 100px;">
+                      {% trans "Sust. Out" %}
+                    </th>
+                    <th scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
+                      {% trans "Notas" %}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-600">
+                  {% for form in formset %}
+                  <tr data-player-status="{{ form.status.value|default:'starter' }}"
+                    class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <!-- Campos ocultos -->
+                    {% for hidden in form.hidden_fields %}
+                    {{ hidden }}
+                    {% endfor %}
+
+                    <!-- Información del Jugador -->
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        {% if form.instance.player.photo %}
+                        <img src="{{ form.instance.player.photo.url }}" class="h-8 w-8 rounded-full mr-3"
+                          alt="{{ form.instance.player.full_name }}">
+                        {% else %}
+                        <div
+                          class="h-8 w-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center mr-3">
+                          <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                              clip-rule="evenodd"></path>
+                          </svg>
+                        </div>
+                        {% endif %}
+                        <div>
+                          <div class="text-sm font-medium text-gray-900 dark:text-white">
+                            {{ form.instance.player.full_name }}</div>
+                          {% if form.instance.player.position %}
+                          <div class="text-sm text-gray-500 dark:text-gray-400">{{ form.instance.player.position }}
+                          </div>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </td>
+
+                    <!-- Estado -->
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      {{ form.status|add_class:"block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" }}
+                      {% if form.status.errors %}
+                      <div class="text-red-600 text-xs mt-1">{{ form.status.errors.0 }}</div>
+                      {% endif %}
+                    </td>
+
+                    <!-- Asistió -->
+                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                      {{ form.attended|add_class:"h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600" }}
+                      {% if form.attended.errors %}
+                      <div class="text-red-600 text-xs mt-1">{{ form.attended.errors.0 }}</div>
+                      {% endif %}
+                    </td>
+
+                    <!-- Minutos -->
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      {{ form.minutes_played|add_class:"block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" }}
+                      {% if form.minutes_played.errors %}
+                      <div class="text-red-600 text-xs mt-1">{{ form.minutes_played.errors.0 }}</div>
+                      {% endif %}
+                    </td>
+
+                    <!-- Goles -->
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      {{ form.goals|add_class:"block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-center dark:bg-gray-700 dark:border-gray-600 dark:text-white" }}
+                      {% if form.goals.errors %}
+                      <div class="text-red-600 text-xs mt-1">{{ form.goals.errors.0 }}</div>
+                      {% endif %}
+                    </td>
+
+                    <!-- Asistencias -->
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      {{ form.assists|add_class:"block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-center dark:bg-gray-700 dark:border-gray-600 dark:text-white" }}
+                      {% if form.assists.errors %}
+                      <div class="text-red-600 text-xs mt-1">{{ form.assists.errors.0 }}</div>
+                      {% endif %}
+                    </td>
+
+                    <!-- Tarjetas Amarillas -->
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      {{ form.yellow_cards|add_class:"block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-center dark:bg-gray-700 dark:border-gray-600 dark:text-white" }}
+                      {% if form.yellow_cards.errors %}
+                      <div class="text-red-600 text-xs mt-1">{{ form.yellow_cards.errors.0 }}</div>
+                      {% endif %}
+                    </td>
+
+                    <!-- Tarjetas Rojas -->
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      {{ form.red_cards|add_class:"block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-center dark:bg-gray-700 dark:border-gray-600 dark:text-white" }}
+                      {% if form.red_cards.errors %}
+                      <div class="text-red-600 text-xs mt-1">{{ form.red_cards.errors.0 }}</div>
+                      {% endif %}
+                    </td>
+
+                    <!-- Calificación -->
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      {{ form.rating|add_class:"block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-center dark:bg-gray-700 dark:border-gray-600 dark:text-white" }}
+                      {% if form.rating.errors %}
+                      <div class="text-red-600 text-xs mt-1">{{ form.rating.errors.0 }}</div>
+                      {% endif %}
+                    </td>
+
+                    <!-- Sustitución Entrada -->
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      {{ form.substitution_in|add_class:"block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-center dark:bg-gray-700 dark:border-gray-600 dark:text-white" }}
+                      {% if form.substitution_in.errors %}
+                      <div class="text-red-600 text-xs mt-1">{{ form.substitution_in.errors.0 }}</div>
+                      {% endif %}
+                    </td>
+
+                    <!-- Sustitución Salida -->
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      {{ form.substitution_out|add_class:"block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-center dark:bg-gray-700 dark:border-gray-600 dark:text-white" }}
+                      {% if form.substitution_out.errors %}
+                      <div class="text-red-600 text-xs mt-1">{{ form.substitution_out.errors.0 }}</div>
+                      {% endif %}
+                    </td>
+
+                    <!-- Notas -->
+                    <td class="px-6 py-4" style="min-width: 200px;">
+                      {{ form.performance_notes|add_class:"block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" }}
+                      {% if form.performance_notes.errors %}
+                      <div class="text-red-600 text-xs mt-1">{{ form.performance_notes.errors.0 }}</div>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Errores del Formset -->
+            {% if formset.non_form_errors %}
+            <div
+              class="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md dark:bg-red-900/20 dark:border-red-700 dark:text-red-300">
+              {{ formset.non_form_errors }}
+            </div>
+            {% endif %}
+
+            <!-- Botones de acción -->
+            <div class="mt-6 flex justify-end space-x-3">
+              <a href="{% url 'matches:match_detail' match.pk %}"
+                class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
+                {% trans "Cancelar" %}
+              </a>
+              <button type="submit"
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                {% trans "Guardar Estadísticas" %}
+              </button>
+            </div>
+
+            <!-- Información de Ayuda -->
+            <div class="mt-6">
+              <div
+                class="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-md dark:bg-blue-900/20 dark:border-blue-700 dark:text-blue-300">
+                <h6 class="font-medium mb-2">{% trans "Instrucciones" %}</h6>
+                <ul class="text-sm space-y-1">
+                  <li>• {% trans "Los jugadores que no asistieron al partido no pueden tener estadísticas de juego" %}
+                  </li>
+                  <li>• {% trans "Los jugadores de banquillo no pueden tener estadísticas de juego" %}</li>
+                  <li>• {% trans "Los jugadores con tarjeta roja no pueden tener más de una tarjeta amarilla" %}</li>
+                  <li>• {% trans "Los minutos jugados deben estar entre 0 y 120" %}</li>
+                  <li>• {% trans "La calificación debe estar entre 0 y 10" %}</li>
+                </ul>
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Estilos para mejorar la visualización */
+  .table td {
+    vertical-align: middle;
+  }
+
+  .form-control-sm {
+    font-size: 0.875rem;
+  }
+
+  /* Colores por estado del jugador */
+  tr[data-player-status="starter"] {
+    background-color: rgba(25, 135, 84, 0.1);
+  }
+
+  tr[data-player-status="substitute"] {
+    background-color: rgba(13, 202, 240, 0.1);
+  }
+
+  tr[data-player-status="bench"] {
+    background-color: rgba(255, 193, 7, 0.1);
+  }
+
+  tr[data-player-status="not_available"] {
+    background-color: rgba(108, 117, 125, 0.1);
+  }
+
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Manejar cambios en el estado de cada jugador
+    const statusFields = document.querySelectorAll('[id$="-status"]');
+
+    statusFields.forEach(function (statusField) {
+      const row = statusField.closest('tr');
+      const prefix = statusField.id.replace('-status', '');
+
+      const gameStatsFields = [
+        document.getElementById(prefix + '-goals'),
+        document.getElementById(prefix + '-assists'),
+        document.getElementById(prefix + '-yellow_cards'),
+        document.getElementById(prefix + '-red_cards'),
+        document.getElementById(prefix + '-rating')
+      ];
+
+      const minutesField = document.getElementById(prefix + '-minutes_played');
+
+      function toggleGameStats() {
+        const isBench = statusField.value === 'bench' || statusField.value === 'not_available';
+
+        // Actualizar el color de la fila
+        row.setAttribute('data-player-status', statusField.value);
+
+        gameStatsFields.forEach(function (field) {
+          if (field) {
+            if (isBench) {
+              field.disabled = true;
+              field.value = '';
+              field.style.opacity = '0.5';
+            } else {
+              field.disabled = false;
+              field.style.opacity = '1';
+            }
+          }
+        });
+
+        // Si está en banquillo, poner minutos en 0
+        if (isBench && minutesField) {
+          minutesField.value = '0';
+          minutesField.disabled = true;
+          minutesField.style.opacity = '0.5';
+        } else if (minutesField) {
+          minutesField.disabled = false;
+          minutesField.style.opacity = '1';
+        }
+      }
+
+      statusField.addEventListener('change', toggleGameStats);
+      toggleGameStats(); // Ejecutar al cargar la página
+    });
+
+    // Validación de tarjetas en tiempo real
+    const redCardFields = document.querySelectorAll('[id$="-red_cards"]');
+    const yellowCardFields = document.querySelectorAll('[id$="-yellow_cards"]');
+
+    function validateCards(redField, yellowField) {
+      const redValue = parseInt(redField.value) || 0;
+      const yellowValue = parseInt(yellowField.value) || 0;
+
+      if (redValue > 0 && yellowValue > 1) {
+        redField.setCustomValidity(
+          '{% trans "Un jugador con tarjeta roja no puede tener más de una tarjeta amarilla" %}');
+        redField.classList.add('is-invalid');
+      } else {
+        redField.setCustomValidity('');
+        redField.classList.remove('is-invalid');
+      }
+    }
+
+    redCardFields.forEach(function (redField) {
+      const prefix = redField.id.replace('-red_cards', '');
+      const yellowField = document.getElementById(prefix + '-yellow_cards');
+
+      if (yellowField) {
+        redField.addEventListener('input', function () {
+          validateCards(redField, yellowField);
+        });
+        yellowField.addEventListener('input', function () {
+          validateCards(redField, yellowField);
+        });
+      }
+    });
+  });
+
+</script>
+{% endblock %}

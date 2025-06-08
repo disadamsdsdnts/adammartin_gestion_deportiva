@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">{{ stat.player.full_name }} - {{ stat.match }}</h3>
+          <div class="card-toolbar">
+            <a href="{% url 'matches:player_stats_update' stat.pk %}" class="btn btn-sm btn-primary">
+              <i class="bi bi-pencil"></i>
+              {% trans "Editar" %}
+            </a>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="row">
+            <!-- Información del Jugador -->
+            <div class="col-md-4">
+              <div class="card border-0 bg-light">
+                <div class="card-body text-center">
+                  {% if stat.player.photo %}
+                  <img src="{{ stat.player.photo.url }}" class="rounded-circle mb-3" width="100" height="100"
+                    alt="{{ stat.player.full_name }}">
+                  {% else %}
+                  <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mb-3 mx-auto"
+                    style="width: 100px; height: 100px;">
+                    <i class="bi bi-person-fill text-white" style="font-size: 3rem;"></i>
+                  </div>
+                  {% endif %}
+                  <h5 class="card-title">{{ stat.player.full_name }}</h5>
+                  {% if stat.player.sport_name %}
+                  <p class="text-muted">"{{ stat.player.sport_name }}"</p>
+                  {% endif %}
+                  {% if stat.player.position %}
+                  <span class="badge bg-info">{{ stat.player.position }}</span>
+                  {% endif %}
+                  {% if stat.player.dorsal %}
+                  <span class="badge bg-dark">#{{ stat.player.dorsal }}</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Información del Partido -->
+            <div class="col-md-4">
+              <div class="card border-0 bg-light">
+                <div class="card-body">
+                  <h6 class="card-title">{% trans "Información del Partido" %}</h6>
+                  <table class="table table-borderless table-sm">
+                    <tr>
+                      <td><strong>{% trans "Rival:" %}</strong></td>
+                      <td>{{ stat.match.away_team.name }}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>{% trans "Fecha:" %}</strong></td>
+                      <td>{{ stat.match.match_date|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>{% trans "Tipo:" %}</strong></td>
+                      <td>{{ stat.match.get_match_type_display }}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>{% trans "Estado:" %}</strong></td>
+                      <td>{{ stat.match.get_status_display }}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>{% trans "Ubicación:" %}</strong></td>
+                      <td>
+                        {% if stat.match.is_home %}
+                        <i class="bi bi-house"></i> {% trans "Local" %}
+                        {% else %}
+                        <i class="bi bi-airplane"></i> {% trans "Visitante" %}
+                        {% endif %}
+                      </td>
+                    </tr>
+                    {% if stat.match.venue %}
+                    <tr>
+                      <td><strong>{% trans "Estadio:" %}</strong></td>
+                      <td>{{ stat.match.venue }}</td>
+                    </tr>
+                    {% endif %}
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Estado del Jugador -->
+            <div class="col-md-4">
+              <div class="card border-0 bg-light">
+                <div class="card-body">
+                  <h6 class="card-title">{% trans "Estado en el Partido" %}</h6>
+                  <div class="text-center mb-3">
+                    {% if stat.status == 'starter' %}
+                    <span class="badge bg-success fs-6">{% trans "Titular" %}</span>
+                    {% elif stat.status == 'substitute' %}
+                    <span class="badge bg-info fs-6">{% trans "Suplente" %}</span>
+                    {% elif stat.status == 'bench' %}
+                    <span class="badge bg-warning fs-6">{% trans "Banquillo" %}</span>
+                    {% else %}
+                    <span class="badge bg-secondary fs-6">{% trans "No disponible" %}</span>
+                    {% endif %}
+                  </div>
+
+                  <!-- Asistencia al partido -->
+                  <div class="text-center mb-3">
+                    {% if stat.attended %}
+                    <span class="badge bg-success">
+                      <i class="bi bi-check-circle"></i> {% trans "Asistió" %}
+                    </span>
+                    {% else %}
+                    <span class="badge bg-danger">
+                      <i class="bi bi-x-circle"></i> {% trans "No asistió" %}
+                    </span>
+                    {% endif %}
+                  </div>
+
+                  {% if stat.substitution_in or stat.substitution_out %}
+                  <table class="table table-borderless table-sm">
+                    {% if stat.substitution_in %}
+                    <tr>
+                      <td><strong>{% trans "Entró:" %}</strong></td>
+                      <td>{{ stat.substitution_in }}'</td>
+                    </tr>
+                    {% endif %}
+                    {% if stat.substitution_out %}
+                    <tr>
+                      <td><strong>{% trans "Salió:" %}</strong></td>
+                      <td>{{ stat.substitution_out }}'</td>
+                    </tr>
+                    {% endif %}
+                  </table>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Estadísticas Principales -->
+          <div class="row mt-4">
+            <div class="col-12">
+              <h5>{% trans "Estadísticas del Partido" %}</h5>
+            </div>
+          </div>
+
+          <div class="row">
+            <!-- Minutos Jugados -->
+            <div class="col-md-2 col-sm-4 col-6">
+              <div class="card text-center border-0 bg-primary bg-opacity-10">
+                <div class="card-body">
+                  <i class="bi bi-clock text-primary" style="font-size: 2rem;"></i>
+                  <h3 class="text-primary">{{ stat.minutes_played }}</h3>
+                  <p class="text-muted small">{% trans "Minutos" %}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Goles -->
+            <div class="col-md-2 col-sm-4 col-6">
+              <div class="card text-center border-0 bg-success bg-opacity-10">
+                <div class="card-body">
+                  <i class="bi bi-trophy text-success" style="font-size: 2rem;"></i>
+                  <h3 class="text-success">{{ stat.goals }}</h3>
+                  <p class="text-muted small">{% trans "Goles" %}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Asistencias -->
+            <div class="col-md-2 col-sm-4 col-6">
+              <div class="card text-center border-0 bg-info bg-opacity-10">
+                <div class="card-body">
+                  <i class="bi bi-hand-thumbs-up text-info" style="font-size: 2rem;"></i>
+                  <h3 class="text-info">{{ stat.assists }}</h3>
+                  <p class="text-muted small">{% trans "Asistencias" %}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tarjetas Amarillas -->
+            <div class="col-md-2 col-sm-4 col-6">
+              <div class="card text-center border-0 bg-warning bg-opacity-10">
+                <div class="card-body">
+                  <i class="bi bi-square-fill text-warning" style="font-size: 2rem;"></i>
+                  <h3 class="text-warning">{{ stat.yellow_cards }}</h3>
+                  <p class="text-muted small">{% trans "T. Amarillas" %}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tarjetas Rojas -->
+            <div class="col-md-2 col-sm-4 col-6">
+              <div class="card text-center border-0 bg-danger bg-opacity-10">
+                <div class="card-body">
+                  <i class="bi bi-square-fill text-danger" style="font-size: 2rem;"></i>
+                  <h3 class="text-danger">{{ stat.red_cards }}</h3>
+                  <p class="text-muted small">{% trans "T. Rojas" %}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Calificación -->
+            <div class="col-md-2 col-sm-4 col-6">
+              <div class="card text-center border-0 bg-secondary bg-opacity-10">
+                <div class="card-body">
+                  <i class="bi bi-star text-secondary" style="font-size: 2rem;"></i>
+                  <h3 class="text-secondary">
+                    {% if stat.rating %}
+                    {{ stat.rating }}/10
+                    {% else %}
+                    -
+                    {% endif %}
+                  </h3>
+                  <p class="text-muted small">{% trans "Calificación" %}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resumen del Rendimiento -->
+          {% if stat.get_performance_summary != "Sin estadísticas destacadas" %}
+          <div class="row mt-4">
+            <div class="col-12">
+              <div class="alert alert-info">
+                <h6 class="alert-heading">{% trans "Resumen del Rendimiento" %}</h6>
+                <p class="mb-0">{{ stat.get_performance_summary }}</p>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Notas de Rendimiento -->
+          {% if stat.performance_notes %}
+          <div class="row mt-4">
+            <div class="col-12">
+              <h6>{% trans "Notas de Rendimiento" %}</h6>
+              <div class="card border-0 bg-light">
+                <div class="card-body">
+                  <p class="mb-0">{{ stat.performance_notes|linebreaks }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Información de Auditoría -->
+          <div class="row mt-4">
+            <div class="col-12">
+              <div class="text-muted small">
+                <p class="mb-1">
+                  {% trans "Creado:" %} {{ stat.created|date:"d/m/Y H:i" }}
+                </p>
+                {% if stat.modified != stat.created %}
+                <p class="mb-0">
+                  {% trans "Última modificación:" %} {{ stat.modified|date:"d/m/Y H:i" }}
+                </p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <div class="d-flex justify-content-between">
+            <div>
+              <a href="{% url 'matches:player_stats_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i>
+                {% trans "Volver a la Lista" %}
+              </a>
+              <a href="{% url 'matches:match_detail' stat.match.pk %}" class="btn btn-outline-primary">
+                <i class="bi bi-eye"></i>
+                {% trans "Ver Partido" %}
+              </a>
+            </div>
+            <div>
+              <a href="{% url 'matches:player_stats_update' stat.pk %}" class="btn btn-primary">
+                <i class="bi bi-pencil"></i>
+                {% trans "Editar" %}
+              </a>
+              <a href="{% url 'matches:player_stats_delete' stat.pk %}" class="btn btn-danger"
+                onclick="return confirm('{% trans "¿Está seguro de que desea eliminar estas estadísticas?" %}')">
+                <i class="bi bi-trash"></i>
+                {% trans "Eliminar" %}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

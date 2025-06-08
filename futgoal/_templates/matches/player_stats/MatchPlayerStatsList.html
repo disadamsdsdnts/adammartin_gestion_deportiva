@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">{% trans "Estadísticas de Jugadores" %}</h3>
+          <div class="card-toolbar">
+            <a href="{% url 'matches:player_stats_summary' %}" class="btn btn-sm btn-light">
+              <i class="bi bi-graph-up"></i>
+              {% trans "Ver Resumen" %}
+            </a>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <!-- Filtros -->
+          <form method="get" class="mb-4">
+            <div class="row">
+              <div class="col-md-3">
+                {{ filter_form.player.label_tag }}
+                {{ filter_form.player }}
+              </div>
+              <div class="col-md-3">
+                {{ filter_form.season.label_tag }}
+                {{ filter_form.season }}
+              </div>
+              <div class="col-md-2">
+                {{ filter_form.min_goals.label_tag }}
+                {{ filter_form.min_goals }}
+              </div>
+              <div class="col-md-2">
+                {{ filter_form.min_assists.label_tag }}
+                {{ filter_form.min_assists }}
+              </div>
+              <div class="col-md-2">
+                <label>&nbsp;</label>
+                <div>
+                  <button type="submit" class="btn btn-primary">{% trans "Filtrar" %}</button>
+                  <a href="{% url 'matches:player_stats_list' %}" class="btn btn-secondary">{% trans "Limpiar" %}</a>
+                </div>
+              </div>
+            </div>
+          </form>
+
+          <!-- Tabla de estadísticas -->
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>{% trans "Jugador" %}</th>
+                  <th>{% trans "Partido" %}</th>
+                  <th>{% trans "Fecha" %}</th>
+                  <th>{% trans "Estado" %}</th>
+                  <th>{% trans "Asistió" %}</th>
+                  <th>{% trans "Min." %}</th>
+                  <th>{% trans "Goles" %}</th>
+                  <th>{% trans "Asist." %}</th>
+                  <th>{% trans "T.A." %}</th>
+                  <th>{% trans "T.R." %}</th>
+                  <th>{% trans "Calif." %}</th>
+                  <th>{% trans "Acciones" %}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for stat in stats %}
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      {% if stat.player.photo %}
+                      <img src="{{ stat.player.photo.url }}" class="rounded-circle me-2" width="32" height="32">
+                      {% endif %}
+                      <div>
+                        <strong>{{ stat.player.full_name }}</strong>
+                        {% if stat.player.sport_name %}
+                        <br><small class="text-muted">"{{ stat.player.sport_name }}"</small>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <a href="{% url 'matches:match_detail' stat.match.pk %}">
+                      {{ stat.match.away_team.name }}
+                    </a>
+                    <br>
+                    <small class="text-muted">
+                      {% if stat.match.is_home %}
+                      <i class="bi bi-house"></i> {% trans "Local" %}
+                      {% else %}
+                      <i class="bi bi-airplane"></i> {% trans "Visitante" %}
+                      {% endif %}
+                    </small>
+                  </td>
+                  <td>{{ stat.match.match_date|date:"d/m/Y H:i" }}</td>
+                  <td>
+                    {% if stat.status == 'starter' %}
+                    <span class="badge bg-success">{% trans "Titular" %}</span>
+                    {% elif stat.status == 'substitute' %}
+                    <span class="badge bg-info">{% trans "Suplente" %}</span>
+                    {% elif stat.status == 'bench' %}
+                    <span class="badge bg-warning">{% trans "Banquillo" %}</span>
+                    {% else %}
+                    <span class="badge bg-secondary">{% trans "No disponible" %}</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-center">
+                    {% if stat.attended %}
+                    <i class="bi bi-check-circle text-success" title="{% trans 'Asistió' %}"></i>
+                    {% else %}
+                    <i class="bi bi-x-circle text-danger" title="{% trans 'No asistió' %}"></i>
+                    {% endif %}
+                  </td>
+                  <td>{{ stat.minutes_played }}'</td>
+                  <td>
+                    {% if stat.goals > 0 %}
+                    <span class="badge bg-success">{{ stat.goals }}</span>
+                    {% else %}
+                    -
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if stat.assists > 0 %}
+                    <span class="badge bg-primary">{{ stat.assists }}</span>
+                    {% else %}
+                    -
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if stat.yellow_cards > 0 %}
+                    <span class="badge bg-warning">{{ stat.yellow_cards }}</span>
+                    {% else %}
+                    -
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if stat.red_cards > 0 %}
+                    <span class="badge bg-danger">{{ stat.red_cards }}</span>
+                    {% else %}
+                    -
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if stat.rating %}
+                    {{ stat.rating }}/10
+                    {% else %}
+                    -
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="btn-group btn-group-sm">
+                      <a href="{% url 'matches:player_stats_detail' stat.pk %}" class="btn btn-light"
+                        title="{% trans 'Ver detalle' %}">
+                        <i class="bi bi-eye"></i>
+                      </a>
+                      <a href="{% url 'matches:player_stats_update' stat.pk %}" class="btn btn-primary"
+                        title="{% trans 'Editar' %}">
+                        <i class="bi bi-pencil"></i>
+                      </a>
+                      <a href="{% url 'matches:player_stats_delete' stat.pk %}" class="btn btn-danger"
+                        title="{% trans 'Eliminar' %}"
+                        onclick="return confirm('{% trans "¿Está seguro de que desea eliminar estas estadísticas?" %}')">
+                        <i class="bi bi-trash"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="12" class="text-center text-muted py-4">
+                    {% trans "No se encontraron estadísticas de jugadores" %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Paginación -->
+          {% if is_paginated %}
+          <nav aria-label="{% trans 'Paginación' %}">
+            <ul class="pagination justify-content-center">
+              {% if page_obj.has_previous %}
+              <li class="page-item">
+                <a class="page-link"
+                  href="?page={{ page_obj.previous_page_number }}{% if request.GET.player %}&player={{ request.GET.player }}{% endif %}{% if request.GET.season %}&season={{ request.GET.season }}{% endif %}{% if request.GET.min_goals %}&min_goals={{ request.GET.min_goals }}{% endif %}{% if request.GET.min_assists %}&min_assists={{ request.GET.min_assists }}{% endif %}">{% trans "Anterior" %}</a>
+              </li>
+              {% endif %}
+
+              <li class="page-item active">
+                <span class="page-link">
+                  {% trans "Página" %} {{ page_obj.number }} {% trans "de" %} {{ page_obj.paginator.num_pages }}
+                </span>
+              </li>
+
+              {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link"
+                  href="?page={{ page_obj.next_page_number }}{% if request.GET.player %}&player={{ request.GET.player }}{% endif %}{% if request.GET.season %}&season={{ request.GET.season }}{% endif %}{% if request.GET.min_goals %}&min_goals={{ request.GET.min_goals }}{% endif %}{% if request.GET.min_assists %}&min_assists={{ request.GET.min_assists }}{% endif %}">{% trans "Siguiente" %}</a>
+              </li>
+              {% endif %}
+            </ul>
+          </nav>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

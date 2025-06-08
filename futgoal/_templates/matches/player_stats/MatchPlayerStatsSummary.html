@@ -1,0 +1,348 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">{% trans "Resumen de Estadísticas" %}</h3>
+          <div class="card-toolbar">
+            {% if selected_season %}
+            <span class="badge bg-primary">{{ selected_season.name }}</span>
+            {% else %}
+            <span class="badge bg-secondary">{% trans "Todas las temporadas" %}</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="card-body">
+          <!-- Filtros de Temporada -->
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <form method="get" class="d-flex align-items-end">
+                <div class="me-2">
+                  <label class="form-label">{% trans "Temporada" %}</label>
+                  <select name="season" class="form-select">
+                    <option value="">{% trans "Todas las temporadas" %}</option>
+                    {% for season in seasons %}
+                    <option value="{{ season.pk }}" {% if season.pk == selected_season.pk %}selected{% endif %}>
+                      {{ season.name }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                  <i class="bi bi-funnel"></i>
+                  {% trans "Filtrar" %}
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Rankings -->
+          <div class="row">
+            <!-- Top Goleadores -->
+            <div class="col-lg-6 col-xl-3 mb-4">
+              <div class="card border-0 bg-success bg-opacity-10">
+                <div class="card-header bg-success text-white">
+                  <h6 class="card-title mb-0">
+                    <i class="bi bi-trophy me-2"></i>
+                    {% trans "Top Goleadores" %}
+                  </h6>
+                </div>
+                <div class="card-body p-0">
+                  {% if top_scorers %}
+                  <div class="list-group list-group-flush">
+                    {% for player_stat in top_scorers %}
+                    <div class="list-group-item d-flex align-items-center">
+                      <div class="badge bg-success me-2">{{ forloop.counter }}</div>
+                      {% if player_stat.player__photo %}
+                      <img src="{{ player_stat.player__photo }}" class="rounded-circle me-2" width="24" height="24"
+                        alt="{{ player_stat.player__full_name }}">
+                      {% else %}
+                      <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-2"
+                        style="width: 24px; height: 24px;">
+                        <i class="bi bi-person-fill text-white" style="font-size: 0.7rem;"></i>
+                      </div>
+                      {% endif %}
+                      <div class="flex-grow-1">
+                        <div class="fw-bold small">{{ player_stat.player__full_name }}</div>
+                        <div class="text-muted" style="font-size: 0.75rem;">{{ player_stat.total_goals }}
+                          {% trans "goles" %}</div>
+                      </div>
+                    </div>
+                    {% endfor %}
+                  </div>
+                  {% else %}
+                  <div class="p-3 text-center text-muted">
+                    {% trans "No hay datos disponibles" %}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Top Asistentes -->
+            <div class="col-lg-6 col-xl-3 mb-4">
+              <div class="card border-0 bg-info bg-opacity-10">
+                <div class="card-header bg-info text-white">
+                  <h6 class="card-title mb-0">
+                    <i class="bi bi-hand-thumbs-up me-2"></i>
+                    {% trans "Top Asistentes" %}
+                  </h6>
+                </div>
+                <div class="card-body p-0">
+                  {% if top_assisters %}
+                  <div class="list-group list-group-flush">
+                    {% for player_stat in top_assisters %}
+                    <div class="list-group-item d-flex align-items-center">
+                      <div class="badge bg-info me-2">{{ forloop.counter }}</div>
+                      {% if player_stat.player__photo %}
+                      <img src="{{ player_stat.player__photo }}" class="rounded-circle me-2" width="24" height="24"
+                        alt="{{ player_stat.player__full_name }}">
+                      {% else %}
+                      <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-2"
+                        style="width: 24px; height: 24px;">
+                        <i class="bi bi-person-fill text-white" style="font-size: 0.7rem;"></i>
+                      </div>
+                      {% endif %}
+                      <div class="flex-grow-1">
+                        <div class="fw-bold small">{{ player_stat.player__full_name }}</div>
+                        <div class="text-muted" style="font-size: 0.75rem;">{{ player_stat.total_assists }}
+                          {% trans "asistencias" %}</div>
+                      </div>
+                    </div>
+                    {% endfor %}
+                  </div>
+                  {% else %}
+                  <div class="p-3 text-center text-muted">
+                    {% trans "No hay datos disponibles" %}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Más Tarjetas -->
+            <div class="col-lg-6 col-xl-3 mb-4">
+              <div class="card border-0 bg-warning bg-opacity-10">
+                <div class="card-header bg-warning text-dark">
+                  <h6 class="card-title mb-0">
+                    <i class="bi bi-square-fill me-2"></i>
+                    {% trans "Más Tarjetas" %}
+                  </h6>
+                </div>
+                <div class="card-body p-0">
+                  {% if most_carded %}
+                  <div class="list-group list-group-flush">
+                    {% for player_stat in most_carded %}
+                    <div class="list-group-item d-flex align-items-center">
+                      <div class="badge bg-warning text-dark me-2">{{ forloop.counter }}</div>
+                      {% if player_stat.player__photo %}
+                      <img src="{{ player_stat.player__photo }}" class="rounded-circle me-2" width="24" height="24"
+                        alt="{{ player_stat.player__full_name }}">
+                      {% else %}
+                      <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-2"
+                        style="width: 24px; height: 24px;">
+                        <i class="bi bi-person-fill text-white" style="font-size: 0.7rem;"></i>
+                      </div>
+                      {% endif %}
+                      <div class="flex-grow-1">
+                        <div class="fw-bold small">{{ player_stat.player__full_name }}</div>
+                        <div class="text-muted" style="font-size: 0.75rem;">
+                          {{ player_stat.total_cards }} {% trans "tarjetas" %}
+                          ({{ player_stat.total_yellow_cards }}<i
+                            class="bi bi-square-fill text-warning ms-1 me-1"></i>{{ player_stat.total_red_cards }}<i
+                            class="bi bi-square-fill text-danger ms-1"></i>)
+                        </div>
+                      </div>
+                    </div>
+                    {% endfor %}
+                  </div>
+                  {% else %}
+                  <div class="p-3 text-center text-muted">
+                    {% trans "No hay datos disponibles" %}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Más Minutos -->
+            <div class="col-lg-6 col-xl-3 mb-4">
+              <div class="card border-0 bg-primary bg-opacity-10">
+                <div class="card-header bg-primary text-white">
+                  <h6 class="card-title mb-0">
+                    <i class="bi bi-clock me-2"></i>
+                    {% trans "Más Minutos" %}
+                  </h6>
+                </div>
+                <div class="card-body p-0">
+                  {% if most_minutes %}
+                  <div class="list-group list-group-flush">
+                    {% for player_stat in most_minutes %}
+                    <div class="list-group-item d-flex align-items-center">
+                      <div class="badge bg-primary me-2">{{ forloop.counter }}</div>
+                      {% if player_stat.player__photo %}
+                      <img src="{{ player_stat.player__photo }}" class="rounded-circle me-2" width="24" height="24"
+                        alt="{{ player_stat.player__full_name }}">
+                      {% else %}
+                      <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-2"
+                        style="width: 24px; height: 24px;">
+                        <i class="bi bi-person-fill text-white" style="font-size: 0.7rem;"></i>
+                      </div>
+                      {% endif %}
+                      <div class="flex-grow-1">
+                        <div class="fw-bold small">{{ player_stat.player__full_name }}</div>
+                        <div class="text-muted" style="font-size: 0.75rem;">{{ player_stat.total_minutes }}
+                          {% trans "minutos" %}</div>
+                      </div>
+                    </div>
+                    {% endfor %}
+                  </div>
+                  {% else %}
+                  <div class="p-3 text-center text-muted">
+                    {% trans "No hay datos disponibles" %}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Estadísticas Generales -->
+          <div class="row mt-4">
+            <div class="col-12">
+              <h5>{% trans "Estadísticas Generales" %}</h5>
+              <hr>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-2 col-sm-4 col-6">
+              <div class="card text-center border-0 bg-light">
+                <div class="card-body">
+                  <i class="bi bi-people text-primary" style="font-size: 2rem;"></i>
+                  <h3 class="text-primary">{{ general_stats.total_players }}</h3>
+                  <p class="text-muted small">{% trans "Jugadores" %}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-2 col-sm-4 col-6">
+              <div class="card text-center border-0 bg-light">
+                <div class="card-body">
+                  <i class="bi bi-calendar-event text-info" style="font-size: 2rem;"></i>
+                  <h3 class="text-info">{{ general_stats.total_matches }}</h3>
+                  <p class="text-muted small">{% trans "Partidos" %}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-2 col-sm-4 col-6">
+              <div class="card text-center border-0 bg-light">
+                <div class="card-body">
+                  <i class="bi bi-trophy text-success" style="font-size: 2rem;"></i>
+                  <h3 class="text-success">{{ general_stats.total_goals }}</h3>
+                  <p class="text-muted small">{% trans "Goles Totales" %}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-2 col-sm-4 col-6">
+              <div class="card text-center border-0 bg-light">
+                <div class="card-body">
+                  <i class="bi bi-hand-thumbs-up text-info" style="font-size: 2rem;"></i>
+                  <h3 class="text-info">{{ general_stats.total_assists }}</h3>
+                  <p class="text-muted small">{% trans "Asistencias Totales" %}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-2 col-sm-4 col-6">
+              <div class="card text-center border-0 bg-light">
+                <div class="card-body">
+                  <i class="bi bi-square-fill text-warning" style="font-size: 2rem;"></i>
+                  <h3 class="text-warning">{{ general_stats.total_yellow_cards }}</h3>
+                  <p class="text-muted small">{% trans "T. Amarillas" %}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-2 col-sm-4 col-6">
+              <div class="card text-center border-0 bg-light">
+                <div class="card-body">
+                  <i class="bi bi-square-fill text-danger" style="font-size: 2rem;"></i>
+                  <h3 class="text-danger">{{ general_stats.total_red_cards }}</h3>
+                  <p class="text-muted small">{% trans "T. Rojas" %}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Promedios -->
+          <div class="row mt-4">
+            <div class="col-12">
+              <h6>{% trans "Promedios por Partido" %}</h6>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-3 col-sm-6">
+              <div class="card text-center border-0 bg-success bg-opacity-10">
+                <div class="card-body py-2">
+                  <h5 class="text-success mb-0">{{ general_stats.avg_goals_per_match|floatformat:1 }}</h5>
+                  <small class="text-muted">{% trans "Goles/Partido" %}</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+              <div class="card text-center border-0 bg-info bg-opacity-10">
+                <div class="card-body py-2">
+                  <h5 class="text-info mb-0">{{ general_stats.avg_assists_per_match|floatformat:1 }}</h5>
+                  <small class="text-muted">{% trans "Asistencias/Partido" %}</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+              <div class="card text-center border-0 bg-warning bg-opacity-10">
+                <div class="card-body py-2">
+                  <h5 class="text-warning mb-0">{{ general_stats.avg_yellow_cards_per_match|floatformat:1 }}</h5>
+                  <small class="text-muted">{% trans "T.A./Partido" %}</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+              <div class="card text-center border-0 bg-danger bg-opacity-10">
+                <div class="card-body py-2">
+                  <h5 class="text-danger mb-0">{{ general_stats.avg_red_cards_per_match|floatformat:1 }}</h5>
+                  <small class="text-muted">{% trans "T.R./Partido" %}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <a href="{% url 'matches:player_stats_list' %}" class="btn btn-secondary">
+                <i class="bi bi-list"></i>
+                {% trans "Ver Lista Completa" %}
+              </a>
+            </div>
+            <div class="text-muted small">
+              {% trans "Última actualización:" %} {{ now|date:"d/m/Y H:i" }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

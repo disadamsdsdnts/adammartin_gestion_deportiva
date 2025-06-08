@@ -1,9 +1,11 @@
 from django.urls import path
 from . import views
+from .views import match_player_stats_views
 
 app_name = 'matches'
 
 urlpatterns = [
+    # Matches URLs
     path('', views.AllMatchListView.as_view(), name='match_list'),
     path('all/', views.AllMatchListView.as_view(), name='all_match_list'),
     path('upcoming/', views.UpcomingMatchListView.as_view(), name='upcoming_match_list'),
@@ -21,10 +23,22 @@ urlpatterns = [
     path('<int:pk>/', views.MatchDetailView.as_view(), name='match_detail'),
     path('<int:pk>/edit/', views.MatchUpdateView.as_view(), name='match_update'),
     path('<int:pk>/delete/', views.MatchDeleteView.as_view(), name='match_delete'),
+
+    # Match Notes URLs
     path('notes/', views.MatchNoteListView.as_view(), name='match_note_list'),
     path('<int:match_id>/notes/create/', views.MatchNoteCreateView.as_view(), name='match_note_create'),
     path('notes/<int:pk>/', views.MatchNoteDetailView.as_view(), name='match_note_detail'),
     path('notes/<int:pk>/edit/', views.MatchNoteUpdateView.as_view(), name='match_note_update'),
     path('notes/<int:pk>/delete/', views.MatchNoteDeleteView.as_view(), name='match_note_delete'),
     path('notes/<int:pk>/delete-ajax/', views.delete_match_note_ajax, name='match_note_delete_ajax'),
+
+    # Player Stats URLs
+    path('player-stats/', match_player_stats_views.MatchPlayerStatsListView.as_view(), name='player_stats_list'),
+    path('player-stats/create/', match_player_stats_views.MatchPlayerStatsCreateView.as_view(), name='player_stats_create'),
+    path('player-stats/<int:pk>/', match_player_stats_views.MatchPlayerStatsDetailView.as_view(), name='player_stats_detail'),
+    path('player-stats/<int:pk>/edit/', match_player_stats_views.MatchPlayerStatsUpdateView.as_view(), name='player_stats_update'),
+    path('player-stats/<int:pk>/delete/', match_player_stats_views.MatchPlayerStatsDeleteView.as_view(), name='player_stats_delete'),
+    path('player-stats/summary/', match_player_stats_views.MatchPlayerStatsSummaryView.as_view(), name='player_stats_summary'),
+    path('<int:match_id>/player-stats/manage/', match_player_stats_views.MatchPlayerStatsManageView.as_view(), name='player_stats_manage'),
+    path('player-stats/quick-add/', match_player_stats_views.MatchPlayerStatsQuickAddView.as_view(), name='player_stats_quick_add'),
 ]

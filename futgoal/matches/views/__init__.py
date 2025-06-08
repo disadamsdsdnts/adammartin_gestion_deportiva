@@ -25,8 +25,20 @@ from .match_note_views import (
     MatchNoteDeleteView,
     delete_match_note_ajax
 )
+from .match_player_stats_views import (
+    MatchPlayerStatsListView,
+    MatchPlayerStatsDetailView,
+    MatchPlayerStatsCreateView,
+    MatchPlayerStatsUpdateView,
+    MatchPlayerStatsDeleteView,
+    MatchPlayerStatsManageView,
+    MatchPlayerStatsSummaryView,
+    PlayerStatsHistoryView,
+    MatchPlayerStatsQuickAddView,
+)
 
 __all__ = [
+    # Match views
     'UpcomingMatchListView',
     'PreviousMatchListView',
     'InProgressMatchListView',
@@ -40,10 +52,24 @@ __all__ = [
     'MatchImportView',
     'MatchImportCSVTemplateView',
     'MatchProcessCSVView',
+    'MatchBulkDataImportView',
+    'MatchBulkDataExportView',
+    'MatchBulkDataProcessCSVView',
+    # Match note views
     'MatchNoteListView',
     'MatchNoteDetailView',
     'MatchNoteCreateView',
     'MatchNoteUpdateView',
     'MatchNoteDeleteView',
-    'delete_match_note_ajax'
+    'delete_match_note_ajax',
+    # Player stats views
+    'MatchPlayerStatsListView',
+    'MatchPlayerStatsDetailView',
+    'MatchPlayerStatsCreateView',
+    'MatchPlayerStatsUpdateView',
+    'MatchPlayerStatsDeleteView',
+    'MatchPlayerStatsManageView',
+    'MatchPlayerStatsSummaryView',
+    'PlayerStatsHistoryView',
+    'MatchPlayerStatsQuickAddView',
 ]
