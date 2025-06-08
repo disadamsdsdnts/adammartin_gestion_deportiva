@@ -6,7 +6,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}{% if page_title %}{{ page_title }} | {% endif %}FutGoal{% endblock %}</title>
+  <meta name="keywords"
+    content="fútbol, gestión deportiva, equipos, entrenadores, jugadores, DAW, Django, estadística deportiva" />
+  <meta name="theme-color" content="#22c55e" />
 
+  <!-- Open Graph (Facebook, LinkedIn) -->
+  <meta property="og:title" content="FutGOAL – Gestión de equipos de fútbol" />
+  <meta property="og:description"
+    content="Gestiona tu equipo de fútbol con FutGOAL: jugadores, partidos, temporadas y estadísticas." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://futgoal.adammartin.es/" />
+  <meta property="og:image" content="https://futgoal.adammartin.es/images/futgoal-og.jpg" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="FutGOAL – Gestión de equipos de fútbol" />
+  <meta name="twitter:description"
+    content="Gestiona tu equipo de fútbol con FutGOAL: jugadores, partidos, temporadas y estadísticas." />
+  <meta name="twitter:image" content="https://futgoal.adammartin.es/images/futgoal-og.jpg" />
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="{% static 'favicon/favicon-96x96.png' %}" sizes="96x96" />
   <link rel="icon" type="image/svg+xml" href="{% static 'favicon/favicon.svg' %}" />
@@ -24,11 +41,13 @@
   <!-- Dark mode script -->
   <script>
     // On page load or when changing themes, best to add inline in `head` to avoid FOUC
-    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia(
+        '(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark')
     }
+
   </script>
 
 </head>
@@ -84,7 +103,8 @@
     var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
 
     // Change the icons inside the button based on previous settings
-    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia(
+        '(prefers-color-scheme: dark)').matches)) {
       themeToggleLightIcon.classList.remove('hidden');
     } else {
       themeToggleDarkIcon.classList.remove('hidden');
@@ -117,6 +137,7 @@
         }
       }
     });
+
   </script>
 </body>
 
