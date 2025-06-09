@@ -19,15 +19,11 @@ services:
       - ./.envs/.dev/.django  # Variables específicas de Django
       - ./.envs/.dev/.email   # Variables de configuración de email
       - ./.envs/.dev/.ubuntu  # Variables específicas del sistema
+      - ./.envs/.dev/.postgres  # Variables de configuración de la base de datos
 
-    # Variables de entorno para la base de datos
+    # Variables de entorno para desarrollo
     environment:
       - DEBUG=True  # Modo debug activado para desarrollo
-      - DB_NAME=futgoal  # Nombre de la base de datos
-      - DB_USER=postgres  # Usuario de la base de datos
-      - DB_PASSWORD=postgres  # Contraseña de la base de datos
-      - DB_HOST=db  # Nombre del servicio de base de datos
-      - DB_PORT=5432  # Puerto de PostgreSQL
 
     # Mapeo de puertos host:contenedor
     ports:
@@ -42,10 +38,8 @@ services:
     image: postgis/postgis:15-3.3  # Imagen oficial de PostgreSQL con PostGIS
     volumes:
       - postgres_data:/var/lib/postgresql/data  # Persistencia de datos
-    environment:
-      - POSTGRES_DB=futgoal  # Nombre de la base de datos a crear
-      - POSTGRES_USER=postgres  # Usuario administrador
-      - POSTGRES_PASSWORD=postgres  # Contraseña del usuario
+    env_file:
+      - ./.envs/.dev/.postgres  # Variables de configuración de la base de datos
     ports:
       - "5432:5432"  # Expone el puerto de PostgreSQL
 
