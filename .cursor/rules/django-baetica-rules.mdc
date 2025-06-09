@@ -5,7 +5,9 @@ alwaysApply: true
 ---
 # Reglas y Buenas Prácticas del Proyecto
 
-Este documento describe las reglas y buenas prácticas que se siguen en este proyecto Django.
+Este documento describe las reglas y buenas prácticas que se siguen en este proyecto Django en Docker.
+
+Recuerda siempre que, si quieres ejecutar un comando, tendrás que hacerlo con: docker-compose -f dev.yml run --rm django python manage.py {args}
 
 ## 1. Estructura del Proyecto
 - Organización modular por aplicaciones (futgoal/, users/, configuration/, etc.)
