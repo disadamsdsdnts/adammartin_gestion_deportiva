@@ -147,7 +147,8 @@ class DashboardView(TemplateView):
         context['upcoming_birthdays'] = upcoming_birthdays[:5]
 
         # Obtener estadísticas de la temporada actual
-        from django.db.models import Q, Count
+        from django.db.models import Q, Count, Sum
+        from futgoal.matches.models import MatchPlayerStats
 
         if active_season:
             # Obtener todos los partidos de la temporada actual
@@ -196,9 +197,65 @@ class DashboardView(TemplateView):
             }
 
             context['season_stats'] = season_stats
+
+            # Obtener top 5 goleadores de la temporada
+            top_scorers = MatchPlayerStats.objects.filter(
+                match__season=active_season
+            ).values(
+                'player__id',
+                'player__first_name',
+                'player__last_name',
+                'player__sport_name',
+                'player__photo'
+            ).annotate(
+                total_goals=Sum('goals'),
+                matches_played=Count('match', distinct=True)
+            ).filter(
+                total_goals__gt=0
+            ).order_by('-total_goals')[:5]
+
+            # Obtener top 5 jugadores con más tarjetas amarillas
+            top_yellow_cards = MatchPlayerStats.objects.filter(
+                match__season=active_season
+            ).values(
+                'player__id',
+                'player__first_name',
+                'player__last_name',
+                'player__sport_name',
+                'player__photo'
+            ).annotate(
+                total_yellow_cards=Sum('yellow_cards'),
+                matches_played=Count('match', distinct=True)
+            ).filter(
+                total_yellow_cards__gt=0
+            ).order_by('-total_yellow_cards')[:5]
+
+            # Obtener top 5 jugadores con más tarjetas rojas
+            top_red_cards = MatchPlayerStats.objects.filter(
+                match__season=active_season
+            ).values(
+                'player__id',
+                'player__first_name',
+                'player__last_name',
+                'player__sport_name',
+                'player__photo'
+            ).annotate(
+                total_red_cards=Sum('red_cards'),
+                matches_played=Count('match', distinct=True)
+            ).filter(
+                total_red_cards__gt=0
+            ).order_by('-total_red_cards')[:5]
+
+            context['top_scorers'] = top_scorers
+            context['top_yellow_cards'] = top_yellow_cards
+            context['top_red_cards'] = top_red_cards
+
         else:
             # Si no hay temporada activa, no mostrar estadísticas
             context['season_stats'] = None
+            context['top_scorers'] = []
+            context['top_yellow_cards'] = []
+            context['top_red_cards'] = []
 
         return context
 

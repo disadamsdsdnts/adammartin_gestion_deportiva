@@ -5,7 +5,7 @@
 
 <!-- Dashboard Cards Grid -->
 <div class="">
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 mb-8">
 
     <!-- Próximos Partidos Card -->
     <div class="w-full p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
@@ -294,6 +294,221 @@
                 clip-rule="evenodd"></path>
             </svg>
           </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Segunda fila con estadísticas de jugadores -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+
+    <!-- Top 5 Goleadores Card -->
+    <div class="w-full p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+      <div class="flex items-center justify-between mb-4">
+        <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white">{% trans 'Top Goleadores' %}</h5>
+        <a href="{% url 'matches:player_stats_summary' %}"
+          class="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">
+          {% trans 'Ver más' %}
+        </a>
+      </div>
+
+      <div class="flow-root">
+        {% if top_scorers %}
+        <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+          {% for scorer in top_scorers %}
+          <li class="py-3 sm:py-4">
+            <div class="flex items-center">
+              <!-- Foto del jugador -->
+              <div class="shrink-0">
+                {% if scorer.player__photo %}
+                <img class="w-8 h-8 rounded-full" src="{{ scorer.player__photo }}"
+                  alt="{% if scorer.player__sport_name %}{{ scorer.player__sport_name }}{% else %}{{ scorer.player__first_name }}{% endif %}">
+                {% else %}
+                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                      clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                {% endif %}
+              </div>
+
+              <!-- Información del jugador -->
+              <div class="flex-1 min-w-0 ms-4">
+                <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                  {% if scorer.player__sport_name %}
+                  {{ scorer.player__sport_name }}
+                  {% else %}
+                  {{ scorer.player__first_name }} {{ scorer.player__last_name }}
+                  {% endif %}
+                </p>
+                <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                  {{ scorer.matches_played }} partido{% if scorer.matches_played != 1 %}s{% endif %}
+                </p>
+              </div>
+
+              <!-- Goles -->
+              <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                <span
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                  ⚽ {{ scorer.total_goals }}
+                </span>
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <div class="text-center py-8">
+          <svg class="w-12 h-12 mx-auto text-gray-400 dark:text-gray-500 mb-4" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+            </path>
+          </svg>
+          <p class="text-sm text-gray-500 dark:text-gray-400">{% trans 'No hay goles registrados' %}</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Top 5 Tarjetas Amarillas Card -->
+    <div class="w-full p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+      <div class="flex items-center justify-between mb-4">
+        <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white">{% trans 'Tarjetas Amarillas' %}</h5>
+        <a href="{% url 'matches:player_stats_summary' %}"
+          class="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">
+          {% trans 'Ver más' %}
+        </a>
+      </div>
+
+      <div class="flow-root">
+        {% if top_yellow_cards %}
+        <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+          {% for player in top_yellow_cards %}
+          <li class="py-3 sm:py-4">
+            <div class="flex items-center">
+              <!-- Foto del jugador -->
+              <div class="shrink-0">
+                {% if player.player__photo %}
+                <img class="w-8 h-8 rounded-full" src="{{ player.player__photo }}"
+                  alt="{% if player.player__sport_name %}{{ player.player__sport_name }}{% else %}{{ player.player__first_name }}{% endif %}">
+                {% else %}
+                <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                      clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                {% endif %}
+              </div>
+
+              <!-- Información del jugador -->
+              <div class="flex-1 min-w-0 ms-4">
+                <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                  {% if player.player__sport_name %}
+                  {{ player.player__sport_name }}
+                  {% else %}
+                  {{ player.player__first_name }} {{ player.player__last_name }}
+                  {% endif %}
+                </p>
+                <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                  {{ player.matches_played }} partido{% if player.matches_played != 1 %}s{% endif %}
+                </p>
+              </div>
+
+              <!-- Tarjetas -->
+              <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                <span
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
+                  🟨 {{ player.total_yellow_cards }}
+                </span>
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <div class="text-center py-8">
+          <svg class="w-12 h-12 mx-auto text-gray-400 dark:text-gray-500 mb-4" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+            </path>
+          </svg>
+          <p class="text-sm text-gray-500 dark:text-gray-400">{% trans 'No hay tarjetas amarillas registradas' %}</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Top 5 Tarjetas Rojas Card -->
+    <div class="w-full p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
+      <div class="flex items-center justify-between mb-4">
+        <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white">{% trans 'Tarjetas Rojas' %}</h5>
+        <a href="{% url 'matches:player_stats_summary' %}"
+          class="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">
+          {% trans 'Ver más' %}
+        </a>
+      </div>
+
+      <div class="flow-root">
+        {% if top_red_cards %}
+        <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+          {% for player in top_red_cards %}
+          <li class="py-3 sm:py-4">
+            <div class="flex items-center">
+              <!-- Foto del jugador -->
+              <div class="shrink-0">
+                {% if player.player__photo %}
+                <img class="w-8 h-8 rounded-full" src="{{ player.player__photo }}"
+                  alt="{% if player.player__sport_name %}{{ player.player__sport_name }}{% else %}{{ player.player__first_name }}{% endif %}">
+                {% else %}
+                <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                      clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                {% endif %}
+              </div>
+
+              <!-- Información del jugador -->
+              <div class="flex-1 min-w-0 ms-4">
+                <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                  {% if player.player__sport_name %}
+                  {{ player.player__sport_name }}
+                  {% else %}
+                  {{ player.player__first_name }} {{ player.player__last_name }}
+                  {% endif %}
+                </p>
+                <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                  {{ player.matches_played }} partido{% if player.matches_played != 1 %}s{% endif %}
+                </p>
+              </div>
+
+              <!-- Tarjetas -->
+              <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+                <span
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
+                  🟥 {{ player.total_red_cards }}
+                </span>
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <div class="text-center py-8">
+          <svg class="w-12 h-12 mx-auto text-gray-400 dark:text-gray-500 mb-4" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+            </path>
+          </svg>
+          <p class="text-sm text-gray-500 dark:text-gray-400">{% trans 'No hay tarjetas rojas registradas' %}</p>
         </div>
         {% endif %}
       </div>
