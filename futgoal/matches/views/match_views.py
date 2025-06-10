@@ -303,7 +303,6 @@ class MatchDeleteView(DeleteView):
 
         context['page_title'] = _("Eliminar Partido")
         context['breadcrumbs'] = [
-            {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Partidos'), 'url': reverse('matches:match_list')},
             {'title': _('Eliminar')},
         ]

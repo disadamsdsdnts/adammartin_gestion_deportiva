@@ -73,7 +73,6 @@ class MatchPlayerStatsListView(ListView):
         context = super().get_context_data(**kwargs)
         context['page_title'] = _('Estadísticas de Jugadores')
         context['breadcrumbs'] = [
-            {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Partidos'), 'url': reverse('matches:match_list')},
             {'title': _('Estadísticas de Jugadores')},
         ]
@@ -100,7 +99,6 @@ class MatchPlayerStatsDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['page_title'] = f"{_('Estadísticas')} - {self.object.player.full_name}"
         context['breadcrumbs'] = [
-            {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Partidos'), 'url': reverse('matches:match_list')},
             {'title': _('Estadísticas'), 'url': reverse('matches:player_stats_list')},
             {'title': self.object.player.full_name},
@@ -136,7 +134,6 @@ class MatchPlayerStatsCreateView(CreateView):
             context['page_title'] = _('Agregar Estadísticas de Jugador')
 
         context['breadcrumbs'] = [
-            {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Partidos'), 'url': reverse('matches:match_list')},
             {'title': _('Estadísticas'), 'url': reverse('matches:player_stats_list')},
             {'title': _('Agregar')},
@@ -179,7 +176,6 @@ class MatchPlayerStatsUpdateView(UpdateView):
         context = super().get_context_data(**kwargs)
         context['page_title'] = f"{_('Editar Estadísticas')} - {self.object.player.full_name}"
         context['breadcrumbs'] = [
-            {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Partidos'), 'url': reverse('matches:match_list')},
             {'title': _('Estadísticas'), 'url': reverse('matches:player_stats_list')},
             {'title': self.object.player.full_name, 'url': reverse('matches:player_stats_detail', kwargs={'pk': self.object.pk})},
@@ -206,7 +202,6 @@ class MatchPlayerStatsDeleteView(DeleteView):
         context = super().get_context_data(**kwargs)
         context['page_title'] = f"{_('Eliminar Estadísticas')} - {self.object.player.full_name}"
         context['breadcrumbs'] = [
-            {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Partidos'), 'url': reverse('matches:match_list')},
             {'title': _('Estadísticas'), 'url': reverse('matches:player_stats_list')},
             {'title': _('Eliminar')},
@@ -230,7 +225,7 @@ class MatchPlayerStatsManageView(View):
             'formset': formset,
             'page_title': f"{_('Gestionar Estadísticas')} - {match}",
             'breadcrumbs': [
-                {'title': _('Dashboard'), 'url': reverse('dashboard')},
+
                 {'title': _('Partidos'), 'url': reverse('matches:match_list')},
                 {'title': str(match), 'url': reverse('matches:match_detail', kwargs={'pk': match.pk})},
                 {'title': _('Gestionar Estadísticas')},
@@ -389,7 +384,7 @@ class MatchPlayerStatsSummaryView(TemplateView):
         context.update({
             'page_title': _('Resumen de Estadísticas'),
             'breadcrumbs': [
-                {'title': _('Dashboard'), 'url': reverse('dashboard')},
+
                 {'title': _('Partidos'), 'url': reverse('matches:match_list')},
                 {'title': _('Estadísticas'), 'url': reverse('matches:player_stats_list')},
                 {'title': _('Resumen')},
@@ -446,7 +441,7 @@ class PlayerStatsHistoryView(DetailView):
         context.update({
             'page_title': f"{_('Historial de')} {self.object.full_name}",
             'breadcrumbs': [
-                {'title': _('Dashboard'), 'url': reverse('dashboard')},
+
                 {'title': _('Jugadores'), 'url': reverse('players:player_list')},
                 {'title': self.object.full_name, 'url': reverse('players:player_detail', kwargs={'pk': self.object.pk})},
                 {'title': _('Historial de Estadísticas')},
@@ -510,7 +505,7 @@ class MatchPlayerStatsImportView(View):
             'form': form,
             'page_title': _('Importar Estadísticas'),
             'breadcrumbs': [
-                {'title': _('Dashboard'), 'url': reverse('dashboard')},
+
                 {'title': _('Estadísticas'), 'url': reverse('matches:player_stats_list')},
                 {'title': _('Importar')},
             ],

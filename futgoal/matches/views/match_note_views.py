@@ -40,7 +40,6 @@ class MatchNoteListView(ListView):
         context = super().get_context_data(**kwargs)
         context['page_title'] = _('Notas de Partidos')
         context['breadcrumbs'] = [
-            {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Partidos'), 'url': reverse('matches:match_list')},
             {'title': _('Notas'), 'url': reverse('matches:match_note_list')},
         ]
@@ -71,7 +70,6 @@ class MatchNoteDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['page_title'] = f"{_('Nota')}: {self.object.title}"
         context['breadcrumbs'] = [
-            {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Partidos'), 'url': reverse('matches:match_list')},
             {'title': _('Notas'), 'url': reverse('matches:match_note_list')},
             {'title': self.object.title}
@@ -102,7 +100,6 @@ class MatchNoteCreateView(CreateView):
         context['match'] = match
         context['page_title'] = _('Nueva Nota de Partido')
         context['breadcrumbs'] = [
-            {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Partidos'), 'url': reverse('matches:match_list')},
             {'title': str(match), 'url': reverse('matches:match_detail', kwargs={'pk': match.pk})},
             {'title': _('Nueva Nota')},
@@ -134,7 +131,6 @@ class MatchNoteUpdateView(UpdateView):
         context = super().get_context_data(**kwargs)
         context['page_title'] = _('Editar Nota')
         context['breadcrumbs'] = [
-            {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Partidos'), 'url': reverse('matches:match_list')},
             {'title': str(self.object.match), 'url': reverse('matches:match_detail', kwargs={'pk': self.object.match.pk})},
             {'title': _('Editar Nota')},
@@ -160,7 +156,6 @@ class MatchNoteDeleteView(DeleteView):
         context = super().get_context_data(**kwargs)
         context['page_title'] = _("Eliminar Nota")
         context['breadcrumbs'] = [
-            {'title': _('Dashboard'), 'url': reverse('dashboard')},
             {'title': _('Partidos'), 'url': reverse('matches:match_list')},
             {'title': str(self.object.match), 'url': reverse('matches:match_detail', kwargs={'pk': self.object.match.pk})},
             {'title': _('Eliminar Nota')},
