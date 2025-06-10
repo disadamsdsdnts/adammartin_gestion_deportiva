@@ -9,12 +9,11 @@ from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
-from futgoal.users.decorators import is_global_admin
 from futgoal.matches.models import Match, MatchNote
 from futgoal.matches.forms.match_note_forms import MatchNoteForm
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class MatchNoteListView(ListView):
     """Vista para listar todas las notas de partido"""
     template_name = 'matches/MatchNotesList.html'
@@ -61,7 +60,7 @@ class MatchNoteListView(ListView):
         return context
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class MatchNoteDetailView(DetailView):
     """Vista para mostrar el detalle de una nota de partido"""
     template_name = 'matches/MatchNoteDetail.html'
@@ -80,7 +79,7 @@ class MatchNoteDetailView(DetailView):
         return context
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class MatchNoteCreateView(CreateView):
     """Vista para crear una nueva nota de partido"""
     template_name = 'matches/MatchNoteCreate.html'
@@ -119,7 +118,7 @@ class MatchNoteCreateView(CreateView):
         return reverse_lazy('matches:match_detail', kwargs={'pk': self.get_match().pk})
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class MatchNoteUpdateView(UpdateView):
     """Vista para editar una nota de partido"""
     template_name = 'matches/MatchNoteUpdate.html'
@@ -151,7 +150,7 @@ class MatchNoteUpdateView(UpdateView):
         return reverse_lazy('matches:match_detail', kwargs={'pk': self.object.match.pk})
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class MatchNoteDeleteView(DeleteView):
     """Vista para eliminar una nota de partido"""
     model = MatchNote
@@ -178,8 +177,6 @@ class MatchNoteDeleteView(DeleteView):
 
 
 @login_required
-@is_global_admin
-@require_POST
 def delete_match_note_ajax(request, pk):
     """Vista AJAX para eliminar una nota de partido"""
     try:

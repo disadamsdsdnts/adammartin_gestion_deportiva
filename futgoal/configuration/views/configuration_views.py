@@ -20,14 +20,13 @@ from django.contrib.auth.decorators import login_required
 from futgoal.configuration.forms import ConfigurationUpdateForm
 from futgoal.configuration.models import Configuration
 
-from futgoal.users.decorators import is_global_admin
 from futgoal.matches.models import MatchNote, Match
 from futgoal.rivals.models import Rival
 from futgoal.players.models import Player
 from futgoal.season.models import Season
 
 
-@method_decorator([is_global_admin, ], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class ConfigurationDetailView(DetailView):
     model = Configuration
     template_name = 'configuration/ConfigurationDetail.html'
@@ -46,7 +45,7 @@ class ConfigurationDetailView(DetailView):
         return Configuration.objects.first()
 
 
-@method_decorator([is_global_admin, ], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class ConfigurationUpdateView(UpdateView):
     form_class = ConfigurationUpdateForm
     model = Configuration

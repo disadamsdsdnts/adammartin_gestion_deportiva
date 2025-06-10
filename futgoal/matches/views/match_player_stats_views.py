@@ -19,7 +19,6 @@ from django.db import transaction
 from django.core.paginator import Paginator
 from django.forms import formset_factory
 
-from futgoal.users.decorators import is_global_admin
 from futgoal.matches.models import Match, MatchPlayerStats
 from futgoal.matches.forms.match_player_stats_forms import (
     MatchPlayerStatsForm,
@@ -31,7 +30,7 @@ from futgoal.players.models import Player
 from futgoal.season.models import Season
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class MatchPlayerStatsListView(ListView):
     """Vista para listar todas las estadísticas de jugadores por partido"""
     template_name = 'matches/player_stats/MatchPlayerStatsList.html'
@@ -86,7 +85,7 @@ class MatchPlayerStatsListView(ListView):
         return context
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class MatchPlayerStatsDetailView(DetailView):
     """Vista para ver el detalle de estadísticas de un jugador en un partido"""
     template_name = 'matches/player_stats/MatchPlayerStatsDetail.html'
@@ -113,7 +112,7 @@ class MatchPlayerStatsDetailView(DetailView):
         return context
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class MatchPlayerStatsCreateView(CreateView):
     """Vista para crear estadísticas de un jugador en un partido"""
     template_name = 'matches/player_stats/MatchPlayerStatsCreate.html'
@@ -165,7 +164,7 @@ class MatchPlayerStatsCreateView(CreateView):
         return reverse_lazy('matches:player_stats_detail', kwargs={'pk': self.object.pk})
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class MatchPlayerStatsUpdateView(UpdateView):
     """Vista para editar estadísticas de un jugador en un partido"""
     template_name = 'matches/player_stats/MatchPlayerStatsUpdate.html'
@@ -193,7 +192,7 @@ class MatchPlayerStatsUpdateView(UpdateView):
         return reverse_lazy('matches:player_stats_detail', kwargs={'pk': self.object.pk})
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class MatchPlayerStatsDeleteView(DeleteView):
     """Vista para eliminar estadísticas de un jugador en un partido"""
     model = MatchPlayerStats
@@ -215,7 +214,7 @@ class MatchPlayerStatsDeleteView(DeleteView):
         return reverse_lazy('matches:player_stats_list')
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class MatchPlayerStatsManageView(View):
     """Vista para gestionar todas las estadísticas de un partido específico"""
     template_name = 'matches/player_stats/MatchPlayerStatsManage.html'
@@ -328,7 +327,7 @@ class MatchPlayerStatsManageView(View):
         return render(request, self.template_name, context)
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class MatchPlayerStatsSummaryView(TemplateView):
     """Vista para mostrar resumen y estadísticas globales de jugadores"""
     template_name = 'matches/player_stats/MatchPlayerStatsSummary.html'
@@ -402,7 +401,7 @@ class MatchPlayerStatsSummaryView(TemplateView):
         return context
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class PlayerStatsHistoryView(DetailView):
     """Vista para ver el historial de estadísticas de un jugador específico"""
     template_name = 'matches/player_stats/PlayerStatsHistory.html'
@@ -456,7 +455,7 @@ class PlayerStatsHistoryView(DetailView):
         return context
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class MatchPlayerStatsQuickAddView(View):
     """Vista AJAX para agregar estadísticas rápidamente"""
 

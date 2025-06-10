@@ -12,13 +12,12 @@ from django.views.generic import (
 )
 from django.db.models import Q
 
-from futgoal.users.decorators import is_global_admin
 from futgoal.season.models import Season
 from .models import Rival
 from .forms import RivalForm, ImportRivalsForm
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class RivalListView(ListView):
     """Vista para listar equipos rivales"""
     template_name = 'rivals/RivalsList.html'
@@ -73,7 +72,7 @@ class RivalListView(ListView):
         return context
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class RivalDetailView(DetailView):
     """Vista para ver detalle de un equipo rival"""
     template_name = 'rivals/RivalDetail.html'
@@ -105,7 +104,7 @@ class RivalDetailView(DetailView):
         return context
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class RivalCreateView(CreateView):
     """Vista para crear un nuevo equipo rival"""
     template_name = 'rivals/RivalCreate.html'
@@ -131,7 +130,7 @@ class RivalCreateView(CreateView):
         return reverse_lazy('rivals:rival_detail', kwargs={'pk': self.object.pk})
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class RivalUpdateView(UpdateView):
     """Vista para editar un equipo rival"""
     template_name = 'rivals/RivalUpdate.html'
@@ -158,7 +157,7 @@ class RivalUpdateView(UpdateView):
         return reverse_lazy('rivals:rival_detail', kwargs={'pk': self.object.pk})
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class RivalDeleteView(DeleteView):
     """Vista para eliminar un equipo rival"""
     model = Rival

@@ -20,14 +20,13 @@ import io
 from datetime import datetime
 from django.utils import timezone
 
-from futgoal.users.decorators import is_global_admin
 from futgoal.matches.models import Match
 from futgoal.matches.forms import MatchForm, MatchFilterForm, MatchImportForm
 from futgoal.season.models import Season
 from futgoal.rivals.models import Rival
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class BaseMatchListView(ListView):
     """Vista base para listar partidos con filtros"""
     template_name = 'matches/MatchesList.html'
@@ -107,7 +106,7 @@ class BaseMatchListView(ListView):
         return context
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class UpcomingMatchListView(ListView):
     """Vista para listar próximos partidos"""
     template_name = 'matches/MatchesList.html'
@@ -158,7 +157,7 @@ class UpcomingMatchListView(ListView):
         return context
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class PreviousMatchListView(ListView):
     """Vista para listar partidos anteriores"""
     template_name = 'matches/MatchesList.html'
@@ -209,7 +208,7 @@ class PreviousMatchListView(ListView):
         return context
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class MatchDetailView(DetailView):
     """Vista para ver detalle de un partido"""
     template_name = 'matches/MatchDetail.html'
@@ -241,7 +240,7 @@ class MatchDetailView(DetailView):
         return context
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class MatchCreateView(CreateView):
     """Vista para crear un nuevo partido"""
     template_name = 'matches/MatchCreate.html'
@@ -267,7 +266,7 @@ class MatchCreateView(CreateView):
         return reverse_lazy('matches:match_detail', kwargs={'pk': self.object.pk})
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class MatchUpdateView(UpdateView):
     """Vista para editar un partido"""
     template_name = 'matches/MatchUpdate.html'
@@ -293,7 +292,7 @@ class MatchUpdateView(UpdateView):
         return reverse_lazy('matches:match_detail', kwargs={'pk': self.object.pk})
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class MatchDeleteView(DeleteView):
     """Vista para eliminar un partido"""
     model = Match
@@ -320,7 +319,7 @@ class MatchDeleteView(DeleteView):
         return reverse_lazy('matches:match_list')
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class MatchImportView(View):
     """Vista para importación masiva de partidos"""
     template_name = 'matches/MatchImport.html'
@@ -409,7 +408,7 @@ class MatchImportView(View):
         return context
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class MatchImportCSVTemplateView(View):
     """Vista para descargar la plantilla CSV de importación básica"""
 
@@ -446,7 +445,7 @@ class MatchImportCSVTemplateView(View):
         return response
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class MatchProcessCSVView(View):
     """Vista para procesar el archivo CSV de partidos"""
 
@@ -585,7 +584,7 @@ class MatchProcessCSVView(View):
             })
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class InProgressMatchListView(ListView):
     """Vista para listar partidos en curso"""
     template_name = 'matches/MatchesList.html'
@@ -632,7 +631,7 @@ class InProgressMatchListView(ListView):
         return context
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class PostponedMatchListView(ListView):
     """Vista para listar partidos aplazados"""
     template_name = 'matches/MatchesList.html'
@@ -679,7 +678,7 @@ class PostponedMatchListView(ListView):
         return context
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class CancelledMatchListView(ListView):
     """Vista para listar partidos cancelados"""
     template_name = 'matches/MatchesList.html'
@@ -726,7 +725,7 @@ class CancelledMatchListView(ListView):
         return context
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class AllMatchListView(ListView):
     """Vista para listar todos los partidos"""
     template_name = 'matches/MatchesList.html'
@@ -773,7 +772,7 @@ class AllMatchListView(ListView):
         return context
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class MatchBulkDataImportView(View):
     """Vista para importación masiva de todos los datos de partidos"""
     template_name = 'matches/MatchBulkDataImport.html'
@@ -865,7 +864,7 @@ class MatchBulkDataImportView(View):
         return context
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class MatchBulkDataExportView(View):
     """Vista para exportar todos los datos actuales de partidos"""
 
@@ -944,7 +943,7 @@ class MatchBulkDataExportView(View):
         return response
 
 
-@method_decorator([login_required, is_global_admin], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class MatchBulkDataProcessCSVView(View):
     """Vista para procesar el archivo CSV de importación completa"""
 
