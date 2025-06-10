@@ -1,313 +1,248 @@
 {% extends "layout/LayoutBase.html" %}
 {% load i18n %}
-{% load widget_tweaks %}
 
 {% block content %}
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">{% trans "Nueva Estadística de Jugador" %}</h3>
-        </div>
+{% include 'layout/_page-header.html' with title=page_title breadcrumb_items=breadcrumbs %}
 
-        <form method="post">
-          {% csrf_token %}
-          <div class="card-body">
-            <div class="row">
-              <!-- Información Principal -->
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label class="form-label required">{{ form.player.label }}</label>
-                  {{ form.player|add_class:"form-select" }}
-                  {% if form.player.errors %}
-                  <div class="text-danger">{{ form.player.errors.0 }}</div>
-                  {% endif %}
-                  {% if form.player.help_text %}
-                  <div class="form-text">{{ form.player.help_text }}</div>
-                  {% endif %}
-                </div>
+<div class="flex flex-col">
+  <div class="overflow-x-auto">
+    <div class="inline-block min-w-full align-middle">
+      <div class="overflow-hidden shadow">
+        <div class="p-6 bg-white dark:bg-gray-800">
+          <form method="post" action="{% url 'matches:player_stats_create' %}">
+            {% csrf_token %}
 
-                <div class="mb-3">
-                  <div class="form-check">
-                    {{ form.attended }}
-                    <label class="form-check-label" for="{{ form.attended.id_for_label }}">
-                      {{ form.attended.label }}
-                    </label>
-                  </div>
-                  {% if form.attended.errors %}
-                  <div class="text-danger">{{ form.attended.errors.0 }}</div>
-                  {% endif %}
-                  {% if form.attended.help_text %}
-                  <div class="form-text">{{ form.attended.help_text }}</div>
-                  {% endif %}
-                </div>
+            {% if form.errors %}
+            <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800"
+              role="alert">
+              <div class="font-medium">{% trans "Por favor corrige los siguientes errores:" %}</div>
+              <ul class="mt-1.5 ml-4 list-disc list-inside">
+                {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                <li>{{ field|title }}: {{ error }}</li>
+                {% endfor %}
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
 
-                <div class="mb-3">
-                  <label class="form-label required">{{ form.match.label }}</label>
-                  {{ form.match|add_class:"form-select" }}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Información del Partido y Jugador -->
+              <div class="space-y-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{% trans "Información General" %}</h3>
+
+                <!-- Partido -->
+                <div>
+                  <label for="{{ form.match.id_for_label }}"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    {{ form.match.label }}{% if form.match.field.required %}<span
+                      class="text-red-500 ml-1">*</span>{% endif %}
+                  </label>
+                  {{ form.match }}
                   {% if form.match.errors %}
-                  <div class="text-danger">{{ form.match.errors.0 }}</div>
+                  <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ form.match.errors.0 }}</p>
                   {% endif %}
                   {% if form.match.help_text %}
-                  <div class="form-text">{{ form.match.help_text }}</div>
+                  <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ form.match.help_text }}</p>
                   {% endif %}
                 </div>
 
-                <div class="mb-3">
-                  <label class="form-label">{{ form.status.label }}</label>
-                  {{ form.status|add_class:"form-select" }}
+                <!-- Jugador -->
+                <div>
+                  <label for="{{ form.player.id_for_label }}"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    {{ form.player.label }}{% if form.player.field.required %}<span
+                      class="text-red-500 ml-1">*</span>{% endif %}
+                  </label>
+                  {{ form.player }}
+                  {% if form.player.errors %}
+                  <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ form.player.errors.0 }}</p>
+                  {% endif %}
+                  {% if form.player.help_text %}
+                  <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ form.player.help_text }}</p>
+                  {% endif %}
+                </div>
+
+                <!-- Estado -->
+                <div>
+                  <label for="{{ form.status.id_for_label }}"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    {{ form.status.label }}{% if form.status.field.required %}<span
+                      class="text-red-500 ml-1">*</span>{% endif %}
+                  </label>
+                  {{ form.status }}
                   {% if form.status.errors %}
-                  <div class="text-danger">{{ form.status.errors.0 }}</div>
+                  <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ form.status.errors.0 }}</p>
                   {% endif %}
                   {% if form.status.help_text %}
-                  <div class="form-text">{{ form.status.help_text }}</div>
+                  <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ form.status.help_text }}</p>
+                  {% endif %}
+                </div>
+
+                <!-- Asistencia -->
+                <div class="flex items-center">
+                  {{ form.attended }}
+                  <label for="{{ form.attended.id_for_label }}"
+                    class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                    {{ form.attended.label }}
+                  </label>
+                  {% if form.attended.errors %}
+                  <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ form.attended.errors.0 }}</p>
                   {% endif %}
                 </div>
               </div>
 
-              <!-- Tiempo de Juego -->
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label class="form-label">{{ form.minutes_played.label }}</label>
-                  {{ form.minutes_played|add_class:"form-control" }}
+              <!-- Estadísticas de Juego -->
+              <div class="space-y-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{% trans "Estadísticas del Partido" %}
+                </h3>
+
+                <!-- Minutos Jugados -->
+                <div>
+                  <label for="{{ form.minutes_played.id_for_label }}"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    {{ form.minutes_played.label }}
+                  </label>
+                  {{ form.minutes_played }}
                   {% if form.minutes_played.errors %}
-                  <div class="text-danger">{{ form.minutes_played.errors.0 }}</div>
+                  <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ form.minutes_played.errors.0 }}</p>
                   {% endif %}
                   {% if form.minutes_played.help_text %}
-                  <div class="form-text">{{ form.minutes_played.help_text }}</div>
+                  <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ form.minutes_played.help_text }}</p>
                   {% endif %}
                 </div>
 
-                <div class="row">
-                  <div class="col-6">
-                    <div class="mb-3">
-                      <label class="form-label">{{ form.substitution_in.label }}</label>
-                      {{ form.substitution_in|add_class:"form-control" }}
-                      {% if form.substitution_in.errors %}
-                      <div class="text-danger">{{ form.substitution_in.errors.0 }}</div>
-                      {% endif %}
-                    </div>
+                <!-- Goles y Asistencias -->
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label for="{{ form.goals.id_for_label }}"
+                      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                      {{ form.goals.label }}
+                    </label>
+                    {{ form.goals }}
+                    {% if form.goals.errors %}
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ form.goals.errors.0 }}</p>
+                    {% endif %}
                   </div>
-                  <div class="col-6">
-                    <div class="mb-3">
-                      <label class="form-label">{{ form.substitution_out.label }}</label>
-                      {{ form.substitution_out|add_class:"form-control" }}
-                      {% if form.substitution_out.errors %}
-                      <div class="text-danger">{{ form.substitution_out.errors.0 }}</div>
-                      {% endif %}
-                    </div>
+                  <div>
+                    <label for="{{ form.assists.id_for_label }}"
+                      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                      {{ form.assists.label }}
+                    </label>
+                    {{ form.assists }}
+                    {% if form.assists.errors %}
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ form.assists.errors.0 }}</p>
+                    {% endif %}
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <!-- Estadísticas de Rendimiento -->
-            <div class="row mt-4">
-              <div class="col-12">
-                <h5>{% trans "Estadísticas de Rendimiento" %}</h5>
-                <hr>
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col-md-2 col-sm-4 col-6">
-                <div class="mb-3">
-                  <label class="form-label">{{ form.goals.label }}</label>
-                  <div class="input-group">
-                    {{ form.goals|add_class:"form-control" }}
-                    <span class="input-group-text">
-                      <i class="bi bi-trophy text-success"></i>
-                    </span>
+                <!-- Tarjetas -->
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label for="{{ form.yellow_cards.id_for_label }}"
+                      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                      {{ form.yellow_cards.label }}
+                    </label>
+                    {{ form.yellow_cards }}
+                    {% if form.yellow_cards.errors %}
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ form.yellow_cards.errors.0 }}</p>
+                    {% endif %}
                   </div>
-                  {% if form.goals.errors %}
-                  <div class="text-danger">{{ form.goals.errors.0 }}</div>
-                  {% endif %}
+                  <div>
+                    <label for="{{ form.red_cards.id_for_label }}"
+                      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                      {{ form.red_cards.label }}
+                    </label>
+                    {{ form.red_cards }}
+                    {% if form.red_cards.errors %}
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ form.red_cards.errors.0 }}</p>
+                    {% endif %}
+                  </div>
                 </div>
-              </div>
 
-              <div class="col-md-2 col-sm-4 col-6">
-                <div class="mb-3">
-                  <label class="form-label">{{ form.assists.label }}</label>
-                  <div class="input-group">
-                    {{ form.assists|add_class:"form-control" }}
-                    <span class="input-group-text">
-                      <i class="bi bi-hand-thumbs-up text-info"></i>
-                    </span>
-                  </div>
-                  {% if form.assists.errors %}
-                  <div class="text-danger">{{ form.assists.errors.0 }}</div>
-                  {% endif %}
-                </div>
-              </div>
-
-              <div class="col-md-2 col-sm-4 col-6">
-                <div class="mb-3">
-                  <label class="form-label">{{ form.yellow_cards.label }}</label>
-                  <div class="input-group">
-                    {{ form.yellow_cards|add_class:"form-control" }}
-                    <span class="input-group-text">
-                      <i class="bi bi-square-fill text-warning"></i>
-                    </span>
-                  </div>
-                  {% if form.yellow_cards.errors %}
-                  <div class="text-danger">{{ form.yellow_cards.errors.0 }}</div>
-                  {% endif %}
-                </div>
-              </div>
-
-              <div class="col-md-2 col-sm-4 col-6">
-                <div class="mb-3">
-                  <label class="form-label">{{ form.red_cards.label }}</label>
-                  <div class="input-group">
-                    {{ form.red_cards|add_class:"form-control" }}
-                    <span class="input-group-text">
-                      <i class="bi bi-square-fill text-danger"></i>
-                    </span>
-                  </div>
-                  {% if form.red_cards.errors %}
-                  <div class="text-danger">{{ form.red_cards.errors.0 }}</div>
-                  {% endif %}
-                </div>
-              </div>
-
-              <div class="col-md-2 col-sm-4 col-6">
-                <div class="mb-3">
-                  <label class="form-label">{{ form.rating.label }}</label>
-                  <div class="input-group">
-                    {{ form.rating|add_class:"form-control" }}
-                    <span class="input-group-text">
-                      <i class="bi bi-star text-secondary"></i>
-                    </span>
-                  </div>
+                <!-- Calificación -->
+                <div>
+                  <label for="{{ form.rating.id_for_label }}"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    {{ form.rating.label }}
+                  </label>
+                  {{ form.rating }}
                   {% if form.rating.errors %}
-                  <div class="text-danger">{{ form.rating.errors.0 }}</div>
+                  <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ form.rating.errors.0 }}</p>
                   {% endif %}
                   {% if form.rating.help_text %}
-                  <div class="form-text">{{ form.rating.help_text }}</div>
+                  <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ form.rating.help_text }}</p>
                   {% endif %}
                 </div>
               </div>
             </div>
 
-            <!-- Notas de Rendimiento -->
-            <div class="row mt-4">
-              <div class="col-12">
-                <div class="mb-3">
-                  <label class="form-label">{{ form.performance_notes.label }}</label>
-                  {{ form.performance_notes|add_class:"form-control" }}
-                  {% if form.performance_notes.errors %}
-                  <div class="text-danger">{{ form.performance_notes.errors.0 }}</div>
+            <!-- Sustituciones -->
+            <div class="mt-6 space-y-6">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{% trans "Sustituciones" %}</h3>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label for="{{ form.substitution_in.id_for_label }}"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    {{ form.substitution_in.label }}
+                  </label>
+                  {{ form.substitution_in }}
+                  {% if form.substitution_in.errors %}
+                  <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ form.substitution_in.errors.0 }}</p>
                   {% endif %}
-                  {% if form.performance_notes.help_text %}
-                  <div class="form-text">{{ form.performance_notes.help_text }}</div>
+                  {% if form.substitution_in.help_text %}
+                  <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ form.substitution_in.help_text }}</p>
+                  {% endif %}
+                </div>
+                <div>
+                  <label for="{{ form.substitution_out.id_for_label }}"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    {{ form.substitution_out.label }}
+                  </label>
+                  {{ form.substitution_out }}
+                  {% if form.substitution_out.errors %}
+                  <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ form.substitution_out.errors.0 }}</p>
+                  {% endif %}
+                  {% if form.substitution_out.help_text %}
+                  <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ form.substitution_out.help_text }}</p>
                   {% endif %}
                 </div>
               </div>
             </div>
 
-            <!-- Información de Ayuda -->
-            <div class="row mt-4">
-              <div class="col-12">
-                <div class="alert alert-info">
-                  <h6 class="alert-heading">{% trans "Información Importante" %}</h6>
-                  <ul class="mb-0">
-                    <li>
-                      {% trans "Los jugadores de banquillo no pueden tener estadísticas de juego (goles, asistencias, tarjetas, etc.)" %}
-                    </li>
-                    <li>{% trans "Los jugadores con tarjeta roja no pueden tener más de una tarjeta amarilla" %}</li>
-                    <li>{% trans "Los minutos jugados deben estar entre 0 y 120" %}</li>
-                    <li>{% trans "La calificación debe estar entre 0 y 10" %}</li>
-                  </ul>
-                </div>
-              </div>
+            <!-- Notas -->
+            {% if form.notes %}
+            <div class="mt-6">
+              <label for="{{ form.notes.id_for_label }}"
+                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                {{ form.notes.label }}
+              </label>
+              {{ form.notes }}
+              {% if form.notes.errors %}
+              <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ form.notes.errors.0 }}</p>
+              {% endif %}
+              {% if form.notes.help_text %}
+              <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ form.notes.help_text }}</p>
+              {% endif %}
             </div>
-          </div>
+            {% endif %}
 
-          <div class="card-footer">
-            <div class="d-flex justify-content-between">
-              <a href="{% url 'matches:player_stats_list' %}" class="btn btn-secondary">
-                <i class="bi bi-arrow-left"></i>
+            <!-- Botones de Acción -->
+            <div class="flex justify-end space-x-3 mt-8 pt-6 border-t border-gray-200 dark:border-gray-600">
+              <a href="{% url 'matches:player_stats_list' %}"
+                class="px-4 py-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
                 {% trans "Cancelar" %}
               </a>
-              <div>
-                <button type="submit" class="btn btn-primary">
-                  <i class="bi bi-save"></i>
-                  {% trans "Crear Estadística" %}
-                </button>
-              </div>
+              <button type="submit"
+                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                {% trans "Crear Estadística" %}
+              </button>
             </div>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   </div>
 </div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    // Manejar cambios en el estado del jugador
-    const statusField = document.getElementById('id_status');
-    const gameStatsFields = ['id_goals', 'id_assists', 'id_yellow_cards', 'id_red_cards', 'id_minutes_played',
-      'id_rating'
-    ];
-
-    function toggleGameStats() {
-      const isBench = statusField.value === 'bench' || statusField.value === 'not_available';
-
-      gameStatsFields.forEach(fieldId => {
-        const field = document.getElementById(fieldId);
-        if (field) {
-          if (isBench) {
-            field.disabled = true;
-            if (fieldId !== 'id_minutes_played') {
-              field.value = '';
-            }
-            field.style.opacity = '0.5';
-          } else {
-            field.disabled = false;
-            field.style.opacity = '1';
-          }
-        }
-      });
-
-      // Si está en banquillo, poner minutos en 0
-      if (isBench) {
-        const minutesField = document.getElementById('id_minutes_played');
-        if (minutesField) {
-          minutesField.value = '0';
-        }
-      }
-    }
-
-    if (statusField) {
-      statusField.addEventListener('change', toggleGameStats);
-      toggleGameStats(); // Ejecutar al cargar la página
-    }
-
-    // Validación de tarjetas
-    const yellowCards = document.getElementById('id_yellow_cards');
-    const redCards = document.getElementById('id_red_cards');
-
-    function validateCards() {
-      if (yellowCards && redCards) {
-        const yellowValue = parseInt(yellowCards.value) || 0;
-        const redValue = parseInt(redCards.value) || 0;
-
-        if (redValue > 0 && yellowValue > 1) {
-          redCards.setCustomValidity(
-            '{% trans "Un jugador con tarjeta roja no puede tener más de una tarjeta amarilla" %}');
-        } else {
-          redCards.setCustomValidity('');
-        }
-      }
-    }
-
-    if (yellowCards && redCards) {
-      yellowCards.addEventListener('input', validateCards);
-      redCards.addEventListener('input', validateCards);
-    }
-  });
-
-</script>
 {% endblock %}
