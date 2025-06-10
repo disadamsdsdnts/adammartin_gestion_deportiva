@@ -12,7 +12,9 @@ from django.views.generic import (
     DeleteView,
     TemplateView
 )
-from django.db.models import Q, Sum, Avg, Count
+from django.db.models import Q, Sum, Avg, Count, F
+from django.db.models.functions import Concat
+from django.db.models import Value
 from django.views import View
 from django.http import JsonResponse
 from django.db import transaction
@@ -46,6 +48,7 @@ class MatchPlayerStatsListView(ListView):
         queryset = MatchPlayerStats.objects.select_related('match', 'player', 'match__season').order_by('-match__match_date')
 
         # Aplicar filtros
+        from futgoal.matches.forms.match_player_stats_forms import MatchPlayerStatsFilterForm
         form = MatchPlayerStatsFilterForm(self.request.GET)
         if form.is_valid():
             player = form.cleaned_data.get('player')
@@ -56,10 +59,8 @@ class MatchPlayerStatsListView(ListView):
             if player:
                 queryset = queryset.filter(player=player)
 
-            if season == 'active':
-                active_season = Season.get_active()
-                if active_season:
-                    queryset = queryset.filter(match__season=active_season)
+            if season:
+                queryset = queryset.filter(match__season=season)
 
             if min_goals is not None:
                 queryset = queryset.filter(goals__gte=min_goals)
@@ -76,6 +77,7 @@ class MatchPlayerStatsListView(ListView):
             {'title': _('Partidos'), 'url': reverse('matches:match_list')},
             {'title': _('Estadísticas de Jugadores')},
         ]
+        from futgoal.matches.forms.match_player_stats_forms import MatchPlayerStatsFilterForm
         context['filter_form'] = MatchPlayerStatsFilterForm(self.request.GET)
         context['actions'] = [
             {
@@ -225,7 +227,6 @@ class MatchPlayerStatsManageView(View):
             'formset': formset,
             'page_title': f"{_('Gestionar Estadísticas')} - {match}",
             'breadcrumbs': [
-
                 {'title': _('Partidos'), 'url': reverse('matches:match_list')},
                 {'title': str(match), 'url': reverse('matches:match_detail', kwargs={'pk': match.pk})},
                 {'title': _('Gestionar Estadísticas')},
@@ -332,69 +333,98 @@ class MatchPlayerStatsSummaryView(TemplateView):
     template_name = 'matches/player_stats/MatchPlayerStatsSummary.html'
 
     def get_context_data(self, **kwargs):
+        from futgoal.matches.forms.match_player_stats_forms import MatchPlayerStatsFilterForm
+
         context = super().get_context_data(**kwargs)
 
-        # Obtener temporada activa
-        active_season = Season.get_active()
+        # Crear formulario de filtros
+        filter_form = MatchPlayerStatsFilterForm(self.request.GET or None)
 
-        if active_season:
-            # Estadísticas de la temporada actual
-            season_stats = MatchPlayerStats.objects.filter(match__season=active_season)
-        else:
-            # Si no hay temporada activa, usar todas las estadísticas
-            season_stats = MatchPlayerStats.objects.all()
+        # Obtener todas las estadísticas
+        queryset = MatchPlayerStats.objects.select_related('player', 'match', 'match__season')
+
+        # Aplicar filtros si el formulario es válido
+        if filter_form.is_valid():
+            season = filter_form.cleaned_data.get('season')
+            player = filter_form.cleaned_data.get('player')
+            position = filter_form.cleaned_data.get('position')
+
+            if season:
+                queryset = queryset.filter(match__season=season)
+            if player:
+                queryset = queryset.filter(player=player)
+            if position:
+                queryset = queryset.filter(player__position__icontains=position)
+
+        # Estadísticas generales
+        total_players = queryset.values('player').distinct().count()
+        total_matches = queryset.values('match').distinct().count()
+        total_goals = queryset.aggregate(total=Sum('goals'))['total'] or 0
+        total_assists = queryset.aggregate(total=Sum('assists'))['total'] or 0
 
         # Top goleadores
-        top_scorers = season_stats.values('player__first_name', 'player__last_name', 'player__sport_name', 'player__id').annotate(
+        top_scorers = queryset.values(
+            'player__id',
+            'player__first_name',
+            'player__last_name',
+            'player__sport_name',
+            'player__photo'
+        ).annotate(
             total_goals=Sum('goals'),
-            matches_played=Count('match', distinct=True)
+            matches_played=Count('match', distinct=True),
+            full_name=Concat('player__first_name', Value(' '), 'player__last_name')
         ).filter(total_goals__gt=0).order_by('-total_goals')[:10]
 
         # Top asistentes
-        top_assisters = season_stats.values('player__first_name', 'player__last_name', 'player__sport_name', 'player__id').annotate(
+        top_assisters = queryset.values(
+            'player__id',
+            'player__first_name',
+            'player__last_name',
+            'player__sport_name',
+            'player__photo'
+        ).annotate(
             total_assists=Sum('assists'),
-            matches_played=Count('match', distinct=True)
+            matches_played=Count('match', distinct=True),
+            full_name=Concat('player__first_name', Value(' '), 'player__last_name')
         ).filter(total_assists__gt=0).order_by('-total_assists')[:10]
 
-        # Jugadores con más tarjetas
-        most_carded = season_stats.values('player__first_name', 'player__last_name', 'player__sport_name', 'player__id').annotate(
-            total_yellow=Sum('yellow_cards'),
-            total_red=Sum('red_cards'),
-            total_cards=Sum('yellow_cards') + Sum('red_cards'),
-            matches_played=Count('match', distinct=True)
-        ).filter(total_cards__gt=0).order_by('-total_cards')[:10]
-
-        # Jugadores con más minutos
-        most_minutes = season_stats.values('player__first_name', 'player__last_name', 'player__sport_name', 'player__id').annotate(
-            total_minutes=Sum('minutes_played'),
-            matches_played=Count('match', distinct=True),
-            avg_minutes=Avg('minutes_played')
-        ).filter(total_minutes__gt=0).order_by('-total_minutes')[:10]
-
-        # Estadísticas generales
-        total_stats = season_stats.aggregate(
+        # Estadísticas por posición
+        position_stats = queryset.values('player__position').annotate(
+            position=F('player__position'),
+            player_count=Count('player', distinct=True),
+            total_matches=Count('match', distinct=True),
             total_goals=Sum('goals'),
             total_assists=Sum('assists'),
-            total_yellow=Sum('yellow_cards'),
-            total_red=Sum('red_cards'),
-            total_minutes=Sum('minutes_played'),
-            matches_with_stats=Count('match', distinct=True)
-        )
+            avg_goals=Avg('goals'),
+            avg_assists=Avg('assists')
+        ).filter(player_count__gt=0).order_by('-total_goals')
+
+        # Rendimiento por temporada
+        season_stats = queryset.values('match__season__name').annotate(
+            season=F('match__season__name'),
+            total_matches=Count('match', distinct=True),
+            total_goals=Sum('goals'),
+            total_assists=Sum('assists'),
+            avg_goals=Avg('goals'),
+            avg_assists=Avg('assists')
+        ).order_by('-match__season__start_date')
 
         context.update({
             'page_title': _('Resumen de Estadísticas'),
             'breadcrumbs': [
-
                 {'title': _('Partidos'), 'url': reverse('matches:match_list')},
                 {'title': _('Estadísticas'), 'url': reverse('matches:player_stats_list')},
                 {'title': _('Resumen')},
             ],
-            'active_season': active_season,
+            'filter_form': filter_form,
+            'total_players': total_players,
+            'total_matches': total_matches,
+            'total_goals': total_goals,
+            'total_assists': total_assists,
             'top_scorers': top_scorers,
             'top_assisters': top_assisters,
-            'most_carded': most_carded,
-            'most_minutes': most_minutes,
-            'total_stats': total_stats,
+            'position_stats': position_stats,
+            'season_stats': season_stats,
         })
 
         return context
@@ -441,7 +471,6 @@ class PlayerStatsHistoryView(DetailView):
         context.update({
             'page_title': f"{_('Historial de')} {self.object.full_name}",
             'breadcrumbs': [
-
                 {'title': _('Jugadores'), 'url': reverse('players:player_list')},
                 {'title': self.object.full_name, 'url': reverse('players:player_detail', kwargs={'pk': self.object.pk})},
                 {'title': _('Historial de Estadísticas')},
@@ -505,7 +534,6 @@ class MatchPlayerStatsImportView(View):
             'form': form,
             'page_title': _('Importar Estadísticas'),
             'breadcrumbs': [
-
                 {'title': _('Estadísticas'), 'url': reverse('matches:player_stats_list')},
                 {'title': _('Importar')},
             ],

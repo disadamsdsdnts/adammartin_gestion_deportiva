@@ -27,6 +27,20 @@ class MatchPlayerStatsForm(forms.ModelForm):
             'rating',
             'performance_notes'
         ]
+        labels = {
+            'player': _('Jugador'),
+            'attended': _('Asistió'),
+            'status': _('Estado'),
+            'minutes_played': _('Minutos jugados'),
+            'goals': _('Goles'),
+            'assists': _('Asistencias'),
+            'yellow_cards': _('Tarjetas amarillas'),
+            'red_cards': _('Tarjetas rojas'),
+            'substitution_in': _('Minuto de entrada'),
+            'substitution_out': _('Minuto de salida'),
+            'rating': _('Calificación'),
+            'performance_notes': _('Notas de rendimiento')
+        }
         widgets = {
             'player': forms.Select(
                 attrs={
@@ -229,6 +243,16 @@ class MatchPlayerStatsQuickForm(forms.ModelForm):
     class Meta:
         model = MatchPlayerStats
         fields = ['player', 'attended', 'status', 'minutes_played', 'goals', 'assists', 'yellow_cards', 'red_cards']
+        labels = {
+            'player': _('Jugador'),
+            'attended': _('Asistió'),
+            'status': _('Estado'),
+            'minutes_played': _('Minutos jugados'),
+            'goals': _('Goles'),
+            'assists': _('Asistencias'),
+            'yellow_cards': _('Tarjetas amarillas'),
+            'red_cards': _('Tarjetas rojas')
+        }
         widgets = {
             'player': forms.Select(attrs={'class': 'form-control'}),
             'attended': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
@@ -251,22 +275,29 @@ class MatchPlayerStatsFilterForm(forms.Form):
     Formulario para filtrar estadísticas de jugadores
     """
 
+    season = forms.ModelChoiceField(
+        queryset=None,  # Se establecerá en __init__
+        required=False,
+        label=_('Temporada'),
+        empty_label=_('Todas las temporadas'),
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
     player = forms.ModelChoiceField(
         queryset=Player.objects.filter(is_active=True).order_by('first_name', 'last_name'),
         required=False,
+        label=_('Jugador'),
         empty_label=_('Todos los jugadores'),
         widget=forms.Select(attrs={'class': 'form-control'})
     )
 
-    SEASON_CHOICES = [
-        ('', _('Todas las temporadas')),
-        ('active', _('Temporada actual')),
-    ]
-
-    season = forms.ChoiceField(
-        choices=SEASON_CHOICES,
+    position = forms.CharField(
         required=False,
-        widget=forms.Select(attrs={'class': 'form-control'})
+        label=_('Posición'),
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': _('Posición')
+        })
     )
 
     min_goals = forms.IntegerField(
@@ -286,6 +317,14 @@ class MatchPlayerStatsFilterForm(forms.Form):
             'placeholder': _('Asistencias mínimas')
         })
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Importar aquí para evitar importaciones circulares
+        from futgoal.season.models import Season
+
+        # Configurar el queryset de temporadas
+        self.fields['season'].queryset = Season.objects.all().order_by('-start_date')
 
 
 class MatchPlayerStatsImportForm(forms.Form):
