@@ -52,6 +52,7 @@ THIRD_PARTY_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'compressor',
+    'widget_tweaks',
 ]
 
 LOCAL_APPS = [

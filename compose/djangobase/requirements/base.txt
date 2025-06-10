@@ -10,3 +10,4 @@ requests
 django-allauth==0.61.1
 django-compressor
 Pillow
+django-widget-tweaks
