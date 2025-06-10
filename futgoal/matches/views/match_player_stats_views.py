@@ -18,13 +18,17 @@ from django.http import JsonResponse
 from django.db import transaction
 from django.core.paginator import Paginator
 from django.forms import formset_factory
+from datetime import datetime
+from django.utils.dateparse import parse_datetime
+from django.utils import timezone
 
 from futgoal.matches.models import Match, MatchPlayerStats
 from futgoal.matches.forms.match_player_stats_forms import (
     MatchPlayerStatsForm,
     MatchPlayerStatsFormSet,
     MatchPlayerStatsQuickForm,
-    MatchPlayerStatsFilterForm
+    MatchPlayerStatsFilterForm,
+    MatchPlayerStatsImportForm
 )
 from futgoal.players.models import Player
 from futgoal.season.models import Season
@@ -492,3 +496,439 @@ class MatchPlayerStatsQuickAddView(View):
             return JsonResponse({'success': False, 'error': _('Partido o jugador no encontrado')})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
+
+
+@method_decorator([login_required], name='dispatch')
+class MatchPlayerStatsImportView(View):
+    """Vista para importar estadísticas de jugadores desde CSV"""
+    template_name = 'matches/player_stats/MatchPlayerStatsImport.html'
+
+    def get(self, request, *args, **kwargs):
+        """Mostrar formulario de importación"""
+        form = MatchPlayerStatsImportForm()
+        context = {
+            'form': form,
+            'page_title': _('Importar Estadísticas'),
+            'breadcrumbs': [
+                {'title': _('Dashboard'), 'url': reverse('dashboard')},
+                {'title': _('Estadísticas'), 'url': reverse('matches:player_stats_list')},
+                {'title': _('Importar')},
+            ],
+        }
+        return render(request, self.template_name, context)
+
+
+@method_decorator([login_required], name='dispatch')
+class MatchPlayerStatsImportCSVTemplateView(View):
+    """Vista para descargar plantilla CSV de importación de estadísticas"""
+
+    def get(self, request, *args, **kwargs):
+        """Generar y descargar plantilla CSV"""
+        from django.http import HttpResponse
+        import csv
+
+        response = HttpResponse(content_type='text/csv; charset=utf-8')
+        response['Content-Disposition'] = 'attachment; filename="plantilla_estadisticas_jugadores.csv"'
+
+        # Añadir BOM para Excel
+        response.write('\ufeff')
+
+        writer = csv.writer(response)
+
+        # Escribir headers basados en el CSV proporcionado
+        writer.writerow([
+            'Rival',
+            'Fecha y hora',
+            'Nombre',
+            'Apellidos',
+            'Goles',
+            'Tarjetas rojas',
+            'Tarjetas amarillas'
+        ])
+
+        # Escribir algunas filas de ejemplo
+        writer.writerow([
+            'LA POSTA CARCHUNA-CALAHONDA',
+            '15-09-2024 09:00',
+            'MARIO',
+            'JURADO CASAS',
+            '1',
+            '0',
+            '0'
+        ])
+        writer.writerow([
+            'BARCELONA FC',
+            '22-09-2024 16:30',
+            'JUAN',
+            'PÉREZ GARCÍA',
+            '2',
+            '0',
+            '1'
+        ])
+        writer.writerow([
+            'REAL MADRID',
+            '29-09-2024 20:00',
+            'CARLOS',
+            'MARTÍN LÓPEZ',
+            '0',
+            '1',
+            '0'
+        ])
+
+        return response
+
+
+@method_decorator([login_required], name='dispatch')
+class MatchPlayerStatsProcessCSVView(View):
+    """Vista para procesar archivo CSV de estadísticas"""
+
+    def post(self, request, *args, **kwargs):
+        """Procesar archivo CSV y devolver datos para previsualización"""
+        import csv
+        import io
+        from datetime import datetime
+        from django.utils import timezone
+        from zoneinfo import ZoneInfo
+
+        # Configurar timezone de Madrid usando zoneinfo (Python 3.9+)
+        madrid_tz = ZoneInfo('Europe/Madrid')
+
+        # Obtener archivos CSV (puede ser uno o varios)
+        csv_files = request.FILES.getlist('csv_files')
+        if not csv_files:
+            # Compatibilidad con version anterior de un solo archivo
+            csv_file = request.FILES.get('csv_file')
+            if csv_file:
+                csv_files = [csv_file]
+            else:
+                return JsonResponse({'success': False, 'error': _('No se seleccionó ningún archivo')})
+
+        try:
+            all_stats_to_process = []
+            all_errors = []
+            total_files_processed = 0
+
+            for file_index, csv_file in enumerate(csv_files):
+                file_name = csv_file.name
+
+                # Validar tamaño del archivo
+                if csv_file.size > 5 * 1024 * 1024:  # 5MB
+                    all_errors.append(f"Archivo '{file_name}': Archivo demasiado grande (máximo 5MB)")
+                    continue
+
+                try:
+                    # Leer el archivo CSV
+                    decoded_file = csv_file.read().decode('utf-8-sig')  # utf-8-sig para manejar BOM
+                    csv_data = csv.DictReader(io.StringIO(decoded_file))
+
+                    stats_to_process = []
+                    file_errors = []
+                    row_number = 1  # Empezar desde 1 (header no cuenta)
+
+                    for row in csv_data:
+                        row_number += 1
+                        row_errors = []
+
+                        # Limpiar datos
+                        rival_name = row.get('Rival', '').strip()
+                        fecha_hora = row.get('Fecha y hora', '').strip()
+                        nombre_jugador = row.get('Nombre', '').strip()
+                        apellidos_jugador = row.get('Apellidos', '').strip()
+                        goles = row.get('Goles', '0').strip()
+                        tarjetas_rojas = row.get('Tarjetas rojas', '0').strip()
+                        tarjetas_amarillas = row.get('Tarjetas amarillas', '0').strip()
+
+                        # Validaciones básicas
+                        if not rival_name:
+                            row_errors.append(_('El nombre del rival es obligatorio'))
+
+                        if not fecha_hora:
+                            row_errors.append(_('La fecha y hora es obligatoria'))
+                        else:
+                            # Intentar parsear fecha en formato DD-MM-YYYY HH:MM
+                            try:
+                                # Convertir formato DD-MM-YYYY HH:MM a datetime
+                                parsed_date = datetime.strptime(fecha_hora, '%d-%m-%Y %H:%M')
+                                # Hacer timezone aware
+                                parsed_date = timezone.make_aware(parsed_date, madrid_tz)
+                            except ValueError:
+                                row_errors.append(_('Formato de fecha inválido. Use DD-MM-YYYY HH:MM (ej: 15-09-2024 09:00)'))
+                                parsed_date = None
+
+                        if not nombre_jugador:
+                            row_errors.append(_('El nombre del jugador es obligatorio'))
+
+                        if not apellidos_jugador:
+                            row_errors.append(_('Los apellidos del jugador son obligatorios'))
+
+                        # Validar números
+                        try:
+                            goles_int = int(goles) if goles else 0
+                            if goles_int < 0 or goles_int > 20:
+                                row_errors.append(_('Goles debe estar entre 0 y 20'))
+                        except ValueError:
+                            row_errors.append(_('Goles debe ser un número válido'))
+                            goles_int = 0
+
+                        try:
+                            rojas_int = int(tarjetas_rojas) if tarjetas_rojas else 0
+                            if rojas_int < 0 or rojas_int > 1:
+                                row_errors.append(_('Tarjetas rojas debe estar entre 0 y 1'))
+                        except ValueError:
+                            row_errors.append(_('Tarjetas rojas debe ser un número válido'))
+                            rojas_int = 0
+
+                        try:
+                            amarillas_int = int(tarjetas_amarillas) if tarjetas_amarillas else 0
+                            if amarillas_int < 0 or amarillas_int > 2:
+                                row_errors.append(_('Tarjetas amarillas debe estar entre 0 y 2'))
+                        except ValueError:
+                            row_errors.append(_('Tarjetas amarillas debe ser un número válido'))
+                            amarillas_int = 0
+
+                        if row_errors:
+                            # Prefijo con nombre de archivo para identificar el origen del error
+                            prefixed_errors = [f"Archivo '{file_name}' - Fila {row_number}: {error}" for error in row_errors]
+                            file_errors.extend(prefixed_errors)
+                            continue
+
+                        # Crear objeto de datos para procesamiento
+                        stat_data = {
+                            'rival_name': rival_name,
+                            'match_date': parsed_date,
+                            'player_name': nombre_jugador,
+                            'player_lastname': apellidos_jugador,
+                            'goals': goles_int,
+                            'red_cards': rojas_int,
+                            'yellow_cards': amarillas_int,
+                            'assists': 0,  # No viene en CSV, valor por defecto
+                            'minutes_played': 90,  # Valor por defecto
+                            'status': 'starter',  # Valor por defecto
+                            'attended': True,  # Valor por defecto
+                            'source_file': file_name,  # Agregar información del archivo fuente
+                        }
+
+                        # Agregar datos formateados para mostrar en la tabla
+                        stat_data['display'] = {
+                            'rival_name': rival_name,
+                            'match_date': parsed_date.strftime('%d/%m/%Y %H:%M') if parsed_date else fecha_hora,
+                            'player_full_name': f"{nombre_jugador} {apellidos_jugador}",
+                            'goals': str(goles_int),
+                            'red_cards': str(rojas_int),
+                            'yellow_cards': str(amarillas_int),
+                            'source_file': file_name,
+                        }
+
+                        stats_to_process.append(stat_data)
+
+                    # Agregar estadísticas de este archivo a la lista total
+                    all_stats_to_process.extend(stats_to_process)
+                    all_errors.extend(file_errors)
+                    total_files_processed += 1
+
+                except Exception as e:
+                    all_errors.append(f"Error procesando archivo '{file_name}': {str(e)}")
+
+            if all_errors:
+                return JsonResponse({
+                    'success': False,
+                    'validation_errors': all_errors
+                })
+
+            return JsonResponse({
+                'success': True,
+                'stats': all_stats_to_process,
+                'total_stats': len(all_stats_to_process),
+                'files_processed': total_files_processed,
+                'total_files': len(csv_files)
+            })
+
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': _('Error interno del servidor: %(error)s') % {'error': str(e)}
+            })
+
+
+@method_decorator([login_required], name='dispatch')
+class MatchPlayerStatsImportExecuteView(View):
+    """Vista para ejecutar la importación final de estadísticas"""
+
+    def post(self, request, *args, **kwargs):
+        """Ejecutar la importación de estadísticas"""
+        import json
+        from datetime import datetime
+        from django.utils import timezone
+        from django.db import transaction
+        from futgoal.season.models import Season
+        from futgoal.rivals.models import Rival
+        from futgoal.team.models import Team
+        from futgoal.players.models import Player
+
+        try:
+            # Obtener los datos procesados del POST
+            stats_data = json.loads(request.POST.get('stats_data', '[]'))
+
+            if not stats_data:
+                return JsonResponse({'success': False, 'error': _('No hay datos para procesar')})
+
+            created_count = 0
+            updated_count = 0
+            errors = []
+
+            # Obtener temporada activa y equipo local
+            active_season = Season.get_active()
+            if not active_season:
+                return JsonResponse({'success': False, 'error': _('No hay una temporada activa')})
+
+            local_team = Team.objects.first()
+            if not local_team:
+                return JsonResponse({'success': False, 'error': _('No hay un equipo configurado')})
+
+            with transaction.atomic():
+                for stat_data in stats_data:
+                    try:
+                        # Buscar o crear rival
+                        rival, _ = Rival.objects.get_or_create(
+                            name=stat_data['rival_name'],
+                            defaults={'seasons': [active_season.id] if active_season else []}
+                        )
+
+                        # Buscar o crear partido
+                        # La fecha viene serializada como string ISO desde JSON
+                        try:
+                            if isinstance(stat_data['match_date'], str):
+                                # Parsear fecha ISO string
+                                match_date = parse_datetime(stat_data['match_date'])
+                                if not match_date:
+                                    # Fallback: intentar con fromisoformat
+                                    match_date = datetime.fromisoformat(stat_data['match_date'].replace('Z', '+00:00'))
+                            else:
+                                # Si viene como datetime objeto, usarlo directamente
+                                match_date = stat_data['match_date']
+
+                            # Asegurarse de que sea timezone-aware
+                            if match_date and timezone.is_naive(match_date):
+                                match_date = timezone.make_aware(match_date)
+
+                        except (ValueError, TypeError) as e:
+                            errors.append(f"Error parseando fecha para {stat_data['rival_name']}: {str(e)}")
+                            continue
+
+                        match, match_created = Match.objects.get_or_create(
+                            home_team=local_team,
+                            away_team=rival,
+                            match_date=match_date,
+                            defaults={
+                                'season': active_season,
+                                'match_type': 'friendly',
+                                'status': 'finished',
+                                'venue': '',
+                                'is_home': True,
+                            }
+                        )
+
+                        # Buscar jugador por nombre y apellidos
+                        try:
+                            player = Player.objects.get(
+                                first_name__iexact=stat_data['player_name'],
+                                last_name__iexact=stat_data['player_lastname']
+                            )
+                        except Player.DoesNotExist:
+                            # Verificar si son nombres genéricos/placeholder antes de crear
+                            player_name = stat_data['player_name'].strip().lower()
+                            player_lastname = stat_data['player_lastname'].strip().lower()
+
+                            # Lista de nombres/apellidos genéricos que no deberían crear jugadores
+                            generic_names = [
+                                'nombre faltante', 'apellidos faltantes', 'apellido faltante',
+                                'sin nombre', 'sin apellido', 'sin apellidos',
+                                'nombre', 'apellido', 'apellidos',
+                                'player', 'jugador', 'desconocido', 'unknown',
+                                'n/a', 'na', 'null', 'none', 'vacio', 'vacío',
+                                'test', 'prueba', 'ejemplo', 'sample'
+                            ]
+
+                            # Verificar si algún campo contiene nombres genéricos
+                            is_generic = any(
+                                generic in player_name or generic in player_lastname
+                                for generic in generic_names
+                            )
+
+                            # También verificar si son solo espacios, números o muy cortos
+                            is_invalid = (
+                                len(player_name.strip()) < 2 or
+                                len(player_lastname.strip()) < 2 or
+                                player_name.strip().isdigit() or
+                                player_lastname.strip().isdigit()
+                            )
+
+                            if is_generic or is_invalid:
+                                errors.append(f"Jugador {stat_data['player_name']} {stat_data['player_lastname']} no encontrado (nombre genérico o inválido)")
+                                continue
+
+                            # Crear jugador automáticamente si tiene nombres reales
+                            try:
+                                player = Player.objects.create(
+                                    first_name=stat_data['player_name'].strip().title(),
+                                    last_name=stat_data['player_lastname'].strip().title(),
+                                    is_active=True,
+                                    # Todos los demás campos son opcionales según el modelo
+                                )
+                                errors.append(f"✓ Jugador {player.first_name} {player.last_name} creado automáticamente")
+                            except Exception as create_error:
+                                errors.append(f"Error creando jugador {stat_data['player_name']} {stat_data['player_lastname']}: {str(create_error)}")
+                                continue
+
+                        except Player.MultipleObjectsReturned:
+                            # Si hay múltiples jugadores con el mismo nombre, tomar el primero activo
+                            player = Player.objects.filter(
+                                first_name__iexact=stat_data['player_name'],
+                                last_name__iexact=stat_data['player_lastname'],
+                                is_active=True
+                            ).first()
+                            if not player:
+                                errors.append(f"Múltiples jugadores encontrados para {stat_data['player_name']} {stat_data['player_lastname']}")
+                                continue
+
+                        # Crear o actualizar estadísticas
+                        stats, stats_created = MatchPlayerStats.objects.update_or_create(
+                            match=match,
+                            player=player,
+                            defaults={
+                                'goals': stat_data['goals'],
+                                'assists': stat_data.get('assists', 0),
+                                'yellow_cards': stat_data['yellow_cards'],
+                                'red_cards': stat_data['red_cards'],
+                                'minutes_played': stat_data.get('minutes_played', 90),
+                                'status': stat_data.get('status', 'starter'),
+                                'attended': stat_data.get('attended', True),
+                            }
+                        )
+
+                        if stats_created:
+                            created_count += 1
+                        else:
+                            updated_count += 1
+
+                    except Exception as e:
+                        errors.append(f"Error procesando estadística: {str(e)}")
+
+            # Preparar respuesta
+            result = {
+                'success': True,
+                'created_count': created_count,
+                'updated_count': updated_count,
+                'total_processed': created_count + updated_count,
+            }
+
+            if errors:
+                result['warnings'] = errors
+
+            return JsonResponse(result)
+
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': _('Error interno del servidor: %(error)s') % {'error': str(e)}
+            })

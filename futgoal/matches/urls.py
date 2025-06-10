@@ -41,4 +41,10 @@ urlpatterns = [
     path('player-stats/summary/', match_player_stats_views.MatchPlayerStatsSummaryView.as_view(), name='player_stats_summary'),
     path('<int:match_id>/player-stats/manage/', match_player_stats_views.MatchPlayerStatsManageView.as_view(), name='player_stats_manage'),
     path('player-stats/quick-add/', match_player_stats_views.MatchPlayerStatsQuickAddView.as_view(), name='player_stats_quick_add'),
+
+    # Player Stats Import URLs
+    path('player-stats/import/', match_player_stats_views.MatchPlayerStatsImportView.as_view(), name='player_stats_import'),
+    path('player-stats/import/csv-template/', match_player_stats_views.MatchPlayerStatsImportCSVTemplateView.as_view(), name='player_stats_import_csv_template'),
+    path('player-stats/import/process-csv/', match_player_stats_views.MatchPlayerStatsProcessCSVView.as_view(), name='player_stats_process_csv'),
+    path('player-stats/import/execute/', match_player_stats_views.MatchPlayerStatsImportExecuteView.as_view(), name='player_stats_import_execute'),
 ]

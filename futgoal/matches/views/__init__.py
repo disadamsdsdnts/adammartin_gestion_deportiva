@@ -35,6 +35,10 @@ from .match_player_stats_views import (
     MatchPlayerStatsSummaryView,
     PlayerStatsHistoryView,
     MatchPlayerStatsQuickAddView,
+    MatchPlayerStatsImportView,
+    MatchPlayerStatsImportCSVTemplateView,
+    MatchPlayerStatsProcessCSVView,
+    MatchPlayerStatsImportExecuteView,
 )
 
 __all__ = [
@@ -72,4 +76,8 @@ __all__ = [
     'MatchPlayerStatsSummaryView',
     'PlayerStatsHistoryView',
     'MatchPlayerStatsQuickAddView',
+    'MatchPlayerStatsImportView',
+    'MatchPlayerStatsImportCSVTemplateView',
+    'MatchPlayerStatsProcessCSVView',
+    'MatchPlayerStatsImportExecuteView',
 ]
