@@ -83,7 +83,7 @@ class User(AbstractUser):
 
     @property
     def magic_login_link(self):
-        return f"https://futgoal.baeticadigital.com/es/auth/loginwithuuid/{self.uuid}/"
+        return f"https://futgoal.adammartin.es/es/auth/loginwithuuid/{self.uuid}/"
 
     def save(self, *args, **kwargs):
         if self.uuid is None:
