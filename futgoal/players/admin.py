@@ -27,23 +27,23 @@ class PlayerAdmin(admin.ModelAdmin):
     get_phone.admin_order_field = 'phone'
 
     list_display = ('get_full_name', 'get_sport_name', 'get_identity_document', 'email', 'get_phone', 'position', 'country', 'is_active')
-    list_filter = ('is_active', 'position', 'country')
+    list_filter = ('is_active', 'position', 'country', 'birth_date')
     search_fields = ('first_name', 'last_name', 'sport_name', 'identity_document', 'email', 'phone')
     fieldsets = (
         (_('Información personal'), {
             'fields': (
-                'first_name', 'last_name', 'identity_document', 'sport_name',
+                'first_name', 'last_name', 'birth_date', 'identity_document', 'sport_name',
                 'email', 'phone', 'photo'
             )
         }),
         (_('Dirección'), {
             'fields': (
-                'address', 'city', 'municipality', 'postal_code'
+                'address', 'city', 'municipality', 'postal_code', 'region'
             )
         }),
         (_('Información deportiva'), {
             'fields': (
-                'position', 'country'
+                'position', 'dorsal', 'country'
             )
         }),
         (_('Estado'), {
