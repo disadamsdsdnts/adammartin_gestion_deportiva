@@ -62,8 +62,7 @@
                   class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Documento de identidad' %}</label>
                 <input type="text" name="{{ form.identity_document.name }}"
                   id="{{ form.identity_document.id_for_label }}" value="{{ form.identity_document.value|default:'' }}"
-                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  required />
+                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" />
                 {% if form.identity_document.errors %}
                 <p class="mt-2 text-sm text-red-600">{{ form.identity_document.errors.0 }}</p>
                 {% endif %}
@@ -83,8 +82,7 @@
                   class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Email' %}</label>
                 <input type="email" name="{{ form.email.name }}" id="{{ form.email.id_for_label }}"
                   value="{{ form.email.value|default:'' }}"
-                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  required />
+                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" />
                 {% if form.email.errors %}
                 <p class="mt-2 text-sm text-red-600">{{ form.email.errors.0 }}</p>
                 {% endif %}
@@ -94,8 +92,7 @@
                   class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans 'Teléfono' %}</label>
                 <input type="tel" name="{{ form.phone.name }}" id="{{ form.phone.id_for_label }}"
                   value="{{ form.phone.value|default:'' }}"
-                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  required />
+                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" />
                 {% if form.phone.errors %}
                 <p class="mt-2 text-sm text-red-600">{{ form.phone.errors.0 }}</p>
                 {% endif %}
